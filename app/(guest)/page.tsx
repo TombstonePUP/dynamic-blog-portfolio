@@ -8,7 +8,7 @@ const blogPosts = [
     image: "https://strengthswriter.com/wp-content/uploads/2025/08/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1.png",
     author: "Ian",
     date: "August 13, 2025",
-    tags: ["Latest","Featured", "What's your worry?"],
+    tags: ["Latest", "Featured", "What's your worry?"],
     excerpt: "Beshie, napansin mo ba lately? Si officemate na dati’y laging naka-high heels at full glam, ngayon naka-crocs at hoodie na lang. Si Kuya na laging masayahin, bigla na lang naging parang background music—present pero hindi mo maramdaman. Grabe, baka hindi lang sila pagod… Quiet cracking na yan. Oo besh, hindi lang ito quiet quitting na petiks lang sa trabaho. Iba ito. Mas malala. Ito yung “I’m fine” pero sa totoo lang, “I’m barely holding it together”",
     comments: "No Comments",
   },
@@ -169,38 +169,72 @@ function SocialIcon({ social }: { social: typeof socials[0] }) {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen font-sans bg-white">
+    <div className="min-h-screen font-sans bg-[#FAF9F6] space-y-6">
+      <section className="max-w-5xl mx-auto pt-4">
+        <Link key={blogPosts[0].id} href={blogPosts[0].href} className="group flex flex-col bg-white overflow-hidden transition justify-between">
+          <div className="overflow-hidden relative">
+            <img
+              src={blogPosts[0].image}
+              alt={blogPosts[0].title}
+              className="w-full h-130 object-cover group-hover:scale-101 transition duration-300"
+            />
+            <div className="absolute top-4 left-4 z-10 flex gap-2">
+              <span className="flex items-center text-xs bg-green-700/80 p-2 text-white  mb-2">
+                Latest
+              </span>
+              <span className="flex items-center text-xs bg-blue-700/80 p-2 text-white  mb-2">
+                {blogPosts[0].tags[1]}
+              </span>
+            </div>
+          </div>
 
-      {/* FEATURED POSTS */}
-      <section id="featured" className="py-4 px-4 scroll-mt-4">
-        <div className="max-w-5xl mx-auto">
-          <Link key={blogPosts[0].id} href={blogPosts[0].href} className="group flex flex-col bg-[#f4f4f4] overflow-hidden transition justify-between">
-            <div className="overflow-hidden relative">
+          <span className="p-6 pb-2 space-y-2">
+            <h4 className="text-2xl font-bold tracking-wide text-neutral-800 leading-snug">
+              {blogPosts[0].title}
+            </h4>
+            <p className="text-sm text-neutral-600 leading-relaxed mb-4 line-clamp-1">{blogPosts[0].excerpt}</p>
+          </span>
+
+        </Link>
+      </section>
+
+      <section className="max-w-5xl mx-auto pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {blogPosts.map((post) => (
+          <Link
+            key={post.id}
+            href={post.href}
+            className="group flex flex-col gap-4 bg-white overflow-hidden transition p-8"
+          >
+            <div className="overflow-hidden">
               <img
-                src={blogPosts[0].image}
-                alt={blogPosts[0].title}
-                className="w-full h-130 object-cover group-hover:scale-101 transition duration-300"
+                src={post.image}
+                alt={post.title}
+                className="w-full h-34 object-cover group-hover:scale-105 transition duration-300"
               />
-              <div className="absolute top-4 left-4 z-10 flex gap-2">
-                <span className="flex items-center text-xs bg-green-700/80 p-2 text-white  mb-2">
-                  Latest
-                </span>
-                <span className="flex items-center text-xs bg-blue-700/80 p-2 text-white  mb-2">
-                  {blogPosts[0].tags[1]}
-                </span>
-              </div>
             </div>
 
-            <span className="p-6 pb-2 space-y-2">
-              <h4 className="text-2xl font-bold tracking-wide text-neutral-800 leading-snug">
-                {blogPosts[0].title}
+            <div>
+              <h4
+                className="font-bold text-base uppercase tracking-wide text-neutral-900 leading-snug mb-2 group-hover:text-blue-700 transition"
+              >
+                {post.title}
               </h4>
-              <p className="text-sm text-neutral-600 leading-relaxed mb-4 line-clamp-1">{blogPosts[0].excerpt}</p>
-            </span>
 
+              <p className="text-sm text-neutral-600 leading-relaxed line-clamp-3">
+                {post.excerpt}
+              </p>
+            </div>
           </Link>
+        ))}
+
+        {/* PAGINATION */}
+        <div className="md:col-span-2 flex items-center gap-2 mt-4">
+          <span className="px-3 py-1 bg-blue-700 text-white text-sm rounded">1</span>
+          <Link href="#" className="px-3 py-1 border border-neutral-300 text-sm rounded hover:bg-neutral-100 transition">2</Link>
+          <Link href="#" className="px-3 py-1 border border-neutral-300 text-sm rounded hover:bg-neutral-100 transition">Next »</Link>
         </div>
       </section>
+
 
       {/* BLOG + SIDEBAR */}
       <section className="max-w-6xl mx-auto px-4 py-12">
