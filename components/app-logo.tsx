@@ -22,13 +22,13 @@ export function LogoIcon({ className = "" }: Props) {
 export function LogoText({ className = "" }: Props) {
   return (
     <Link href="/" className={`flex leading-none ${className}`}>
-      <span>the</span>
+      <span className="text-[#393E46]">the</span>
 
       <span>
         <span className="font-bold text-black">Strengths</span>
       </span>
 
-      <span>Writer</span>
+      <span className="text-[#393E46]">Writer</span>
     </Link>
   );
 }

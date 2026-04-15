@@ -1,26 +1,5 @@
 import Link from "next/link";
 
-const featuredPosts = [
-  {
-    id: 1,
-    title: "Tahimik Pero Wasak: Beshie, Quiet Cracking Na Yan!",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2025/08/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1.png",
-  },
-  {
-    id: 2,
-    title: "Career Search: A Guide for Graduates of the Class of 2023",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2023/06/Blog_1.jpg",
-  },
-  {
-    id: 3,
-    title: "The A to Z of Positive Parenting",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2021/02/Blog-Post-6a.jpg",
-  },
-];
-
 const blogPosts = [
   {
     id: 1,
@@ -29,8 +8,8 @@ const blogPosts = [
     image: "https://strengthswriter.com/wp-content/uploads/2025/08/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1.png",
     author: "Ian",
     date: "August 13, 2025",
-    categories: ["Featured", "What's your worry?"],
-    excerpt: "Beshie, napansin mo ba lately? Si officemate na dati'y laging naka-high heels at full glam, ngayon naka-crocs at",
+    tags: ["Latest","Featured", "What's your worry?"],
+    excerpt: "Beshie, napansin mo ba lately? Si officemate na dati’y laging naka-high heels at full glam, ngayon naka-crocs at hoodie na lang. Si Kuya na laging masayahin, bigla na lang naging parang background music—present pero hindi mo maramdaman. Grabe, baka hindi lang sila pagod… Quiet cracking na yan. Oo besh, hindi lang ito quiet quitting na petiks lang sa trabaho. Iba ito. Mas malala. Ito yung “I’m fine” pero sa totoo lang, “I’m barely holding it together”",
     comments: "No Comments",
   },
   {
@@ -40,7 +19,7 @@ const blogPosts = [
     image: "https://strengthswriter.com/wp-content/uploads/2023/06/Blog_1.jpg",
     author: "Ian",
     date: "June 30, 2023",
-    categories: ["Featured"],
+    tags: ["Featured"],
     excerpt: "Congratulations to the Class of 2023 graduates! As you transition from the academic world to professional opportunities, it",
     comments: "No Comments",
   },
@@ -51,7 +30,7 @@ const blogPosts = [
     image: "https://strengthswriter.com/wp-content/uploads/2021/02/Blog-Post-6a.jpg",
     author: "Ian",
     date: "May 1, 2021",
-    categories: ["Featured"],
+    tags: ["Featured"],
     excerpt: "The quarantine measures this pandemic is an opportunity for parents to relate with their children. Staying at home",
     comments: "No Comments",
   },
@@ -62,7 +41,7 @@ const blogPosts = [
     image: "https://strengthswriter.com/wp-content/uploads/2021/02/Positive-Strengths.jpg",
     author: "Ian",
     date: "February 10, 2021",
-    categories: ["Personal blog", "Why positive psychology?"],
+    tags: ["Personal blog", "Why positive psychology?"],
     excerpt: "In a world that often focuses on problems, challenges, and deficiencies positive psychology provides revitalizing perspective by emphasizing",
     comments: "31 Comments",
   },
@@ -73,7 +52,7 @@ const blogPosts = [
     image: "https://strengthswriter.com/wp-content/uploads/2021/01/144040220_1034879487001599_8417849835091764025_n.jpg",
     author: "Ian",
     date: "February 4, 2021",
-    categories: ["Featured", "What's your worry?"],
+    tags: ["Featured", "What's your worry?"],
     excerpt: "Bes, sa buhay minsan hindi maiwasan na nawawalan tayo ng tiwala sa atin sarili. Minsan o madalas ay",
     comments: "No Comments",
   },
@@ -84,7 +63,7 @@ const blogPosts = [
     image: "https://strengthswriter.com/wp-content/uploads/2021/01/Wearing-is-caring-blog-1.jpg",
     author: "Ian",
     date: "January 25, 2021",
-    categories: ["Featured", "What's your worry?"],
+    tags: ["Featured", "What's your worry?"],
     excerpt: "Halos sampung buwan na tayo nasa quarantine measures para mapigilan ang patuloy na paglaganap ng coronavirus. Habang ang",
     comments: "No Comments",
   },
@@ -190,34 +169,36 @@ function SocialIcon({ social }: { social: typeof socials[0] }) {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen font-sans bg-white">
 
       {/* FEATURED POSTS */}
-      <section id="featured" className="bg-neutral-100 py-12 px-4 scroll-mt-4">
+      <section id="featured" className="py-4 px-4 scroll-mt-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-center text-2xl font-bold tracking-widest text-neutral-800 mb-2">
-            FEATURED
-          </h2>
-          <div className="w-16 h-px bg-neutral-400 mx-auto mb-8" />
+          <Link key={blogPosts[0].id} href={blogPosts[0].href} className="group flex flex-col bg-[#f4f4f4] overflow-hidden transition justify-between">
+            <div className="overflow-hidden relative">
+              <img
+                src={blogPosts[0].image}
+                alt={blogPosts[0].title}
+                className="w-full h-130 object-cover group-hover:scale-101 transition duration-300"
+              />
+              <div className="absolute top-4 left-4 z-10 flex gap-2">
+                <span className="flex items-center text-xs bg-green-700/80 p-2 text-white  mb-2">
+                  Latest
+                </span>
+                <span className="flex items-center text-xs bg-blue-700/80 p-2 text-white  mb-2">
+                  {blogPosts[0].tags[1]}
+                </span>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredPosts.map((post) => (
-              <Link key={post.id} href={post.href} className="group block bg-white rounded overflow-hidden shadow-sm hover:shadow-md transition">
-                <div className="overflow-hidden">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-44 object-cover group-hover:scale-105 transition duration-300"
-                  />
-                </div>
-                <div className="p-4">
-                  <h4 className="text-center text-sm font-semibold tracking-wide text-neutral-800 uppercase leading-snug">
-                    {post.title}
-                  </h4>
-                </div>
-              </Link>
-            ))}
-          </div>
+            <span className="p-6 pb-2 space-y-2">
+              <h4 className="text-2xl font-bold tracking-wide text-neutral-800 leading-snug">
+                {blogPosts[0].title}
+              </h4>
+              <p className="text-sm text-neutral-600 leading-relaxed mb-4 line-clamp-1">{blogPosts[0].excerpt}</p>
+            </span>
+
+          </Link>
         </div>
       </section>
 
@@ -248,7 +229,7 @@ export default function LandingPage() {
                   <div className="flex flex-wrap gap-x-3 text-xs text-neutral-500 mb-3">
                     <span>👤 {post.author}</span>
                     <span>📅 {post.date}</span>
-                    <span>🏷 {post.categories.join(", ")}</span>
+                    <span>🏷 {post.tags.join(", ")}</span>
                     <span>💬 {post.comments}</span>
                   </div>
                   <p className="text-sm text-neutral-600 leading-relaxed mb-4">{post.excerpt}</p>
