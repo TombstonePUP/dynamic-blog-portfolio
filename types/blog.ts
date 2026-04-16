@@ -1,0 +1,31 @@
+export type Tag =
+  | "featured"
+  | "latest"
+  | "movie Review"
+  | "personal blog"
+  | "what's your worry?"
+  | "why positive psychology?";
+
+export interface Author {
+  name: string;
+  slug: string;
+}
+
+export interface Blog {
+  id: number;
+  slug: string;
+  title: string;
+  href: string;
+  /** Full-size image URL */
+  image: string;
+  /** Thumbnail image URL (150x150) */
+  thumbnail: string;
+  author: Author;
+  /** ISO 8601 date string e.g. "2025-08-13" */
+  date: string;
+  /** Human-readable date e.g. "August 13, 2025" */
+  dateLabel: string;
+  tags: Tag[];
+  excerpt: string;
+  commentCount: number;
+}

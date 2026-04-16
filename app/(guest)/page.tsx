@@ -1,119 +1,5 @@
+import { ALL_TAGS, blogs } from "@/data/blog";
 import Link from "next/link";
-
-const blogPosts = [
-  {
-    id: 1,
-    title: "Tahimik Pero Wasak: Beshie, Quiet Cracking Na Yan!",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2025/08/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1.png",
-    author: "Ian",
-    date: "August 13, 2025",
-    tags: ["Latest", "Featured", "What's your worry?"],
-    excerpt: "Beshie, napansin mo ba lately? Si officemate na dati’y laging naka-high heels at full glam, ngayon naka-crocs at hoodie na lang. Si Kuya na laging masayahin, bigla na lang naging parang background music—present pero hindi mo maramdaman. Grabe, baka hindi lang sila pagod… Quiet cracking na yan. Oo besh, hindi lang ito quiet quitting na petiks lang sa trabaho. Iba ito. Mas malala. Ito yung “I’m fine” pero sa totoo lang, “I’m barely holding it together”",
-    comments: "No Comments",
-  },
-  {
-    id: 2,
-    title: "Career Search: A Guide for Graduates of the Class of 2023",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2023/06/Blog_1.jpg",
-    author: "Ian",
-    date: "June 30, 2023",
-    tags: ["Featured"],
-    excerpt: "Congratulations to the Class of 2023 graduates! As you transition from the academic world to professional opportunities, it",
-    comments: "No Comments",
-  },
-  {
-    id: 3,
-    title: "The A to Z of Positive Parenting",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2021/02/Blog-Post-6a.jpg",
-    author: "Ian",
-    date: "May 1, 2021",
-    tags: ["Featured"],
-    excerpt: "The quarantine measures this pandemic is an opportunity for parents to relate with their children. Staying at home",
-    comments: "No Comments",
-  },
-  {
-    id: 4,
-    title: "Positive psychology goals is to boost our strengths",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2021/02/Positive-Strengths.jpg",
-    author: "Ian",
-    date: "February 10, 2021",
-    tags: ["Personal blog", "Why positive psychology?"],
-    excerpt: "In a world that often focuses on problems, challenges, and deficiencies positive psychology provides revitalizing perspective by emphasizing",
-    comments: "31 Comments",
-  },
-  {
-    id: 5,
-    title: "Attack on Itan: How to increase one's self-confidence?",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2021/01/144040220_1034879487001599_8417849835091764025_n.jpg",
-    author: "Ian",
-    date: "February 4, 2021",
-    tags: ["Featured", "What's your worry?"],
-    excerpt: "Bes, sa buhay minsan hindi maiwasan na nawawalan tayo ng tiwala sa atin sarili. Minsan o madalas ay",
-    comments: "No Comments",
-  },
-  {
-    id: 6,
-    title: "Wearing is Caring",
-    href: "#",
-    image: "https://strengthswriter.com/wp-content/uploads/2021/01/Wearing-is-caring-blog-1.jpg",
-    author: "Ian",
-    date: "January 25, 2021",
-    tags: ["Featured", "What's your worry?"],
-    excerpt: "Halos sampung buwan na tayo nasa quarantine measures para mapigilan ang patuloy na paglaganap ng coronavirus. Habang ang",
-    comments: "No Comments",
-  },
-];
-
-const recentPosts = [
-  {
-    title: "Career Search: A Guide for Graduates of the Class of 2023",
-    date: "June 30, 2023",
-    comments: "0 Comments",
-    image: "https://strengthswriter.com/wp-content/uploads/2023/06/Blog_1-150x150.jpg",
-    href: "#",
-  },
-  {
-    title: "Positive psychology goals is to boost our strengths",
-    date: "February 10, 2021",
-    comments: "31 Comments",
-    image: "https://strengthswriter.com/wp-content/uploads/2021/02/Positive-Strengths-150x150.jpg",
-    href: "#",
-  },
-  {
-    title: "Attack on Itan: How to increase one's self-confidence?",
-    date: "February 4, 2021",
-    comments: "0 Comments",
-    image: "https://strengthswriter.com/wp-content/uploads/2021/01/144040220_1034879487001599_8417849835091764025_n-150x150.jpg",
-    href: "#",
-  },
-  {
-    title: "Tahimik Pero Wasak: Beshie, Quiet Cracking Na Yan!",
-    date: "August 13, 2025",
-    comments: "0 Comments",
-    image: "https://strengthswriter.com/wp-content/uploads/2025/08/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1-150x150.png",
-    href: "#",
-  },
-  {
-    title: "The A to Z of Positive Parenting",
-    date: "May 1, 2021",
-    comments: "0 Comments",
-    image: "https://strengthswriter.com/wp-content/uploads/2021/02/Blog-Post-6a-150x150.jpg",
-    href: "#",
-  },
-];
-
-const categories = [
-  "Featured",
-  "Movie Review",
-  "Personal blog",
-  "What's your worry?",
-  "Why positive psychology?",
-];
 
 const socials = [
   { label: "LinkedIn", href: "https://www.linkedin.com/in/ian-llenares-rpm-phd-06aa42103/", color: "bg-blue-700", icon: "in" },
@@ -168,70 +54,70 @@ function SocialIcon({ social }: { social: typeof socials[0] }) {
 }
 
 export default function LandingPage() {
+  const sortedBlogs = [...blogs].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  const latestPost = sortedBlogs.find(post => post.tags.includes("featured")) ?? sortedBlogs[0];
+  const secondaryPosts = sortedBlogs.filter(post => post.id !== latestPost.id).slice(0, 2);
+
   return (
-    <div className="min-h-screen font-sans bg-[#FAF9F6] space-y-6">
-      <section className="max-w-5xl mx-auto pt-4">
-        <Link key={blogPosts[0].id} href={blogPosts[0].href} className="group flex flex-col bg-white overflow-hidden transition justify-between">
+    <main className="min-h-screen font-sans bg-[#FAF9F6] space-y-6">
+      <section className="max-w-7xl mx-auto pt-4 flex">
+        <Link key={latestPost.id} href={latestPost.href} className="group flex flex-col bg-white overflow-hidden transition justify-between h-fit border-b-3 border-blue-700/80 p-12">
           <div className="overflow-hidden relative">
             <img
-              src={blogPosts[0].image}
-              alt={blogPosts[0].title}
+              src={latestPost.image}
+              alt={latestPost.title}
               className="w-full h-130 object-cover group-hover:scale-101 transition duration-300"
             />
             <div className="absolute top-4 left-4 z-10 flex gap-2">
               <span className="flex items-center text-xs bg-green-700/80 p-2 text-white  mb-2">
                 Latest
               </span>
-              <span className="flex items-center text-xs bg-blue-700/80 p-2 text-white  mb-2">
-                {blogPosts[0].tags[1]}
+              <span className="flex items-center text-xs bg-blue-700/80 p-2 text-white capitalize mb-2">
+                {latestPost.tags[1]}
               </span>
             </div>
           </div>
 
-          <span className="p-6 pb-2 space-y-2">
+          <span className="p-6 pb-2 space-y-2 ">
             <h4 className="text-2xl font-bold tracking-wide text-neutral-800 leading-snug">
-              {blogPosts[0].title}
+              {latestPost.title}
             </h4>
-            <p className="text-sm text-neutral-600 leading-relaxed mb-4 line-clamp-1">{blogPosts[0].excerpt}</p>
+            <p className="text-sm text-neutral-600 leading-relaxed mb-4 line-clamp-1">{latestPost.excerpt}</p>
           </span>
 
         </Link>
-      </section>
 
-      <section className="max-w-5xl mx-auto pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {blogPosts.map((post) => (
-          <Link
-            key={post.id}
-            href={post.href}
-            className="group flex flex-col gap-4 bg-white overflow-hidden transition p-8"
-          >
-            <div className="overflow-hidden">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full h-34 object-cover group-hover:scale-105 transition duration-300"
-              />
-            </div>
+        <div className="min-w-100 flex flex-col divide-y divide-neutral-100 justify-between gap-4 ml-6">
+          {secondaryPosts.map((post) => (
+            <Link
+              key={post.id}
+              href={post.href}
+              className="group flex flex-col gap-4 overflow-hidden transition p-8 border-3 border-blue-700/80"
+            >
+              <div className="overflow-hidden">
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-34 object-cover group-hover:scale-105 transition duration-300"
+                />
+              </div>
 
-            <div>
-              <h4
-                className="font-bold text-base uppercase tracking-wide text-neutral-900 leading-snug mb-2 group-hover:text-blue-700 transition"
-              >
-                {post.title}
-              </h4>
+              <div>
+                <h1 className="capitalize">{post.tags.filter(tag => tag !== "featured")[0]}</h1>
+                <h4
+                  className="font-bold text-base tracking-wide text-neutral-900 leading-snug mb-2 group-hover:text-blue-700 transition"
+                >
+                  {post.title}
+                </h4>
 
-              <p className="text-sm text-neutral-600 leading-relaxed line-clamp-3">
-                {post.excerpt}
-              </p>
-            </div>
-          </Link>
-        ))}
-
-        {/* PAGINATION */}
-        <div className="md:col-span-2 flex items-center gap-2 mt-4">
-          <span className="px-3 py-1 bg-blue-700 text-white text-sm rounded">1</span>
-          <Link href="#" className="px-3 py-1 border border-neutral-300 text-sm rounded hover:bg-neutral-100 transition">2</Link>
-          <Link href="#" className="px-3 py-1 border border-neutral-300 text-sm rounded hover:bg-neutral-100 transition">Next »</Link>
+                <p className="text-sm text-neutral-600 leading-relaxed line-clamp-2">
+                  {post.excerpt}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -242,7 +128,7 @@ export default function LandingPage() {
 
           {/* BLOG POSTS */}
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {blogPosts.map((post) => (
+            {blogs.map((post) => (
               <div key={post.id} className="bg-white border border-neutral-200 rounded overflow-hidden shadow-sm">
                 <div className="overflow-hidden">
                   <Link href={post.href}>
@@ -261,10 +147,10 @@ export default function LandingPage() {
                     </Link>
                   </h4>
                   <div className="flex flex-wrap gap-x-3 text-xs text-neutral-500 mb-3">
-                    <span>👤 {post.author}</span>
+                    <span>👤 {post.author.name}</span>
                     <span>📅 {post.date}</span>
                     <span>🏷 {post.tags.join(", ")}</span>
-                    <span>💬 {post.comments}</span>
+                    <span>💬 {post.commentCount}</span>
                   </div>
                   <p className="text-sm text-neutral-600 leading-relaxed mb-4">{post.excerpt}</p>
                   <Link
@@ -327,7 +213,7 @@ export default function LandingPage() {
             <div>
               <h3 className="text-xs font-bold tracking-widest uppercase text-neutral-800 border-l-4 border-blue-700 pl-3 mb-4">Recent Posts</h3>
               <ul className="flex flex-col gap-4">
-                {recentPosts.map((p, i) => (
+                {/* {recentPosts.map((p, i) => (
                   <li key={i} className="flex gap-3 items-start">
                     <Link href={p.href}>
                       <img src={p.image} alt={p.title} className="w-14 h-14 object-cover rounded flex-shrink-0" />
@@ -336,10 +222,10 @@ export default function LandingPage() {
                       <Link href={p.href} className="text-xs font-semibold text-neutral-800 hover:text-blue-700 transition leading-snug block">
                         {p.title}
                       </Link>
-                      <p className="text-xs text-neutral-500 mt-1">{p.date} / {p.comments}</p>
+                      <p className="text-xs text-neutral-500 mt-1">{p.date} / {p.commentCount} comments</p>
                     </div>
                   </li>
-                ))}
+                ))} */}
               </ul>
             </div>
 
@@ -347,7 +233,7 @@ export default function LandingPage() {
             <div>
               <h3 className="text-xs font-bold tracking-widest uppercase text-neutral-800 border-l-4 border-blue-700 pl-3 mb-4">Categories</h3>
               <ul className="flex flex-col gap-2">
-                {categories.map((c) => (
+                {ALL_TAGS.map((c) => (
                   <li key={c}>
                     <Link href="#" className="text-sm text-neutral-700 hover:text-blue-700 transition">
                       {c}
@@ -391,6 +277,6 @@ export default function LandingPage() {
         </div>
       </footer >
 
-    </div >
+    </main >
   );
 }
