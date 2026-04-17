@@ -16,7 +16,22 @@ export default function LandingPage() {
 
   return (
     <main className="relative min-h-screen font-sans space-y-6">
-      <section className=" w-full mt-4 bg-primary h-160 flex gap-16 justify-center pt-12">
+      <section className="relative w-full mt-4 bg-primary h-160 flex gap-16 justify-center pt-12 overflow-x-hidden">
+        <div
+          className="absolute inset-0 pointer-events-none w-200 bottom-10 left-320"
+          style={{
+            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.55) 1.7px, transparent 1.5px)`,
+            backgroundSize: "28px 28px",
+          }}
+        />
+
+        <div
+          className="absolute inset-0 pointer-events-none w-50 top-50 left-0"
+          style={{
+            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.55) 1.7px, transparent 1.5px)`,
+            backgroundSize: "28px 28px",
+          }}
+        />
         <div>
           <span className="flex items-center bg-[#F0D8A1] py-1 px-3 mb-4 mt-4 text-black text-sm w-fit">
             Latest Featured
