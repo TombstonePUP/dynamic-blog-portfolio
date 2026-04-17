@@ -17,6 +17,7 @@ export const ALL_TAGS: Tag[] = [
   "personal blog",
   "what's your worry?",
   "why positive psychology?",
+  "advice",
 ];
 
 // ─── Blogs ───────────────────────────────────────────────────────────────────
@@ -51,7 +52,7 @@ export const blogs: Blog[] = [
     author: AUTHORS.ian,
     date: "2023-06-30",
     dateLabel: "June 30, 2023",
-    tags: ["featured"],
+    tags: ["featured", "advice"],
     excerpt:
       "Congratulations to the Class of 2023 graduates! As you transition from the academic world to professional opportunities, it's important to approach your career search with strategy and confidence.",
     commentCount: 0,
@@ -68,7 +69,7 @@ export const blogs: Blog[] = [
     author: AUTHORS.ian,
     date: "2021-05-01",
     dateLabel: "May 1, 2021",
-    tags: ["featured"],
+    tags: ["featured", "personal blog"],
     excerpt:
       "The quarantine measures this pandemic is an opportunity for parents to relate with their children. Staying at home can be the perfect setting to practice positive parenting.",
     commentCount: 0,

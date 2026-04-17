@@ -4,7 +4,8 @@ export type Tag =
   | "movie Review"
   | "personal blog"
   | "what's your worry?"
-  | "why positive psychology?";
+  | "why positive psychology?"
+  | "advice";
 
 export interface Author {
   name: string;
