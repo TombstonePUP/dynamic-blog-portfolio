@@ -20,9 +20,9 @@ export default function LandingHero({ latestPost }: { latestPost: Blog }) {
             Latest Featured
           </span>
           <h1 className="mb-4 text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.15rem] lg:leading-[1.05]">
-            <span className="text-[#c0af97]">Blogs</span> to help you thrive in
-            your <span className="text-[#c0af97]">personal</span> and{" "}
-            <span className="text-[#c0af97]">professional</span> life.
+            <span className="text-[#8c6d1f]/65">Blogs</span> to help you thrive in
+            your <span className="text-[#8c6d1f]/65">personal</span> and{" "}
+            <span className="text-[#8c6d1f]/65">professional</span> life.
           </h1>
           <p className="max-w-md text-lg leading-relaxed text-foreground/80">
             Discover insights and tips to grow both personally and
