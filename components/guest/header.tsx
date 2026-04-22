@@ -43,10 +43,10 @@ export default function GuestHeader() {
   return (
     <header className="sticky top-0 z-50 w-full bg-[#FAF9F6]">
       <div
-        className={`relative mx-auto flex max-w-7xl justify-center transition-all duration-300 ease-in-out ${scrolled ? "h-20" : "h-40"}`}
+        className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-8 ${scrolled ? "h-20 pt-7" : "h-40 pt-10"}`}
       >
         {/* LEFT NAV */}
-        <NavContainer className={`${scrolled ? "pt-8" : "pt-14"}`}>
+        <nav className="hidden md:flex flex-1 gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80">
           {leftNav.map((link) =>
             link.href.startsWith("#") ? (
               <a key={link.href} href={link.href}>
@@ -58,11 +58,11 @@ export default function GuestHeader() {
               </Link>
             ),
           )}
-        </NavContainer>
+        </nav>
 
         {/* CENTER LOGO */}
         <div
-          className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center ${scrolled ? "top-9" : "top-8"}`}
+          className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
         >
           <div
             className={`transition-all duration-300 ease-in-out overflow-hidden ${
@@ -77,8 +77,8 @@ export default function GuestHeader() {
           <LogoText className="text-lg leading-none" />
         </div>
 
-        {/* RIGHT NAV */}
-        <NavContainer className={`ml-120 ${scrolled ? "pt-8" : "pt-14"}`}>
+        {/* RIGHT NAV (DESKTOP) */}
+        <nav className="hidden md:flex flex-1 justify-end items-center gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80">
           {rightNav.map((link) =>
             link.href.startsWith("#") ? (
               <a key={link.href} href={link.href}>
@@ -91,13 +91,19 @@ export default function GuestHeader() {
             ),
           )}
           <button className="h-fit hover:text-foreground/80 transition hover:bg-transparent focus:bg-transparent focus:outline-none cursor-pointer">
-            <Search className="size-6 " strokeWidth={2.3} />
+            <Search className="size-6" strokeWidth={2.3} />
           </button>
+        </nav>
 
-          <button className="md:hidden flex flex-col gap-1">
-            <Menu />
+        {/* MOBILE CONTROLS */}
+        <div className="flex flex-1 justify-end items-center gap-4 md:hidden">
+          <button className="h-fit hover:text-foreground/80 transition hover:bg-transparent focus:bg-transparent focus:outline-none cursor-pointer">
+            <Search className="size-6" strokeWidth={2.3} />
           </button>
-        </NavContainer>
+          <button className="flex flex-col gap-1 cursor-pointer">
+            <Menu className="size-6" strokeWidth={2.3} />
+          </button>
+        </div>
       </div>
     </header>
   );

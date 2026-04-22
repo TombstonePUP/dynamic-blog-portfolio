@@ -141,9 +141,9 @@ export default function LandingScrollFeed({ streamPosts }: { streamPosts: Blog[]
     <div className="relative font-sans">
       <section
         id="featured"
-        className="absolute z-10 scroll-mt-24 bg-[#f3f2f0] w-7xl -top-40 left-1/2 -translate-x-1/2"
+        className="relative z-10 mx-auto w-full max-w-[1440px] -mt-20 scroll-mt-24 px-4 sm:px-8 lg:-mt-40"
       >
-        <div className="mx-auto max-w-7xl shadow-[0_-12px_40px_-20px_rgba(0,0,0,0.12)]">
+        <div className="mx-auto max-w-7xl bg-[#f3f2f0] shadow-[0_-12px_40px_-20px_rgba(0,0,0,0.12)]">
           <div className="border-t-[10px] border-[#72dbcc] px-4 py-10 text-center sm:px-6 sm:py-12">
             <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
               Featured
@@ -160,7 +160,7 @@ export default function LandingScrollFeed({ streamPosts }: { streamPosts: Blog[]
         </div>
       </section>
 
-      <section className="bg-[#f3f2f0]/90">
+      <section className="pt-8 lg:pt-20">
         <FeedInterstitial
           kicker="Keep reading"
           quote="“Small shifts in how we work and rest add up—often before we notice.”"
@@ -169,7 +169,7 @@ export default function LandingScrollFeed({ streamPosts }: { streamPosts: Blog[]
       </section>
 
       {pool.length > 0 ? (
-        <section className="border-t border-foreground/[0.06] bg-[#f3f2f0]/90 pt-30">
+        <section className="pt-2">
           <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8 sm:py-16">
             <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>

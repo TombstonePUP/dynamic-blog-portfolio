@@ -1,7 +1,7 @@
+import { ArrowRight, Lightbulb, Target } from "lucide-react";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Lightbulb, Target } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About The Strengths Writer",
@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="relative min-h-screen pb-24 font-sans bg-background">
+    <main className="relative min-h-screen pb-24 font-sans bg-gradient-to-b from-transparent to-primary/30">
       {/* Decorative background elements */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-primary/10 to-transparent" aria-hidden />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-gradient-to-b " aria-hidden />
 
       {/* Hero Section */}
       <section className="relative mx-auto max-w-7xl px-5 pt-16 sm:px-8 sm:pt-24 lg:pt-32">
@@ -74,7 +74,7 @@ export default function AboutPage() {
         <div className="grid gap-8 md:grid-cols-2 md:gap-12">
           
           {/* Mission */}
-          <div className="group flex flex-col gap-6 overflow-hidden bg-white p-10 shadow-sm ring-1 ring-black/[0.04] transition-all hover:shadow-md hover:ring-[#72dbcc]/40">
+          <div className="group flex flex-col gap-6 overflow-hidden bg-[#72dbcc]/5 p-10 shadow-sm ring-1 ring-black/[0.04] transition-all hover:shadow-md hover:ring-[#72dbcc]/40">
             <div className="flex size-14 items-center justify-center rounded-full bg-[#72dbcc]/15 text-[#2b776a]">
               <Target className="size-7" strokeWidth={1.5} />
             </div>
@@ -85,7 +85,7 @@ export default function AboutPage() {
           </div>
 
           {/* Vision */}
-          <div className="group flex flex-col gap-6 overflow-hidden bg-white p-10 shadow-sm ring-1 ring-black/[0.04] transition-all hover:shadow-md hover:ring-[#F0D8A1]/50">
+          <div className="group flex flex-col gap-6 overflow-hidden bg-[#72dbcc]/5 p-10 shadow-sm ring-1 ring-black/[0.04] transition-all hover:shadow-md hover:ring-[#F0D8A1]/50">
             <div className="flex size-14 items-center justify-center rounded-full bg-[#F0D8A1]/30 text-[#D4A373]">
               <Lightbulb className="size-7" strokeWidth={1.5} />
             </div>

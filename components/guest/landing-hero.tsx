@@ -11,8 +11,8 @@ const dotStyle: CSSProperties = {
 
 export default function LandingHero({ latestPost }: { latestPost: Blog }) {
   return (
-    <section className="relative mt-4 w-full overflow-hidden bg-background">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-gradient-to-b from-transparent to-primary/70" aria-hidden />
+    <section className="relative mt-4 w-full overflow-hidden bg-background z-10">
+      <div className="pointer-events-none absolute inset-x-0 top-0 min-h-screen bg-gradient-to-b from-transparent to-primary/40" aria-hidden />
 
       <div className="relative mx-auto flex min-h-[min(100svh,42rem)] max-w-7xl flex-col gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-14 lg:flex-row lg:justify-between lg:gap-16 lg:pb-16">
         <div className="max-w-xl shrink-0 lg:max-w-lg">
@@ -31,13 +31,13 @@ export default function LandingHero({ latestPost }: { latestPost: Blog }) {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 bg-background border-2 border-foreground/20 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-foreground/5"
+              className="inline-flex items-center gap-2 bg-background border-1 border-foreground/10 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-foreground/5"
             >
               About Author
             </Link>
             <Link
               href="/blog"
-              className="group inline-flex items-center gap-2 border-2 border-transparent bg-[#F0D8A1] px-6 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#e8cc8a]"
+              className="group inline-flex items-center gap-2 border-1 border-transparent bg-[#F0D8A1] px-6 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#e8cc8a]"
             >
               Explore
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
@@ -69,7 +69,7 @@ export default function LandingHero({ latestPost }: { latestPost: Blog }) {
               </p>
             </div>
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
         </Link>
       </div>
     </section>
