@@ -12,7 +12,7 @@ const dotStyle: CSSProperties = {
 export default function LandingHero({ latestPost }: { latestPost: Blog }) {
   return (
     <section className="relative mt-4 w-full overflow-hidden bg-background">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-gradient-to-b from-transparent to-primary" aria-hidden />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-gradient-to-b from-transparent to-primary/70" aria-hidden />
 
       <div className="relative mx-auto flex min-h-[min(100svh,42rem)] max-w-7xl flex-col gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-14 lg:flex-row lg:justify-between lg:gap-16 lg:pb-16">
         <div className="max-w-xl shrink-0 lg:max-w-lg">
