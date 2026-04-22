@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf9f6;
+  --background: #FAF9F6;
   --foreground: #302c2c;
-  --primary: #948979;
+  --primary: #beb09a;
 }
 
 @theme {
@@ -27,4 +27,24 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-hanken);
+}
+
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.animate-scroll-hint {
+  animation: scroll-hint 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-hint {
+    animation: none;
+  }
 }

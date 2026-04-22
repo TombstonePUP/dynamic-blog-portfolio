@@ -25,7 +25,7 @@ function NavContainer({
 }) {
   return (
     <nav
-      className={`hidden md:flex gap-12 text-lg transition-all duration-300 ease-in-out font-bold hover:text-foreground/80 ${className}`}
+      className={`hidden md:flex gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80 ${className}`}
     >
       {children}
     </nav>

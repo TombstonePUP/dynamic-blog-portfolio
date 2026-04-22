@@ -1,65 +1,98 @@
+import { blogs } from "@/data/blog";
 import Image from "next/image";
+import Link from "next/link";
+import type { CSSProperties } from "react";
 
-export default function LandingPage() {
+function HeroDotPattern() {
+  const dotStyle: CSSProperties = {
+    backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.55) 1.7px, transparent 1.5px)`,
+    backgroundSize: "28px 28px",
+  };
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+      <div
+        className="pointer-events-none absolute inset-0 bottom-10 left-[min(20rem,40%)] w-[clamp(12rem,45vw,28rem)] opacity-90"
+        style={dotStyle}
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 left-0 top-[30%] w-[min(12rem,35vw)] opacity-80"
+        style={dotStyle}
+        aria-hidden
+      />
+    </>
+  );
+}
+
+export default function BlogIndexPage() {
+  const sorted = [...blogs].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+
+  return (
+    <main className="relative min-h-screen space-y-0 pb-16 font-sans">
+      <section className="relative mt-4 w-full overflow-x-hidden bg-primary px-5 pb-28 pt-12 md:px-10 md:pb-36 md:pt-14">
+        <HeroDotPattern />
+        <div className="relative mx-auto max-w-7xl">
+          <span className="mb-4 mt-2 flex w-fit items-center bg-[#F0D8A1] px-3 py-1 text-sm text-black">
+            All posts
+          </span>
+          <h1 className="mb-4 max-w-2xl text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl">
+            <span className="text-[#F0D8A1]">Stories</span> to sit with—in your{" "}
+            <span className="text-[#F0D8A1]">personal</span> and{" "}
+            <span className="text-[#F0D8A1]">professional</span> life.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="max-w-md text-lg leading-relaxed text-white/90">
+            Same voice as the home page: longer reads when you want to go
+            deeper.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section className="relative z-10 -mt-24 mx-auto max-w-7xl bg-[#f3f2f0] px-0 shadow-sm">
+        <h2 className="border-t-10 border-[#72dbcc] py-8 text-center text-4xl font-bold text-foreground">
+          Journal
+        </h2>
+        <div className="grid gap-6 p-6 pt-0 sm:grid-cols-2 sm:p-10 lg:grid-cols-3">
+          {sorted.map((post) => {
+            const topic =
+              post.tags.find((t) => t !== "featured") ?? post.tags[0];
+            return (
+              <Link
+                key={post.id}
+                href={post.href}
+                className="group flex flex-col gap-6 overflow-hidden bg-white p-8 transition"
+              >
+                <div className="relative h-44 overflow-hidden">
+                  <Image
+                    fill
+                    src={post.image}
+                    alt={post.title}
+                    className="object-cover transition duration-300 group-hover:scale-101"
+                  />
+                  <span className="absolute left-2 top-2 bg-[#72dbcc]/80 px-2 py-1 text-xs font-semibold capitalize text-black">
+                    {topic}
+                  </span>
+                </div>
+                <div className="flex min-h-[7.5rem] flex-col justify-between gap-3">
+                  <h3 className="text-lg font-black leading-snug text-foreground transition group-hover:text-black/80">
+                    {post.title}
+                  </h3>
+                  <p className="line-clamp-3 text-sm leading-relaxed text-foreground/80">
+                    {post.excerpt}
+                  </p>
+                  <time
+                    dateTime={post.date}
+                    className="text-xs font-medium uppercase tracking-wide text-foreground/50"
+                  >
+                    {post.dateLabel}
+                  </time>
+                </div>
+              </Link>
+            );
+          })}
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }

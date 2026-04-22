@@ -28,5 +28,16 @@ export interface Blog {
   dateLabel: string;
   tags: Tag[];
   excerpt: string;
+  /** Article body as plain-text paragraphs (rendered as prose) */
+  content: string[];
   commentCount: number;
+  comments?: Comment[];
 }
+
+export type Comment = {
+  id: number;
+  author: string;
+  date: string;
+  dateLabel: string;
+  body: string;
+};
