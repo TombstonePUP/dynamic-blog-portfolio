@@ -26,7 +26,10 @@ function capitalizeTopic(tag: string): string {
     .join(" ");
 }
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ topic?: string }>;
+};
 
 export async function generateStaticParams() {
   return blogs.map((post) => ({ slug: post.slug }));
@@ -80,18 +83,26 @@ function RelatedCard({ post }: { post: Blog }) {
   );
 }
 
-export default async function BlogArticlePage({ params }: PageProps) {
+export default async function BlogArticlePage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const { topic } = await searchParams;
   const post = getBlogBySlug(slug);
   if (!post) notFound();
 
+  // Use the topic from the referring Topics page if provided, else fall back to post tags
+  const themeColor = topic
+    ? getThemeColor([decodeURIComponent(topic) as import("@/types/blog").Tag])
+    : getThemeColor(post.tags);
+
   const minutes = readingMinutesFromContent(post.content);
   const related = getRelatedBlogs(post);
-  const fallbackRelated = blogs
-    .filter((b) => b.slug !== post.slug)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 3);
-  const more = related.length > 0 ? related : fallbackRelated;
+
+  // Pad with recent posts to always reach 3
+  const relatedSlugs = new Set([post.slug, ...related.map((b) => b.slug)]);
+  const padBlogs = blogs
+    .filter((b) => !relatedSlugs.has(b.slug))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const more = [...related, ...padBlogs].slice(0, 3);
 
   return (
     <article className="relative min-h-screen pb-20 font-sans">

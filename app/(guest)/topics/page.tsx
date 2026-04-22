@@ -1,6 +1,6 @@
 import { ALL_TAGS, blogs } from "@/data/blog";
 import { getThemeColor } from "@/lib/theme";
-import type { Blog } from "@/types/blog";
+import type { Blog, Tag } from "@/types/blog";
 import { ArrowRight } from "lucide-react";
 import { Metadata } from "next";
 import Image from "next/image";
@@ -18,11 +18,13 @@ function capitalizeTopic(tag: string): string {
     .join(" ");
 }
 
-function TopicCard({ post }: { post: Blog }) {
+function TopicCard({ post, topic }: { post: Blog; topic: Tag }) {
+  const color = getThemeColor([topic]);
   return (
     <Link
-      href={post.href}
-      className="group flex flex-col gap-6 overflow-hidden bg-white p-6 shadow-sm ring-1 ring-black/[0.04] transition hover:shadow-md hover:ring-foreground/15"
+      href={`${post.href}?topic=${encodeURIComponent(topic)}`}
+      className="group flex flex-col overflow-hidden bg-white shadow-sm ring-1 ring-black/[0.04] transition hover:shadow-md hover:ring-foreground/15"
+      style={{ borderTop: `4px solid ${color}` }}
     >
       <div className="relative h-44 overflow-hidden">
         <Image
@@ -33,7 +35,7 @@ function TopicCard({ post }: { post: Blog }) {
           sizes="(max-width: 768px) 100vw, 33vw"
         />
       </div>
-      <div className="flex flex-1 flex-col justify-between gap-3">
+      <div className="flex flex-1 flex-col justify-between gap-3 p-6">
         <div>
           <h3 className="text-lg font-bold leading-snug text-foreground transition group-hover:text-black/80">
             {post.title}
@@ -125,7 +127,7 @@ export default function TopicsPage() {
 
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {topicBlogs.map((post) => (
-                  <TopicCard key={post.id} post={post} />
+                  <TopicCard key={post.id} post={post} topic={topic} />
                 ))}
               </div>
             </section>
