@@ -72,6 +72,30 @@ export default function TopicsPage() {
         </div>
       </section>
 
+      {/* Filter Pills */}
+      <div className="mx-auto mt-12 flex max-w-5xl flex-wrap justify-center gap-3 px-5 sm:mt-16 sm:px-8">
+        {topics.map((topic) => {
+          const themeColor = getThemeColor([topic]);
+          // Only show topics that actually have blogs
+          const hasBlogs = blogs.some((b) => b.tags.includes(topic));
+          if (!hasBlogs) return null;
+
+          return (
+            <a
+              key={topic}
+              href={`#${topic}`}
+              className="group flex items-center border-l-[4px] bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-sm ring-1 ring-black/[0.04] transition-all hover:-translate-y-0.5 hover:shadow-md"
+              style={{ borderLeftColor: themeColor }}
+            >
+              <span className="mr-1.5 opacity-60 transition-opacity group-hover:opacity-100" style={{ color: themeColor }}>
+                #
+              </span>
+              {capitalizeTopic(topic)}
+            </a>
+          );
+        })}
+      </div>
+
       <div className="mx-auto mt-20 max-w-7xl px-5 sm:px-8 lg:mt-28 space-y-24">
         {topics.map((topic) => {
           const topicBlogs = blogs.filter((b) => b.tags.includes(topic));

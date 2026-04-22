@@ -2,6 +2,7 @@ import "@/app/globals.css";
 import GuestFooter from "@/components/guest/footer";
 import GuestHeader from "@/components/guest/header";
 import LenisProvider from "@/components/lenis-provider";
+import ScrollToTop from "@/components/scroll-to-top";
 import { Metadata } from "next";
 import { Hanken_Grotesk } from "next/font/google";
 
@@ -28,6 +29,7 @@ export default function RootLayout({
         <GuestHeader />
         {children}
         <GuestFooter />
+        <ScrollToTop />
       </body>
     </html>
   );

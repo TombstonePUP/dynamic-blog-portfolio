@@ -45,7 +45,7 @@ export default function GuestHeader() {
   return (
     <header className="sticky top-0 z-50 w-full bg-[#FAF9F6]">
       <div
-        className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-8 ${scrolled ? "h-20 pt-7" : "h-40 pt-10"}`}
+        className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-24 ${scrolled ? "h-20 pt-7" : "h-40 pt-10"}`}
       >
         {/* LEFT NAV */}
         <nav className="hidden md:flex flex-1 gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80">
