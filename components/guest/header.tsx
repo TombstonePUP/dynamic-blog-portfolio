@@ -2,6 +2,7 @@
 
 import { Menu, Search } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LogoIcon, LogoText } from "../app-logo";
 
@@ -33,6 +34,7 @@ function NavContainer({
 
 export default function GuestHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -47,17 +49,21 @@ export default function GuestHeader() {
       >
         {/* LEFT NAV */}
         <nav className="hidden md:flex flex-1 gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80">
-          {leftNav.map((link) =>
-            link.href.startsWith("#") ? (
-              <a key={link.href} href={link.href}>
+          {leftNav.map((link) => {
+            const isHome = pathname === "/";
+            const targetHref =
+              link.href === "#featured" && !isHome ? "/#featured" : link.href;
+
+            return targetHref.startsWith("#") ? (
+              <a key={link.href} href={targetHref}>
                 {link.label}
               </a>
             ) : (
-              <Link key={link.href} href={link.href}>
+              <Link key={link.href} href={targetHref}>
                 {link.label}
               </Link>
-            ),
-          )}
+            );
+          })}
         </nav>
 
         {/* CENTER LOGO */}
