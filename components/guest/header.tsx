@@ -34,9 +34,9 @@ function NavContainer({
 }
 
 export default function GuestHeader() {
-  const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -44,13 +44,15 @@ export default function GuestHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const isCompact = scrolled || pathname.startsWith("/blog/");
+
   return (
     <>
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
 
       <header className="sticky top-0 z-50 w-full bg-[#FAF9F6]">
         <div
-          className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-24 ${scrolled ? "h-20 pt-7" : "h-40 pt-10"}`}
+          className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-24 ${isCompact ? "h-20 pt-7" : "h-40 pt-10"}`}
         >
           {/* LEFT NAV */}
           <nav className="hidden md:flex flex-1 gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80">
@@ -73,14 +75,10 @@ export default function GuestHeader() {
 
           {/* CENTER LOGO */}
           <div
-            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
+            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pt-1"
           >
             <div
-              className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                scrolled
-                  ? "max-h-0 opacity-0 mb-0"
-                  : "max-h-20 opacity-100 mb-0.5"
-              }`}
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${isCompact ?"max-h-0 opacity-0 mb-0":"max-h-20 opacity-100"}`}
             >
               <LogoIcon className="size-20" />
             </div>

@@ -106,7 +106,7 @@ export default async function BlogArticlePage({ params, searchParams }: PageProp
 
   return (
     <article className="relative min-h-screen pb-20 font-sans">
-      <header className="relative mt-4 w-full min-h-[min(68svh,38rem)] overflow-hidden sm:min-h-[min(72svh,44rem)] md:min-h-[min(75svh,48rem)]">
+      <header className="relative w-full min-h-[min(85svh,52rem)] overflow-hidden sm:min-h-[min(88svh,58rem)] md:min-h-[min(92svh,64rem)]">
         <Image
           src={post.image}
           alt=""
@@ -171,12 +171,7 @@ export default async function BlogArticlePage({ params, searchParams }: PageProp
 
                   <a
                     href="#comments"
-                    className="flex items-center gap-1.5 px-3 py-1.5 ring-1 transition hover:opacity-80"
-                    style={{
-                      backgroundColor: `${getThemeColor(post.tags)}30`,
-                      color: getThemeColor(post.tags),
-                      outlineColor: `${getThemeColor(post.tags)}50`,
-                    }}
+                    className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20 transition hover:bg-white/20"
                   >
                     <MessageCircle className="size-4" strokeWidth={1.5} />
                     <span className="font-medium">
