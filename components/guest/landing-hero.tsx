@@ -1,5 +1,5 @@
 import type { Blog } from "@/types/blog";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
@@ -11,37 +11,27 @@ const dotStyle: CSSProperties = {
 
 export default function LandingHero({ latestPost }: { latestPost: Blog }) {
   return (
-    <section className="relative mt-4 w-full overflow-hidden bg-primary">
-      <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-[min(100%,28rem)] opacity-90 max-md:opacity-60"
-        style={dotStyle}
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-48 opacity-70 max-md:w-32"
-        style={dotStyle}
-        aria-hidden
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/[0.03] via-transparent to-black/[0.08]" />
+    <section className="relative mt-4 w-full overflow-hidden bg-background">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-gradient-to-b from-transparent to-primary" aria-hidden />
 
-      <div className="relative mx-auto flex min-h-[min(100svh,42rem)] max-w-7xl flex-col gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-14 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:pb-16">
+      <div className="relative mx-auto flex min-h-[min(100svh,42rem)] max-w-7xl flex-col gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-14 lg:flex-row lg:justify-between lg:gap-16 lg:pb-16">
         <div className="max-w-xl shrink-0 lg:max-w-lg">
           <span className="mb-4 inline-flex items-center bg-[#F0D8A1] px-3 py-1 text-sm text-black">
             Latest Featured
           </span>
-          <h1 className="mb-4 text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.15rem] lg:leading-[1.05]">
-            <span className="text-[#F0D8A1]">Blogs</span> to help you thrive in
-            your <span className="text-[#F0D8A1]">personal</span> and{" "}
-            <span className="text-[#F0D8A1]">professional</span> life.
+          <h1 className="mb-4 text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.15rem] lg:leading-[1.05]">
+            <span className="text-[#a89982]">Blogs</span> to help you thrive in
+            your <span className="text-[#a89982]">personal</span> and{" "}
+            <span className="text-[#a89982]">professional</span> life.
           </h1>
-          <p className="max-w-md text-lg leading-relaxed text-white/90">
+          <p className="max-w-md text-lg leading-relaxed text-foreground/80">
             Discover insights and tips to grow both personally and
             professionally.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 border-2 border-white px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              className="inline-flex items-center gap-2 bg-background border-2 border-foreground/20 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-foreground/5"
             >
               About Author
             </Link>
@@ -78,10 +68,6 @@ export default function LandingHero({ latestPost }: { latestPost: Blog }) {
                 {latestPost.excerpt}
               </p>
             </div>
-            <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-foreground/70 transition group-hover:text-foreground w-full justify-end">
-              Read story
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-            </span>
           </div>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
         </Link>

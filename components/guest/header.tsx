@@ -8,7 +8,6 @@ import { LogoIcon, LogoText } from "../app-logo";
 const leftNav = [
   { label: "Featured", href: "#featured" },
   { label: "Topics", href: "/topics" },
-  { label: "Personal", href: "/personal" },
 ];
 
 const rightNav = [
