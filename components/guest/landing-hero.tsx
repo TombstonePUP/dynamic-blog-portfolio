@@ -11,8 +11,8 @@ const dotStyle: CSSProperties = {
 
 export default function LandingHero({ latestPost }: { latestPost: Blog }) {
   return (
-    <section className="relative mt-4 w-full overflow-hidden bg-background z-10">
-      <div className="pointer-events-none absolute inset-x-0 top-0 min-h-screen bg-gradient-to-b from-transparent to-primary/40" aria-hidden />
+    <section className="relative mt-4 w-full overflow-hidden bg-gradient-to-b from-transparent to-primary/40 z-10">
+      <div className="pointer-events-none absolute inset-x-0 top-0 min-h-screen " aria-hidden />
 
       <div className="relative mx-auto flex min-h-[min(100svh,42rem)] max-w-7xl flex-col gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-14 lg:flex-row lg:justify-between lg:gap-16 lg:pb-16">
         <div className="max-w-xl shrink-0 lg:max-w-lg">
@@ -20,9 +20,9 @@ export default function LandingHero({ latestPost }: { latestPost: Blog }) {
             Latest Featured
           </span>
           <h1 className="mb-4 text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.15rem] lg:leading-[1.05]">
-            <span className="text-[#a89982]">Blogs</span> to help you thrive in
-            your <span className="text-[#a89982]">personal</span> and{" "}
-            <span className="text-[#a89982]">professional</span> life.
+            <span className="text-[#c0af97]">Blogs</span> to help you thrive in
+            your <span className="text-[#c0af97]">personal</span> and{" "}
+            <span className="text-[#c0af97]">professional</span> life.
           </h1>
           <p className="max-w-md text-lg leading-relaxed text-foreground/80">
             Discover insights and tips to grow both personally and
