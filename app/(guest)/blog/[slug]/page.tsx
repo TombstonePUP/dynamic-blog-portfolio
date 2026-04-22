@@ -126,14 +126,14 @@ export default async function BlogArticlePage({ params }: PageProps) {
               </h1>
 
               <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-white/80">
-                <div className="flex items-center gap-2">
+                <Link href="/about" className="flex items-center gap-2 transition-opacity hover:opacity-80">
                   <div className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white/90 ring-1 ring-white/20">
                     <UserCircle className="size-5" strokeWidth={1.75} />
                   </div>
                   <span className="font-semibold text-white">
                     {post.author.name}
                   </span>
-                </div>
+                </Link>
                 
                 <div className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden />
 
@@ -172,7 +172,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
         />
       </header>
 
-      <div className="mx-auto mt-12 max-w-2xl px-5 md:mt-14 md:px-8" style={{ "--theme-color": getThemeColor(post.tags) } as React.CSSProperties}>
+      <div className="mx-auto mt-12 max-w-4xl px-5 md:mt-14 md:px-8" style={{ "--theme-color": getThemeColor(post.tags) } as React.CSSProperties}>
         <div className="space-y-6 text-base leading-[1.8] text-foreground/90 md:text-[1.0625rem] md:leading-[1.85] [&>p:first-of-type]:text-[1.0625rem] [&>p:first-of-type]:leading-relaxed md:[&>p:first-of-type]:text-lg md:[&>p:first-of-type]:leading-relaxed [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:mr-3 [&>p:first-of-type]:first-letter:-mt-2 [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-black [&>p:first-of-type]:first-letter:text-[var(--theme-color)] [&>p:first-of-type]:first-letter:leading-[0.75]">
           {post.content.map((paragraph, i) => (
             <p key={i}>{paragraph}</p>

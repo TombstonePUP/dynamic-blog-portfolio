@@ -1,7 +1,10 @@
+import { AUTHORS } from "@/data/blog";
 import { ArrowRight, Lightbulb, Target } from "lucide-react";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { FaInstagram, FaLinkedinIn, FaTiktok } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 export const metadata: Metadata = {
   title: "About The Strengths Writer",
@@ -15,7 +18,7 @@ export default function AboutPage() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-gradient-to-b " aria-hidden />
 
       {/* Hero Section */}
-      <section className="relative mx-auto max-w-7xl px-5 pt-16 sm:px-8 sm:pt-24 lg:pt-32">
+      <section className="relative mx-auto max-w-7xl px-5 pt-16 sm:px-8 sm:pt-24 lg:pt-20">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center lg:gap-24">
           
           {/* Text Content */}
@@ -74,7 +77,7 @@ export default function AboutPage() {
         <div className="grid gap-8 md:grid-cols-2 md:gap-12">
           
           {/* Mission */}
-          <div className="group flex flex-col gap-6 overflow-hidden bg-[#72dbcc]/5 p-10 shadow-sm ring-1 ring-black/[0.04] transition-all hover:shadow-md hover:ring-[#72dbcc]/40">
+          <div className="group flex flex-col gap-6 overflow-hidden bg-white p-10 shadow-sm ring-1 ring-black/[0.04] transition-all hover:shadow-md hover:ring-[#72dbcc]/40">
             <div className="flex size-14 items-center justify-center rounded-full bg-[#72dbcc]/15 text-[#2b776a]">
               <Target className="size-7" strokeWidth={1.5} />
             </div>
@@ -85,7 +88,7 @@ export default function AboutPage() {
           </div>
 
           {/* Vision */}
-          <div className="group flex flex-col gap-6 overflow-hidden bg-[#72dbcc]/5 p-10 shadow-sm ring-1 ring-black/[0.04] transition-all hover:shadow-md hover:ring-[#F0D8A1]/50">
+          <div className="group flex flex-col gap-6 overflow-hidden bg-white p-10 shadow-sm ring-1 ring-black/[0.04] transition-all hover:shadow-md hover:ring-[#F0D8A1]/50">
             <div className="flex size-14 items-center justify-center rounded-full bg-[#F0D8A1]/30 text-[#D4A373]">
               <Lightbulb className="size-7" strokeWidth={1.5} />
             </div>
@@ -95,6 +98,65 @@ export default function AboutPage() {
             </p>
           </div>
 
+        </div>
+      </section>
+
+      {/* Our Team Section */}
+      <section className="relative mx-auto mt-24 max-w-7xl px-5 sm:px-8 lg:mt-32">
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold text-foreground sm:text-4xl">Meet the Team</h2>
+          <p className="mt-4 text-foreground/70">The voices behind The Strengths Writer.</p>
+        </div>
+
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {Object.values(AUTHORS).map((author) => (
+            <div key={author.slug} className="group relative flex flex-col items-center gap-5 bg-white p-8 shadow-sm ring-1 ring-black/[0.04] transition-all hover:-translate-y-1 hover:shadow-md hover:ring-primary/30">
+              <div className="relative size-32 overflow-hidden rounded-full ring-4 ring-background shadow-md">
+                {author.image ? (
+                  <Image
+                    src={author.image}
+                    alt={author.name}
+                    fill
+                    className="object-cover transition duration-500 group-hover:scale-110"
+                    sizes="128px"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary">
+                    <span className="text-3xl font-bold">{author.name.charAt(0)}</span>
+                  </div>
+                )}
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-bold text-foreground">{author.name}</h3>
+                <p className="text-sm font-medium text-foreground/60">{author.role || "Writer"}</p>
+              </div>
+
+              {author.social && (
+                <div className="mt-2 flex items-center gap-4 text-foreground/40">
+                  {author.social.x && (
+                    <a href={author.social.x} target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors">
+                      <FaXTwitter className="size-4" />
+                    </a>
+                  )}
+                  {author.social.linkedin && (
+                    <a href={author.social.linkedin} target="_blank" rel="noreferrer" className="hover:text-[#0A66C2] transition-colors">
+                      <FaLinkedinIn className="size-4" />
+                    </a>
+                  )}
+                  {author.social.instagram && (
+                    <a href={author.social.instagram} target="_blank" rel="noreferrer" className="hover:text-[#E1306C] transition-colors">
+                      <FaInstagram className="size-4" />
+                    </a>
+                  )}
+                  {author.social.tiktok && (
+                    <a href={author.social.tiktok} target="_blank" rel="noreferrer" className="hover:text-black transition-colors">
+                      <FaTiktok className="size-4" />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 

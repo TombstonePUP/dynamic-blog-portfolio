@@ -30,10 +30,10 @@ export default function LandingHero({ latestPost }: { latestPost: Blog }) {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/blog"
+              href="/about"
               className="inline-flex items-center gap-2 bg-background border-1 border-foreground/10 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-foreground/5"
             >
-              About Author
+              About Strengths Writer
             </Link>
             <Link
               href="/blog"

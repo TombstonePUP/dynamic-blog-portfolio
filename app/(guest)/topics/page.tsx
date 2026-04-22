@@ -58,7 +58,7 @@ export default function TopicsPage() {
     <main className="relative min-h-screen pb-24 font-sans bg-gradient-to-b to-[#72dbcc]/10 from-transparent">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-96" aria-hidden />
 
-      <section className="relative mx-auto max-w-7xl px-5 pt-16 sm:px-8 sm:pt-24 lg:pt-32">
+      <section className="relative mx-auto max-w-7xl px-5 pt-16 sm:px-8 sm:pt-24 lg:pt-20">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center bg-[#72dbcc]/30 px-3 py-1 text-sm font-semibold text-[#2b776a]">
             Explore by Category

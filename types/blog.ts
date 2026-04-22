@@ -10,6 +10,17 @@ export type Tag =
 export interface Author {
   name: string;
   slug: string;
+  role?: string;
+  image?: string;
+  link?: string;
+  social?: {
+    x?: string;
+    linkedin?: string;
+    instagram?: string;
+    github?: string;
+    youtube?: string;
+    tiktok?: string;
+  }
 }
 
 export interface Blog {

@@ -1,12 +1,42 @@
-import type { Author, Blog, Tag } from "@/types/blog";
 import { blogArticleBodies } from "@/data/blog-articles";
+import type { Author, Blog, Tag } from "@/types/blog";
 
 // ─── Authors ────────────────────────────────────────────────────────────────
 
 export const AUTHORS: Record<string, Author> = {
   ian: {
-    name: "Ian",
+    name: "Ian Llenares",
     slug: "ian",
+    role: "Founder & Lead Writer",
+    image: "https://strengthswriter.com/wp-content/uploads/2023/07/Ian-L-1024x1024.jpg",
+    social: {
+      x: "https://x.com/ianllenares",
+      linkedin: "https://linkedin.com/in/ianllenares",
+      instagram: "https://instagram.com/ianllenares",
+      github: "https://github.com/ianllenares",
+      youtube: "https://youtube.com/ianllenares",
+      tiktok: "https://tiktok.com/ianllenares",
+    },
+  },
+  johndoe: {
+    name: "John Doe",
+    slug: "johndoe",
+    role: "Guest Contributor",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2940&auto=format&fit=crop",
+    social: {
+      x: "https://x.com/johndoe",
+      linkedin: "https://linkedin.com/in/johndoe",
+    },
+  },
+  janedoe: {
+    name: "Jane Doe",
+    slug: "janedoe",
+    role: "Editorial Assistant",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2940&auto=format&fit=crop",
+    social: {
+      instagram: "https://instagram.com/janedoe",
+      tiktok: "https://tiktok.com/janedoe",
+    },
   },
 } as const;
 
