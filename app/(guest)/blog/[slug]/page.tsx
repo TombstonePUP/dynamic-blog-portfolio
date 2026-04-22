@@ -1,4 +1,5 @@
 import BackButton from "@/components/guest/back-button";
+import CommentsSection from "@/components/guest/comments-section";
 import {
   blogs,
   getBlogBySlug,
@@ -45,23 +46,29 @@ export async function generateMetadata({
 
 function RelatedCard({ post }: { post: Blog }) {
   const label = seriesLabel(post.tags);
+  const color = getThemeColor(post.tags);
   return (
     <Link
       href={post.href}
-      className="group flex flex-col gap-6 overflow-hidden bg-white p-8 transition"
+      className="group flex flex-col overflow-hidden bg-white transition hover:shadow-md"
+      style={{ borderTop: `4px solid ${color}` }}
     >
       <div className="relative h-44 overflow-hidden">
         <Image
           fill
           src={post.image}
           alt={post.title}
-          className="object-cover transition duration-300 group-hover:scale-101"
+          className="object-cover transition duration-300 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, 33vw"
         />
-        <span className="absolute left-2 top-2 bg-[#72dbcc]/80 px-2 py-1 text-xs font-semibold text-black">
+        <span
+          className="absolute left-2 top-2 px-2 py-1 text-xs font-semibold text-black"
+          style={{ backgroundColor: color }}
+        >
           {label}
         </span>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 p-6">
         <h3 className="text-lg font-black leading-snug text-foreground transition group-hover:text-black/80">
           {post.title}
         </h3>
@@ -101,7 +108,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/45"
           aria-hidden
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#72dbcc]/25 to-transparent mix-blend-soft-light md:h-40" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t to-transparent mix-blend-soft-light md:h-40" style={{ backgroundImage: `linear-gradient(to top, ${getThemeColor(post.tags)}40, transparent)` }} />
 
         <div className="absolute inset-0 z-10 flex flex-col">
           <div className="flex justify-start gap-4 px-5 pt-6 sm:px-8 sm:pt-8 md:px-10 md:pt-10">
@@ -151,15 +158,21 @@ export default async function BlogArticlePage({ params }: PageProps) {
                     <span className="font-medium text-white/90">{minutes} min read</span>
                   </div>
 
-                  {post.commentCount > 0 && (
-                    <div className="flex items-center gap-1.5 rounded-full bg-[#72dbcc]/20 px-3 py-1.5 text-[#72dbcc] ring-1 ring-[#72dbcc]/30">
-                      <MessageCircle className="size-4" strokeWidth={1.5} />
-                      <span className="font-medium">
-                        {post.commentCount}{" "}
-                        {post.commentCount === 1 ? "comment" : "comments"}
-                      </span>
-                    </div>
-                  )}
+                  <a
+                    href="#comments"
+                    className="flex items-center gap-1.5 px-3 py-1.5 ring-1 transition hover:opacity-80"
+                    style={{
+                      backgroundColor: `${getThemeColor(post.tags)}30`,
+                      color: getThemeColor(post.tags),
+                      outlineColor: `${getThemeColor(post.tags)}50`,
+                    }}
+                  >
+                    <MessageCircle className="size-4" strokeWidth={1.5} />
+                    <span className="font-medium">
+                      {post.commentCount}{" "}
+                      {post.commentCount === 1 ? "comment" : "comments"}
+                    </span>
+                  </a>
                 </div>
               </div>
             </div>
@@ -173,14 +186,17 @@ export default async function BlogArticlePage({ params }: PageProps) {
         />
       </header>
 
-      <div className="mx-auto mt-12 max-w-4xl px-5 md:mt-14 md:px-8" style={{ "--theme-color": getThemeColor(post.tags) } as React.CSSProperties}>
+      <div className="mx-auto mt-12 max-w-5xl px-5 md:mt-14 md:px-8" style={{ "--theme-color": getThemeColor(post.tags) } as React.CSSProperties}>
         <div className="space-y-6 text-base leading-[1.8] text-foreground/90 md:text-[1.0625rem] md:leading-[1.85] [&>p:first-of-type]:text-[1.0625rem] [&>p:first-of-type]:leading-relaxed md:[&>p:first-of-type]:text-lg md:[&>p:first-of-type]:leading-relaxed [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:mr-3 [&>p:first-of-type]:first-letter:-mt-2 [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-black [&>p:first-of-type]:first-letter:text-[var(--theme-color)] [&>p:first-of-type]:first-letter:leading-[0.75]">
           {post.content.map((paragraph, i) => (
             <p key={i}>{paragraph}</p>
           ))}
         </div>
 
-        <div className="mt-14 border-t-6 border-[#F0D8A1] bg-[#f3f2f0]/60 px-6 py-8 text-center md:px-10">
+        <div
+          className="mt-14 bg-[#f3f2f0]/60 px-6 py-8 text-center md:px-10"
+          style={{ borderTop: `6px solid ${getThemeColor(post.tags)}` }}
+        >
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">
             The Strengths Writer
           </p>
@@ -190,27 +206,22 @@ export default async function BlogArticlePage({ params }: PageProps) {
           </p>
         </div>
 
-        {post.commentCount > 0 && (
-          <div className="mt-10 space-y-4">
-            <h2 className="text-lg font-bold text-foreground">
-              {post.commentCount} {post.commentCount === 1 ? "Comment" : "Comments"}
-            </h2>
-            <div className="border-l-4 border-[#72dbcc] bg-[#f3f2f0]/60 px-6 py-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="size-8 rounded-full bg-[#72dbcc]/30 flex items-center justify-center text-xs font-bold text-foreground/60">
-                  R
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground">Reader</p>
-                  <p className="text-xs text-foreground/50">February 10, 2021</p>
-                </div>
-              </div>
-              <p className="text-sm leading-relaxed text-foreground/80">
-                This was such an insightful read! Really changed how I think about strengths-based approaches in daily life.
-              </p>
-            </div>
-          </div>
-        )}
+        <CommentsSection
+          themeColor={getThemeColor(post.tags)}
+          initialCount={post.commentCount}
+          seedComments={
+            post.commentCount > 0
+              ? [
+                  {
+                    id: 1,
+                    name: "Reader",
+                    date: "February 10, 2021",
+                    body: "This was such an insightful read! Really changed how I think about strengths-based approaches in daily life.",
+                  },
+                ]
+              : []
+          }
+        />
       </div>
 
       {more.length > 0 ? (
