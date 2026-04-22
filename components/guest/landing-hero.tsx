@@ -11,7 +11,7 @@ const dotStyle: CSSProperties = {
 
 export default function LandingHero({ latestPost }: { latestPost: Blog }) {
   return (
-    <section className="relative mt-4 w-full overflow-hidden bg-gradient-to-b from-transparent to-primary/40 z-10">
+    <section className="relative mt-4 w-full overflow-hidden bg-gradient-to-b from-transparent to-primary/30 z-10">
       <div className="pointer-events-none absolute inset-x-0 top-0 min-h-screen " aria-hidden />
 
       <div className="relative mx-auto flex min-h-[min(100svh,42rem)] max-w-7xl flex-col gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-14 lg:flex-row lg:justify-between lg:gap-16 lg:pb-16">
