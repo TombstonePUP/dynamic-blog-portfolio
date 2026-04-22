@@ -1,3 +1,4 @@
+import BackButton from "@/components/guest/back-button";
 import {
   blogs,
   getBlogBySlug,
@@ -6,7 +7,7 @@ import {
 } from "@/data/blog";
 import { getThemeColor } from "@/lib/theme";
 import type { Blog, Tag } from "@/types/blog";
-import { ArrowLeft, ArrowRight, Calendar, Clock, MessageCircle, UserCircle } from "lucide-react";
+import { ArrowRight, Calendar, Clock, MessageCircle, UserCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -103,12 +104,12 @@ export default async function BlogArticlePage({ params }: PageProps) {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#72dbcc]/25 to-transparent mix-blend-soft-light md:h-40" />
 
         <div className="absolute inset-0 z-10 flex flex-col">
-          <div className="flex justify-start px-5 pt-6 sm:px-8 sm:pt-8 md:px-10 md:pt-10">
+          <div className="flex justify-start gap-4 px-5 pt-6 sm:px-8 sm:pt-8 md:px-10 md:pt-10">
+            <BackButton />
             <Link
-              href="/blog"
+              href="/topics"
               className="inline-flex items-center gap-2 border-2 border-white/90 bg-black/25 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-black/40"
             >
-              <ArrowLeft className="size-4" strokeWidth={2.5} aria-hidden />
               All stories
             </Link>
           </div>
@@ -217,7 +218,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
           <div className="border-t border-foreground/10 pt-10">
             <h2 className="text-2xl font-bold text-foreground/80">More stories</h2>
             <Link
-              href="/blog"
+              href="/topics"
               className="group mt-2 inline-flex items-center gap-2 text-sm font-medium text-foreground/60 transition hover:text-foreground"
             >
               View all stories

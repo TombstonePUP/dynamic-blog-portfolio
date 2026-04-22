@@ -217,7 +217,7 @@ export default function LandingScrollFeed({ streamPosts }: { streamPosts: Blog[]
                   You&apos;ve seen the full loop for now.
                 </p>
                 <Link
-                  href="/blog"
+                  href="/topics"
                   className="group mt-5 inline-flex items-center gap-2 bg-foreground px-8 py-3.5 text-sm font-semibold text-background transition hover:bg-foreground/90"
                 >
                   Open the full journal
@@ -232,7 +232,7 @@ export default function LandingScrollFeed({ streamPosts }: { streamPosts: Blog[]
       {pool.length === 0 && head.length > 0 ? (
         <section className="bg-[#f3f2f0] px-4 py-14 text-center sm:px-8">
           <Link
-            href="/blog"
+            href="/topics"
             className="group inline-flex items-center gap-2 border-2 border-foreground/20 bg-white px-8 py-3.5 text-sm font-semibold text-foreground transition hover:border-[#72dbcc]"
           >
             See every story in the journal

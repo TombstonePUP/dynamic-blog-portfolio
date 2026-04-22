@@ -36,7 +36,7 @@ export default function LandingHero({ latestPost }: { latestPost: Blog }) {
               About Strengths Writer
             </Link>
             <Link
-              href="/blog"
+              href="/topics"
               className="group inline-flex items-center gap-2 border-1 border-transparent bg-[#F0D8A1] px-6 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#e8cc8a]"
             >
               Explore
