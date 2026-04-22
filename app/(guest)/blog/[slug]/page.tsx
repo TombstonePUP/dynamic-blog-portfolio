@@ -213,18 +213,18 @@ export default async function BlogArticlePage({ params }: PageProps) {
       </div>
 
       {more.length > 0 ? (
-        <section className="relative z-10 mx-auto mt-6 max-w-7xl bg-[#f3f2f0] px-0">
-          <div className="border-t-10 border-[#72dbcc] px-5 py-8 text-center md:px-10">
-            <h2 className="text-4xl font-bold text-foreground">More stories</h2>
+        <section className="mx-auto mt-20 max-w-7xl px-5 pb-10 sm:px-8">
+          <div className="border-t border-foreground/10 pt-10">
+            <h2 className="text-2xl font-bold text-foreground/80">More stories</h2>
             <Link
               href="/blog"
-              className="group mt-4 inline-flex items-center gap-2 text-sm font-semibold text-foreground/70 transition hover:text-foreground"
+              className="group mt-2 inline-flex items-center gap-2 text-sm font-medium text-foreground/60 transition hover:text-foreground"
             >
               View all stories
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          <div className="grid gap-6 p-6 pt-0 sm:grid-cols-2 sm:p-10 lg:grid-cols-3">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {more.map((p) => (
               <RelatedCard key={p.id} post={p} />
             ))}
