@@ -4,8 +4,9 @@ import {
   getRelatedBlogs,
   readingMinutesFromContent,
 } from "@/data/blog";
+import { getThemeColor } from "@/lib/theme";
 import type { Blog, Tag } from "@/types/blog";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Clock, MessageCircle, UserCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -114,55 +115,65 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
           <div className="mt-auto mb-10 px-5 pb-10 pt-16 sm:px-8 sm:pb-12 md:px-10 md:pb-14">
             <div className="mx-auto max-w-4xl">
-              <span className="mb-4 inline-flex items-center bg-[#F0D8A1] px-3 py-1 text-sm font-semibold text-black">
+              <span 
+                className="mb-4 inline-flex items-center px-3 py-1 text-sm font-semibold text-black"
+                style={{ backgroundColor: getThemeColor(post.tags) }}
+              >
                 {seriesLabel(post.tags)}
               </span>
               <h1 className="max-w-4xl text-3xl font-bold leading-[1.12] tracking-tight text-white text-balance sm:text-4xl md:text-[4rem] md:leading-[1.1]">
                 {post.title}
               </h1>
+
+              <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-white/80">
+                <div className="flex items-center gap-2">
+                  <div className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white/90 ring-1 ring-white/20">
+                    <UserCircle className="size-5" strokeWidth={1.75} />
+                  </div>
+                  <span className="font-semibold text-white">
+                    {post.author.name}
+                  </span>
+                </div>
+                
+                <div className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden />
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20">
+                    <Calendar className="size-4 text-white/70" strokeWidth={1.5} />
+                    <time dateTime={post.date} className="font-medium text-white/90">
+                      {post.dateLabel}
+                    </time>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20">
+                    <Clock className="size-4 text-white/70" strokeWidth={1.5} />
+                    <span className="font-medium text-white/90">{minutes} min read</span>
+                  </div>
+
+                  {post.commentCount > 0 && (
+                    <div className="flex items-center gap-1.5 rounded-full bg-[#72dbcc]/20 px-3 py-1.5 text-[#72dbcc] ring-1 ring-[#72dbcc]/30">
+                      <MessageCircle className="size-4" strokeWidth={1.5} />
+                      <span className="font-medium">
+                        {post.commentCount}{" "}
+                        {post.commentCount === 1 ? "comment" : "comments"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         <div
-          className="absolute bottom-0 left-0 right-0 z-[11] h-1.5 bg-[#72dbcc]"
+          className="absolute bottom-0 left-0 right-0 z-[11] h-1.5"
+          style={{ backgroundColor: getThemeColor(post.tags) }}
           aria-hidden
         />
       </header>
 
-      <div className="relative z-20 -mt-10 mx-auto max-w-3xl px-4 sm:-mt-12 md:-mt-14 md:px-8">
-        <div className="border-t-6 border-[#F0D8A1] bg-background px-6 pb-8 pt-7 shadow-lg shadow-black/10 md:px-10 md:pb-10 md:pt-9">
-          <p className="text-base leading-relaxed text-foreground/85 md:text-lg md:leading-relaxed">
-            {post.excerpt}
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-foreground/10 pt-6 text-sm text-foreground/75">
-            <span className="font-bold text-foreground">{post.author.name}</span>
-            <span className="text-foreground/35" aria-hidden>
-              ·
-            </span>
-            <time dateTime={post.date}>{post.dateLabel}</time>
-            <span className="text-foreground/35" aria-hidden>
-              ·
-            </span>
-            <span>{minutes} min read</span>
-            {post.commentCount > 0 ? (
-              <>
-                <span className="text-foreground/35" aria-hidden>
-                  ·
-                </span>
-                <span>
-                  {post.commentCount}{" "}
-                  {post.commentCount === 1 ? "comment" : "comments"}
-                </span>
-              </>
-            ) : null}
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto mt-12 max-w-2xl px-5 md:mt-14 md:px-8">
-        <div className="space-y-6 text-base leading-[1.8] text-foreground/90 md:text-[1.0625rem] md:leading-[1.85] [&>p:first-of-type]:text-[1.0625rem] [&>p:first-of-type]:leading-relaxed md:[&>p:first-of-type]:text-lg md:[&>p:first-of-type]:leading-relaxed">
+      <div className="mx-auto mt-12 max-w-2xl px-5 md:mt-14 md:px-8" style={{ "--theme-color": getThemeColor(post.tags) } as React.CSSProperties}>
+        <div className="space-y-6 text-base leading-[1.8] text-foreground/90 md:text-[1.0625rem] md:leading-[1.85] [&>p:first-of-type]:text-[1.0625rem] [&>p:first-of-type]:leading-relaxed md:[&>p:first-of-type]:text-lg md:[&>p:first-of-type]:leading-relaxed [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:mr-3 [&>p:first-of-type]:first-letter:-mt-2 [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-black [&>p:first-of-type]:first-letter:text-[var(--theme-color)] [&>p:first-of-type]:first-letter:leading-[0.75]">
           {post.content.map((paragraph, i) => (
             <p key={i}>{paragraph}</p>
           ))}

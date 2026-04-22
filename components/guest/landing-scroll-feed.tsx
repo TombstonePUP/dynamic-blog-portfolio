@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const BATCH = 2;
+const BATCH = 1;
 
 function topicLabel(post: Blog): string {
   const t = post.tags.find((x) => x !== "featured");
@@ -104,7 +104,7 @@ function FeedInterstitial({ kicker, quote, sub }: { kicker: string; quote: strin
 export default function LandingScrollFeed({ streamPosts }: { streamPosts: Blog[] }) {
   const head = streamPosts.slice(0, 3);
   const tail = streamPosts.slice(3);
-  const pool = tail.length ? [...tail, ...tail] : [];
+  const pool = tail.length ? [...tail] : [];
   const [visibleTail, setVisibleTail] = useState(0);
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
