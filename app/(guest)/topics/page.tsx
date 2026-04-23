@@ -1,4 +1,4 @@
-import { ALL_TAGS, blogs } from "@/data/blog";
+import { MAIN_CATEGORIES, blogs, tagToSlug } from "@/data/blog";
 import { getThemeColor } from "@/lib/theme";
 import type { Blog, Tag } from "@/types/blog";
 import { ArrowRight } from "lucide-react";
@@ -54,7 +54,7 @@ function TopicCard({ post, topic }: { post: Blog; topic: Tag }) {
 }
 
 export default function TopicsPage() {
-  const topics = ALL_TAGS.filter((tag) => tag !== "featured");
+  const topics = MAIN_CATEGORIES;
 
   return (
     <main className="relative min-h-screen pb-24 font-sans bg-gradient-to-b to-[#72dbcc]/10 from-transparent">
@@ -105,24 +105,43 @@ export default function TopicsPage() {
 
           const themeColor = getThemeColor([topic]);
 
+          const topicSubTags = Array.from(new Set(
+            topicBlogs.flatMap((b) => b.tags).filter((t) => !MAIN_CATEGORIES.includes(t) && t !== "featured")
+          ));
+
           return (
             <section key={topic} className="relative scroll-mt-24" id={topic}>
-              <div 
+              <div
                 className="mb-8 border-l-[6px] pl-5"
                 style={{ borderColor: themeColor }}
               >
-                <span 
+                <span
                   className="inline-flex items-center px-3 py-1 text-xs font-bold uppercase tracking-wider text-black"
                   style={{ backgroundColor: themeColor }}
                 >
                   {capitalizeTopic(topic)}
                 </span>
-                <h2 className="mt-3 text-3xl font-bold text-foreground sm:text-4xl">
-                  {capitalizeTopic(topic)}
-                </h2>
-                <p className="mt-2 text-foreground/60">
+                <span className="text-foreground/30 text-xs px-1">•</span>
+                <span className="text-foreground/60">
                   {topicBlogs.length} {topicBlogs.length === 1 ? "Story" : "Stories"}
-                </p>
+                </span>
+                <div className="mt-3 flex items-center flex-wrap gap-2">
+                  {topicSubTags.length > 0 && (
+                    <>
+                      <div className="flex flex-wrap gap-2">
+                        {topicSubTags.map((subTag) => (
+                          <Link 
+                            key={subTag}
+                            href={`/tags/${tagToSlug(subTag)}`}
+                            className="inline-flex items-center rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-foreground/70 shadow-sm ring-1 ring-inset ring-black/[0.06] transition hover:bg-black/5 hover:text-black"
+                          >
+                            {capitalizeTopic(subTag)}
+                          </Link>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

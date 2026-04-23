@@ -10,7 +10,7 @@ const BATCH = 1;
 
 function topicLabel(post: Blog): string {
   const t = post.tags.find((x) => x !== "featured");
-  return t ? t : post.tags[0] ?? "Story";
+  return t ? t : (post.tags[0] ?? "Story");
 }
 
 function FeaturedCard({ post }: { post: Blog }) {
@@ -83,7 +83,15 @@ function RiverCard({ post, variant }: { post: Blog; variant: "a" | "b" }) {
   );
 }
 
-function FeedInterstitial({ kicker, quote, sub }: { kicker: string; quote: string; sub: string }) {
+function FeedInterstitial({
+  kicker,
+  quote,
+  sub,
+}: {
+  kicker: string;
+  quote: string;
+  sub: string;
+}) {
   return (
     <div className="relative mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
       <div
@@ -101,7 +109,11 @@ function FeedInterstitial({ kicker, quote, sub }: { kicker: string; quote: strin
   );
 }
 
-export default function LandingScrollFeed({ streamPosts }: { streamPosts: Blog[] }) {
+export default function LandingScrollFeed({
+  streamPosts,
+}: {
+  streamPosts: Blog[];
+}) {
   const head = streamPosts.slice(0, 3);
   const tail = streamPosts.slice(3);
   const pool = tail.length ? [...tail] : [];

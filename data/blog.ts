@@ -8,7 +8,7 @@ export const AUTHORS: Record<string, Author> = {
     name: "Ian Llenares",
     slug: "ian",
     role: "Founder & Lead Writer",
-    image: "https://strengthswriter.com/wp-content/uploads/2023/07/Ian-L-1024x1024.jpg",
+    image: "/images/blog/Ian-L-1024x1024.jpg",
     social: {
       x: "https://x.com/ianllenares",
       linkedin: "https://linkedin.com/in/ianllenares",
@@ -22,7 +22,7 @@ export const AUTHORS: Record<string, Author> = {
     name: "John Doe",
     slug: "johndoe",
     role: "Guest Contributor",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2940&auto=format&fit=crop",
+    image: "/images/blog/unsplash-1472099645785-5658abf4ff4e.jpg",
     social: {
       x: "https://x.com/johndoe",
       linkedin: "https://linkedin.com/in/johndoe",
@@ -32,7 +32,7 @@ export const AUTHORS: Record<string, Author> = {
     name: "Jane Doe",
     slug: "janedoe",
     role: "Editorial Assistant",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2940&auto=format&fit=crop",
+    image: "/images/blog/unsplash-1438761681033-6461ffad8d80.jpg",
     social: {
       instagram: "https://instagram.com/janedoe",
       tiktok: "https://tiktok.com/janedoe",
@@ -42,14 +42,75 @@ export const AUTHORS: Record<string, Author> = {
 
 // ─── Tags ────────────────────────────────────────────────────────────────────
 
-export const ALL_TAGS: Tag[] = [
-  "featured",
+export const MAIN_CATEGORIES: Tag[] = [
   "movie Review",
   "personal blog",
   "what's your worry?",
   "why positive psychology?",
   "advice",
 ];
+
+export const ALL_TAGS: Tag[] = [
+  // Categories
+  "featured",
+  "movie Review",
+  "personal blog",
+  "what's your worry?",
+  "why positive psychology?",
+  "advice",
+  // SubTags
+  "career search",
+  "character strengths",
+  "coping this new normal",
+  "coping through planting trees",
+  "coronavirus",
+  "covid-19 UK variant in the Philippines",
+  "golem effect",
+  "graduates of 2023",
+  "gratitude",
+  "how to handle romantic rejection",
+  "How to increase self-confidence",
+  "industrial psychology",
+  "job hunting",
+  "love at first chat",
+  "love or infatuation this new normal",
+  "my crush landing on you",
+  "newly graduate",
+  "new normal",
+  "parenting",
+  "parenting this pandemic",
+  "parenting tips",
+  "plantitas",
+  "plantitos",
+  "positiveparenting",
+  "positive psychology",
+  "Positive psychology goals is to boost our strengths",
+  "quiet cracking",
+  "quranflings",
+  "relationship",
+  "self-care",
+  "self-care for drug users",
+  "self-confidence",
+  "self-forgiveness",
+  "signs of quiet cracking",
+  "teenage relationship",
+  "wearing is caring",
+  "workplace",
+];
+
+/** Convert a tag label into a URL-safe slug (spaces → hyphens, lowercase) */
+export function tagToSlug(tag: string): string {
+  return tag
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** Reverse a slug back to the original Tag, or undefined if not found */
+export function slugToTag(slug: string): Tag | undefined {
+  return ALL_TAGS.find((t) => tagToSlug(t) === slug);
+}
 
 // ─── Blogs ───────────────────────────────────────────────────────────────────
 
@@ -60,13 +121,13 @@ export const blogs: Blog[] = [
     title: "Tahimik Pero Wasak: Beshie, Quiet Cracking Na Yan!",
     href: "/blog/tahimik-pero-wasak-quiet-cracking",
     image:
-      "https://strengthswriter.com/wp-content/uploads/2025/08/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1.png",
+      "/images/blog/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1.png",
     thumbnail:
-      "https://strengthswriter.com/wp-content/uploads/2025/08/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1-150x150.png",
+      "/images/blog/BA2A2C81-6F61-40A8-8AC3-B82D15C0B67C-1-150x150.png",
     author: AUTHORS.ian,
     date: "2025-08-13",
     dateLabel: "August 13, 2025",
-    tags: ["featured", "what's your worry?"],
+    tags: ["featured", "what's your worry?", "quiet cracking", "signs of quiet cracking", "workplace", "coping this new normal"],
     excerpt:
       "Beshie, napansin mo ba lately? Si officemate na dati'y laging naka-high heels at full glam, ngayon naka-crocs at hoodie na lang. Si Kuya na laging masayahin, bigla na lang naging parang background music—present pero hindi mo maramdaman. Grabe, baka hindi lang sila pagod… Quiet cracking na yan. Oo besh, hindi lang ito quiet quitting na petiks lang sa trabaho. Iba ito. Mas malala. Ito yung \"I'm fine\" pero sa totoo lang, \"I'm barely holding it together\"",
     content: blogArticleBodies["tahimik-pero-wasak-quiet-cracking"],
@@ -78,13 +139,13 @@ export const blogs: Blog[] = [
     title: "Career Search: A Guide for Graduates of the Class of 2023",
     href: "/blog/career-search-guide-graduates-2023",
     image:
-      "https://strengthswriter.com/wp-content/uploads/2023/06/Blog_1.jpg",
+      "/images/blog/Blog_1.jpg",
     thumbnail:
-      "https://strengthswriter.com/wp-content/uploads/2023/06/Blog_1-150x150.jpg",
+      "/images/blog/Blog_1-150x150.jpg",
     author: AUTHORS.ian,
     date: "2023-06-30",
     dateLabel: "June 30, 2023",
-    tags: ["featured", "advice"],
+    tags: ["featured", "advice", "career search", "graduates of 2023", "newly graduate", "job hunting"],
     excerpt:
       "Congratulations to the Class of 2023 graduates! As you transition from the academic world to professional opportunities, it's important to approach your career search with strategy and confidence.",
     content: blogArticleBodies["career-search-guide-graduates-2023"],
@@ -96,13 +157,13 @@ export const blogs: Blog[] = [
     title: "The A to Z of Positive Parenting",
     href: "/blog/a-to-z-positive-parenting",
     image:
-      "https://strengthswriter.com/wp-content/uploads/2021/02/Blog-Post-6a.jpg",
+      "/images/blog/Blog-Post-6a.jpg",
     thumbnail:
-      "https://strengthswriter.com/wp-content/uploads/2021/02/Blog-Post-6a-150x150.jpg",
+      "/images/blog/Blog-Post-6a-150x150.jpg",
     author: AUTHORS.ian,
     date: "2021-05-01",
     dateLabel: "May 1, 2021",
-    tags: ["featured", "personal blog"],
+    tags: ["featured", "personal blog", "parenting", "positiveparenting", "parenting this pandemic", "parenting tips"],
     excerpt:
       "The quarantine measures this pandemic is an opportunity for parents to relate with their children. Staying at home can be the perfect setting to practice positive parenting.",
     content: blogArticleBodies["a-to-z-positive-parenting"],
@@ -114,13 +175,13 @@ export const blogs: Blog[] = [
     title: "Positive psychology goals is to boost our strengths",
     href: "/blog/positive-psychology-goals-boost-strengths",
     image:
-      "https://strengthswriter.com/wp-content/uploads/2021/02/Positive-Strengths.jpg",
+      "/images/blog/Positive-Strengths.jpg",
     thumbnail:
-      "https://strengthswriter.com/wp-content/uploads/2021/02/Positive-Strengths-150x150.jpg",
+      "/images/blog/Positive-Strengths-150x150.jpg",
     author: AUTHORS.ian,
     date: "2021-02-10",
     dateLabel: "February 10, 2021",
-    tags: ["personal blog", "why positive psychology?"],
+    tags: ["personal blog", "why positive psychology?", "positive psychology", "Positive psychology goals is to boost our strengths", "character strengths"],
     excerpt:
       "In a world that often focuses on problems, challenges, and deficiencies positive psychology provides a revitalizing perspective by emphasizing strengths and what makes life worth living.",
     content: blogArticleBodies["positive-psychology-goals-boost-strengths"],
@@ -155,13 +216,13 @@ export const blogs: Blog[] = [
     title: "Attack on Itan: How to increase one's self-confidence?",
     href: "/blog/attack-on-itan-self-confidence",
     image:
-      "https://strengthswriter.com/wp-content/uploads/2021/01/144040220_1034879487001599_8417849835091764025_n.jpg",
+      "/images/blog/144040220_1034879487001599_8417849835091764025_n.jpg",
     thumbnail:
-      "https://strengthswriter.com/wp-content/uploads/2021/01/144040220_1034879487001599_8417849835091764025_n-150x150.jpg",
+      "/images/blog/144040220_1034879487001599_8417849835091764025_n-150x150.jpg",
     author: AUTHORS.ian,
     date: "2021-02-04",
     dateLabel: "February 4, 2021",
-    tags: ["featured", "what's your worry?"],
+    tags: ["featured", "what's your worry?", "self-confidence", "How to increase self-confidence"],
     excerpt:
       "Bes, sa buhay minsan hindi maiwasan na nawawalan tayo ng tiwala sa atin sarili. Minsan o madalas ay kailangan nating harapin ang mga sitwasyong sumusubok sa ating kumpiyansa.",
     content: blogArticleBodies["attack-on-itan-self-confidence"],
@@ -173,13 +234,13 @@ export const blogs: Blog[] = [
     title: "Wearing is Caring",
     href: "/blog/wearing-is-caring",
     image:
-      "https://strengthswriter.com/wp-content/uploads/2021/01/Wearing-is-caring-blog-1.jpg",
+      "/images/blog/Wearing-is-caring-blog-1.jpg",
     thumbnail:
-      "https://strengthswriter.com/wp-content/uploads/2021/01/Wearing-is-caring-blog-1-150x150.jpg",
+      "/images/blog/Wearing-is-caring-blog-1-150x150.jpg",
     author: AUTHORS.ian,
     date: "2021-01-25",
     dateLabel: "January 25, 2021",
-    tags: ["featured", "what's your worry?"],
+    tags: ["featured", "what's your worry?", "wearing is caring", "coronavirus", "coping this new normal"],
     excerpt:
       "Halos sampung buwan na tayo nasa quarantine measures para mapigilan ang patuloy na paglaganap ng coronavirus. Habang ang iba ay nag-iingat, mahalaga rin na ipaalala sa ating mga sarili ang kahalagahan ng pagmamalasakit.",
     content: blogArticleBodies["wearing-is-caring"],
@@ -191,13 +252,13 @@ export const blogs: Blog[] = [
     title: "My crush landing on You: How to handle romantic rejection?",
     href: "/blog/my-crush-landing-on-you-handle-rejection",
     image:
-      "https://strengthswriter.com/wp-content/uploads/2021/01/My-crush-and-landing-blog.jpg",
+      "/images/blog/My-crush-and-landing-blog.jpg",
     thumbnail:
-      "https://strengthswriter.com/wp-content/uploads/2021/01/My-crush-and-landing-blog-300x157.jpg",
+      "/images/blog/My-crush-and-landing-blog-300x157.jpg",
     author: AUTHORS.ian,
     date: "2021-01-28",
     dateLabel: "January 28, 2021",
-    tags: ["featured", "what's your worry?"],
+    tags: ["featured", "what's your worry?", "my crush landing on you", "how to handle romantic rejection", "relationship"],
     excerpt:
       "Grabe Bes, di ako makapaniwala. Bakit nagawa mo sakin ito? Ako yung nagtanim pero ikaw yung umani.. Sheket!",
     content: blogArticleBodies["my-crush-landing-on-you-handle-rejection"],
@@ -218,13 +279,13 @@ export const blogs: Blog[] = [
     title: "Green Resilience: The Therapeutic Power of Planting this COVID-19 Pandemic",
     href: "/blog/plants-vs-covid-19",
     image:
-      "https://strengthswriter.com/wp-content/uploads/2021/01/plants-vs-covid-blog.jpg",
+      "/images/blog/plants-vs-covid-blog.jpg",
     thumbnail:
-      "https://strengthswriter.com/wp-content/uploads/2021/01/plants-vs-covid-blog-300x157.jpg",
+      "/images/blog/plants-vs-covid-blog-300x157.jpg",
     author: AUTHORS.ian,
     date: "2021-01-24",
     dateLabel: "January 24, 2021",
-    tags: ["featured", "what's your worry?"],
+    tags: ["featured", "what's your worry?", "plantitas", "plantitos", "coping through planting trees", "coping this new normal"],
     excerpt:
       "The COVID-19 pandemic has brought unprecedented challenges, pressing us to adopt new ways of living and coping with stress. One surprisingly effective outlet has been gardening.",
     content: blogArticleBodies["plants-vs-covid-19"],

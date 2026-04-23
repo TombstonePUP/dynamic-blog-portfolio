@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "pages:deploy": "npm run build && npx wrangler pages deploy out --project-name=strengthswriter"
   },
   "dependencies": {
     "@prisma/client": "^7.7.0",
