@@ -1,59 +1,55 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { BellRing } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Separator } from "./ui/separator";
 
 export default function AdminHeader() {
   const pathname = usePathname();
-  const isDashboard = pathname === "/dashboard/";
-  const isEditor = pathname === "/editor/";
+  const isDashboard = pathname === "/dashboard";
+  const isEditor = pathname?.startsWith("/editor");
+
+  if (isEditor) {
+    return null;
+  }
 
   return (
-    <header className="px-8 py-6 flex items-center justify-between bg-[#FAF9F6] border-b border-black/5">
-      <div className="flex items-center gap-6">
-        {!isDashboard ? (
-          <Link
-            href="/dashboard"
-            className="group flex items-center justify-center size-10 bg-white shadow-sm ring-1 ring-black/5 hover:ring-primary/40 transition"
-          >
-            <ArrowLeft className="size-4 text-foreground/60 transition-transform group-hover:text-foreground" />
-          </Link>
-        ) : (
-          <div className="size-10 bg-primary/10 flex items-center justify-center rounded-full text-primary ring-1 ring-primary/20">
-            <span className="font-black text-sm">A</span>
-          </div>
-        )}
-        <div>
-          <h1 className="text-xl font-bold tracking-tight">
-            {isEditor ? "Writing Environment" : "Admin Dashboard"}
+    <header className=" sticky top-0 z-50 border-b ">
+      <div className="mx-auto flex max-w-7xl w-full items-center justify-between gap-6 px-8 py-3">
+        <div className="flex items-center gap-4">
+
+          <h1 className="text-sm font-bold tracking-tight shrink-0 hidden sm:block">
+            {isEditor ? "Writing Environment" : "Admin Console"}
           </h1>
-          <p className="text-xs text-foreground/40 font-medium">ADMIN CONSOLE</p>
+
+          <div className="h-4 w-px bg-admin-contrast/10 mx-2 hidden sm:block" />
+
+
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <nav className="flex items-center gap-6 text-sm font-medium text-admin-text/60">
+            <Link
+              href="/dashboard"
+              className={`transition ${isDashboard ? "text-admin-text font-semibold" : "hover:text-admin-text"}`}
+            >
+              Overview
+            </Link>
+            <Link
+              href="/posts"
+              className={`transition ${pathname === "/posts/" ? "text-admin-text font-semibold" : "hover:text-admin-text"}`}
+            >
+              Explorer
+            </Link>
+          </nav>
+          <Separator orientation="vertical" className="mx-2" />
+          <div className="rounded-full p-2 hover:bg-admin-contrast/5 cursor-pointer relative before:absolute before:left-1/2 before:z-10 before:w-1.5 before:h-1.5 before:rounded-full before:bg-red-500 before:top-2 text-admin-text/60 hover:text-admin-text transition">
+            <BellRing className="size-4" />
+          </div>
+          <div className="ml-1 size-7 rounded-full bg-[#72dbcc]/30 border border-[#72dbcc]/50 shadow-sm cursor-pointer shrink-0" />
         </div>
       </div>
-
-      <nav className="flex items-center gap-8 text-sm font-semibold text-foreground/60">
-        <Link
-          href="/dashboard"
-          className={`transition ${isDashboard ? "text-foreground" : "hover:text-foreground"}`}
-        >
-          Overview
-        </Link>
-        <Link
-          href="/editor"
-          className={`transition ${isEditor ? "text-foreground" : "hover:text-foreground"}`}
-        >
-          Writer
-        </Link>
-        <Link
-          href="/editor-static"
-          className={`transition ${pathname === "/editor-static/" ? "text-foreground" : "hover:text-foreground"}`}
-        >
-          Showcase
-        </Link>
-        <Link href="/topics" className="hover:text-foreground transition">Public Site</Link>
-        <div className="size-8 rounded-full bg-[#72dbcc]/30 border border-[#72dbcc]/50" />
-      </nav>
     </header>
   );
 }

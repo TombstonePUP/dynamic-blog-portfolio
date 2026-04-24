@@ -1,5 +1,6 @@
+import { Button } from "@/components/admin/ui/button";
+import { Eye, FileEdit, Layout, Settings, Users } from "lucide-react";
 import Link from "next/link";
-import { FileEdit, Layout, Settings, Users } from "lucide-react";
 
 export default function DashboardHome() {
   const stats = [
@@ -13,20 +14,20 @@ export default function DashboardHome() {
       <div className="flex flex-col gap-8">
         {/* Welcome Section */}
         <section className="flex flex-col gap-2">
-          <h2 className="text-3xl font-black tracking-tight text-foreground">Welcome back, Ian.</h2>
-          <p className="text-foreground/50 font-medium">Here&apos;s what&apos;s happening with your journal today.</p>
+          <h2 className="text-3xl font-black tracking-tight text-admin-text">Welcome back, Ian.</h2>
+          <p className="text-admin-text/50 font-medium">Here&apos;s what&apos;s happening with your journal today.</p>
         </section>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((stat) => (
-            <div key={stat.label} className="bg-white p-6 shadow-sm ring-1 ring-black/5 flex items-center gap-5">
+            <div key={stat.label} className="p-6 shadow-sm ring-1 flex items-center gap-5">
               <div className={`size-12 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center`}>
                 <stat.icon size={24} />
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40">{stat.label}</p>
-                <p className="text-2xl font-black text-foreground">{stat.value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest ">{stat.label}</p>
+                <p className="text-2xl font-black text-admin-text">{stat.value}</p>
               </div>
             </div>
           ))}
@@ -34,22 +35,23 @@ export default function DashboardHome() {
 
         {/* Quick Actions */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
-          <div className="bg-white p-10 shadow-sm ring-1 ring-black/5 flex flex-col gap-6">
+          <div className="p-10 shadow-sm ring-1 flex flex-col gap-6">
             <h3 className="text-xl font-bold tracking-tight">Quick Actions</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Link 
-                href="/editor" 
-                className="flex items-center justify-center gap-3 bg-foreground text-background py-4 px-6 text-sm font-bold uppercase tracking-widest transition hover:bg-foreground/80"
+              <Button
+                variant="outline"
               >
-                <Plus size={16} />
-                New Story
-              </Link>
-              <Link 
-                href="/topics" 
-                className="flex items-center justify-center gap-3 border border-black/10 py-4 px-6 text-sm font-bold uppercase tracking-widest transition hover:bg-black/5"
-              >
-                View Site
-              </Link>
+                <Link href="/editor" className="flex items-center justify-center gap-2">
+                  <Plus size={16} />
+                  New Story
+                </Link>
+              </Button>
+              <Button>
+                <Link href="/topics" className="flex items-center justify-center gap-2">
+                  <Eye size={16} />
+                  View Site
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -71,14 +73,14 @@ export default function DashboardHome() {
 
 function Plus({ size }: { size: number }) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="3" 
-      strokeLinecap="round" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
       strokeLinejoin="round"
     >
       <line x1="12" y1="5" x2="12" y2="19"></line>

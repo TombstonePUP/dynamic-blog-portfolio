@@ -1,4 +1,5 @@
 import MdxEditor from "@/components/admin/mdx-editor";
+import { Suspense } from "react";
 import { Metadata } from "next";
 import fs from "fs";
 import path from "path";
@@ -64,12 +65,14 @@ Use the editor on the left to write your content, and see the preview update liv
   }
 
   return (
-    <main className="px-8 pb-8 pt-6">
-      <MdxEditor 
-        initialContent={initialContent} 
-        initialBlogFolders={initialBlogFolders}
-        initialBlogContents={initialBlogContents}
-      />
+    <main className="px-8 pb-8 pt-6 flex-1 flex flex-col">
+      <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading editor...</div>}>
+        <MdxEditor 
+          initialContent={initialContent} 
+          initialBlogFolders={initialBlogFolders}
+          initialBlogContents={initialBlogContents}
+        />
+      </Suspense>
     </main>
   );
 }

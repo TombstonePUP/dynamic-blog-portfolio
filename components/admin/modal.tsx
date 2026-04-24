@@ -1,7 +1,7 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
 import { X } from "lucide-react";
+import { ReactNode, useEffect } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -41,15 +41,15 @@ export default function Modal({
   if (!isOpen) return null;
 
   const iconStyles = {
-    default: "bg-primary/10 text-primary",
+    default: "bg-admin-primary/10 text-admin-primary",
     danger: "bg-red-500/10 text-red-600",
     warning: "bg-amber-500/10 text-amber-600",
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div 
-        className="bg-white w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ring-1 ring-black/10 flex flex-col"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-admin-contrast/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div
+        className="w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ring-1 ring-admin-contrast/10 flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-8">
@@ -61,27 +61,27 @@ export default function Modal({
                 </div>
               )}
               <div>
-                <h3 className="text-xl font-bold text-foreground leading-tight">{title}</h3>
-                {description && <p className="text-sm text-foreground/50 mt-1">{description}</p>}
+                <h3 className="text-xl font-bold text-admin-text leading-tight">{title}</h3>
+                {description && <p className="text-sm text-admin-text/50 mt-1">{description}</p>}
               </div>
             </div>
-            <button 
-              onClick={onClose} 
-              className="p-2 hover:bg-black/5 rounded-full transition text-foreground/20 hover:text-foreground shrink-0 -mr-2 -mt-2"
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-admin-contrast/5 rounded-full transition text-admin-text/20 hover:text-admin-text shrink-0 -mr-2 -mt-2"
             >
               <X size={18} />
             </button>
           </div>
-          
+
           {children && (
             <div className="animate-in fade-in slide-in-from-top-2 duration-300">
               {children}
             </div>
           )}
         </div>
-        
+
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-8 py-4 bg-[#FAF9F6] border-t border-black/5">
+          <div className="flex items-center justify-end gap-3 px-8 py-4  border-t border-admin-contrast/5">
             {footer}
           </div>
         )}
