@@ -45,6 +45,12 @@ export default function AdminHeader() {
         >
           Writer
         </Link>
+        <Link
+          href="/editor-static"
+          className={`transition ${pathname === "/editor-static/" ? "text-foreground" : "hover:text-foreground"}`}
+        >
+          Showcase
+        </Link>
         <Link href="/topics" className="hover:text-foreground transition">Public Site</Link>
         <div className="size-8 rounded-full bg-[#72dbcc]/30 border border-[#72dbcc]/50" />
       </nav>

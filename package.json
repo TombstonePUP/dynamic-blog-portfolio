@@ -11,7 +11,6 @@
     "sync": "node sync-assets.mjs",
     "localize": "node download-images.mjs",
     "pages:deploy": "npm run build && npx wrangler pages deploy out --project-name=strengthswriter"
-
   },
   "dependencies": {
     "@prisma/client": "^7.7.0",
@@ -27,6 +26,7 @@
     "react-icons": "^5.6.0"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

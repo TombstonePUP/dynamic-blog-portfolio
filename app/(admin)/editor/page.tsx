@@ -1,5 +1,7 @@
 import MdxEditor from "@/components/admin/mdx-editor";
 import { Metadata } from "next";
+import fs from "fs";
+import path from "path";
 
 export const metadata: Metadata = {
   title: "Writer | The Strengths Writer",
@@ -34,9 +36,40 @@ Use the editor on the left to write your content, and see the preview update liv
 3. **Portability**: Your files are just plain text.
 `;
 
+  const POSTS_PATH = path.join(process.cwd(), "content/posts");
+  let initialBlogFolders: any[] = [];
+  const initialBlogContents: Record<string, string> = {};
+
+  try {
+    if (fs.existsSync(POSTS_PATH)) {
+      const entries = fs.readdirSync(POSTS_PATH);
+      initialBlogFolders = entries.map(slug => {
+        const folderPath = path.join(POSTS_PATH, slug);
+        const stat = fs.statSync(folderPath);
+        if (!stat.isDirectory()) return null;
+        
+        const files = fs.readdirSync(folderPath);
+        
+        // Load the index.mdx content for this post
+        const mdxPath = path.join(folderPath, "index.mdx");
+        if (fs.existsSync(mdxPath)) {
+          initialBlogContents[slug] = fs.readFileSync(mdxPath, "utf8");
+        }
+        
+        return { slug, files };
+      }).filter(Boolean);
+    }
+  } catch (error) {
+    console.error("Error loading posts for editor:", error);
+  }
+
   return (
     <main className="px-8 pb-8 pt-6">
-      <MdxEditor initialContent={initialContent} />
+      <MdxEditor 
+        initialContent={initialContent} 
+        initialBlogFolders={initialBlogFolders}
+        initialBlogContents={initialBlogContents}
+      />
     </main>
   );
 }

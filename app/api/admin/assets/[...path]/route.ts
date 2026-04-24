@@ -1,12 +1,24 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return [{ path: ["_placeholder"] }];
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
     const { path: pathSegments } = await params;
+    
+    // Silence placeholder during build
+    if (pathSegments[0] === '_placeholder') {
+      return new Response('Placeholder', { status: 200 });
+    }
     
     // Construct the absolute path
     const filePath = path.resolve(process.cwd(), 'content', 'posts', ...pathSegments);

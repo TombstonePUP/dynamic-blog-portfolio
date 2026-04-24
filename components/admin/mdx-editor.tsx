@@ -1,54 +1,133 @@
 "use client";
 
-import { useEffect, useState, useTransition, useRef, useCallback } from "react";
-import { compileMdxAction } from "@/app/actions/mdx-actions";
-import { 
-  getBlogListAction, 
-  getBlogContentAction, 
-  saveBlogContentAction,
-  uploadAssetAction,
+import {
+  deleteAssetAction,
   getAssetDataAction,
+  getBlogContentAction,
+  getBlogListAction,
   renameBlogSlugAction,
-  deleteAssetAction
+  saveBlogContentAction,
+  uploadAssetAction
 } from "@/app/actions/blog-actions";
-import { MDXRemote } from "next-mdx-remote";
-import Modal from "./modal";
-import { 
-  Eye, 
-  FileText, 
-  Loader2, 
-  Maximize2, 
-  Save, 
-  ChevronLeft, 
-  ChevronRight,
-  FolderOpen,
-  Plus,
-  Image as ImageIcon,
-  FileCode,
+import {
   ChevronDown,
-  Upload,
-  X,
-  GripVertical,
-  Type,
-  FileEdit,
-  Info,
-  Search,
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
-  Trash2
+  Eye,
+  FileCode,
+  FileEdit,
+  FileText,
+  FolderOpen,
+  Image as ImageIcon,
+  Info,
+  Loader2,
+  Maximize2,
+  Plus,
+  Save,
+  Trash2,
+  Type,
+  Upload,
+  X
 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import Modal from "./modal";
+
+/**
+ * Simple client-side markdown-to-HTML renderer.
+ * Handles frontmatter, headings, bold, italic, blockquotes, lists, images, links, code blocks, and paragraphs.
+ */
+function renderMarkdownToHtml(md: string): string {
+  // Strip frontmatter
+  let content = md.replace(/^---[\s\S]*?---\s*/m, "");
+
+  // Escape HTML entities (except in code blocks)
+  const codeBlocks: string[] = [];
+  content = content.replace(/```[\s\S]*?```/g, (match) => {
+    codeBlocks.push(match);
+    return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+  });
+
+  // Process inline code first (preserve it)
+  const inlineCodes: string[] = [];
+  content = content.replace(/`([^`]+)`/g, (_, code) => {
+    inlineCodes.push(code);
+    return `__INLINE_CODE_${inlineCodes.length - 1}__`;
+  });
+
+  // Headings
+  content = content.replace(/^### (.+)$/gm, '<h3 class="mt-6 mb-3 text-lg font-bold">$1</h3>');
+  content = content.replace(/^## (.+)$/gm, '<h2 class="mt-8 mb-4 text-2xl font-bold">$1</h2>');
+  content = content.replace(/^# (.+)$/gm, '<h1 class="mt-8 mb-4 text-3xl font-bold">$1</h1>');
+
+  // Blockquotes
+  content = content.replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-primary/30 pl-4 italic text-foreground/60 my-4">$1</blockquote>');
+
+  // Images
+  content = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<div class="my-8 overflow-hidden rounded-xl bg-black/5 p-4 text-center"><p class="text-[10px] text-foreground/40 italic mb-2 uppercase tracking-widest">Asset: $2</p><img src="$2" alt="$1" class="mx-auto max-h-96 rounded-lg object-contain shadow-sm" /></div>');
+
+  // Links
+  content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline hover:text-primary/80">$1</a>');
+
+  // Bold and italic
+  content = content.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  content = content.replace(/\*(.+?)\*/g, "<em>$1</em>");
+
+  // Ordered lists
+  content = content.replace(/^\d+\.\s+(.+)$/gm, '<li class="ml-6 list-decimal mb-1">$1</li>');
+
+  // Unordered lists
+  content = content.replace(/^[-*]\s+(.+)$/gm, '<li class="ml-6 list-disc mb-1">$1</li>');
+
+  // Horizontal rules
+  content = content.replace(/^---$/gm, '<hr class="border-black/10 my-8" />');
+
+  // Restore code blocks
+  codeBlocks.forEach((block, i) => {
+    const code = block.replace(/```\w*\n?/, "").replace(/```$/, "");
+    content = content.replace(`__CODE_BLOCK_${i}__`, `<pre class="bg-black/5 p-4 rounded-xl font-mono text-xs overflow-x-auto my-4"><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`);
+  });
+
+  // Restore inline code
+  inlineCodes.forEach((code, i) => {
+    content = content.replace(`__INLINE_CODE_${i}__`, `<code class="bg-black/5 px-1.5 py-0.5 rounded text-xs font-mono">${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`);
+  });
+
+  // Wrap remaining bare lines in paragraphs
+  const lines = content.split("\n");
+  const result: string[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith("<")) {
+      result.push(trimmed);
+    } else {
+      result.push(`<p class="mb-4 leading-relaxed">${trimmed}</p>`);
+    }
+  }
+  return result.join("\n");
+}
 
 type BlogFolder = {
   slug: string;
   files: string[];
 };
 
-export default function MdxEditor({ initialContent = "" }: { initialContent?: string }) {
+export default function MdxEditor({ 
+  initialContent = "",
+  initialBlogFolders = [],
+  initialBlogContents = {}
+}: { 
+  initialContent?: string;
+  initialBlogFolders?: BlogFolder[];
+  initialBlogContents?: Record<string, string>;
+}) {
   const [content, setContent] = useState(initialContent);
   const [lastSavedContent, setLastSavedContent] = useState(initialContent);
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
-  const [blogFolders, setBlogFolders] = useState<BlogFolder[]>([]);
+  const [blogFolders, setBlogFolders] = useState<BlogFolder[]>(initialBlogFolders);
   const [expandedSlugs, setExpandedSlugs] = useState<Set<string>>(new Set());
-  const [mdxSource, setMdxSource] = useState<any>(null);
+  const [previewHtml, setPreviewHtml] = useState<string>("");
   const [previewAsset, setPreviewAsset] = useState<{ slug: string, filename: string, dataUrl: string } | null>(null);
   const [assetCache, setAssetCache] = useState<Record<string, string>>({});
 
@@ -117,28 +196,14 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
     }
   }, [showSidebar, sidebarWidth]);
 
-  // Custom components for the MDX preview
-  const previewComponents = {
-    h1: (props: any) => <h1 className="mt-8 mb-4 text-3xl font-bold" {...props} />,
-    h2: (props: any) => <h2 className="mt-8 mb-4 text-2xl font-bold" {...props} />,
-    p: (props: any) => <p className="mb-6 leading-relaxed" {...props} />,
-    img: ({ src, alt, ...props }: any) => {
-      const cacheKey = (src?.startsWith("./") && activeSlug) 
-        ? `${activeSlug}/${src.replace("./", "")}` 
-        : null;
-      const resolvedSrc = (cacheKey && assetCache[cacheKey]) ? assetCache[cacheKey] : src;
-      return (
-        <div className="my-8 overflow-hidden rounded-xl bg-black/5 p-4 text-center">
-          <p className="text-[10px] text-foreground/40 italic mb-2 uppercase tracking-widest">
-            Asset: {src} {!(cacheKey && assetCache[cacheKey]) && "(Click file in sidebar to load preview)"}
-          </p>
-          <img {...props} src={resolvedSrc} className="mx-auto max-h-96 rounded-lg object-contain shadow-sm" alt={alt || ""} />
-        </div>
-      );
-    },
-  };
+
 
   const refreshList = async () => {
+    // In prototype mode, we just use the initial list passed from the server
+    if (initialBlogFolders.length > 0) {
+      setBlogFolders(initialBlogFolders);
+      return;
+    }
     const result = await getBlogListAction();
     if (result.success) setBlogFolders(result.list || []);
   };
@@ -148,19 +213,26 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
   }, []);
 
   useEffect(() => {
-    if (previewAsset) return; 
+    if (previewAsset) return;
     const timer = setTimeout(() => {
-      startTransition(async () => {
-        const result = await compileMdxAction(content);
-        if (result.success) setMdxSource(result.source);
-      });
-    }, 500);
+      setPreviewHtml(renderMarkdownToHtml(content));
+    }, 300);
     return () => clearTimeout(timer);
   }, [content, previewAsset]);
 
   const handleLoadPost = async (slug: string) => {
     setPreviewAsset(null);
     startTransition(async () => {
+      // If we have the initial content from the server (prototype/static mode), use it
+      if (initialBlogContents[slug]) {
+        setContent(initialBlogContents[slug]);
+        setLastSavedContent(initialBlogContents[slug]);
+        setActiveSlug(slug);
+        setExpandedSlugs(prev => new Set(prev).add(slug));
+        return;
+      }
+
+      // Fallback to the action (which returns dummy data in prototype)
       const result = await getBlogContentAction(slug);
       if (result.success) {
         setContent(result.content || "");
@@ -219,24 +291,24 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
 
   const confirmNewPost = () => {
     if (!newPostSlug.trim()) return;
-    
+
     const slug = newPostSlug
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
-    
+
     if (!slug) return;
 
     const existing = blogFolders.find(f => f.slug === slug);
-    
+
     if (existing) {
       handleLoadPost(slug);
     } else {
       setActiveSlug(slug);
       save(slug);
     }
-    
+
     setIsDialogOpen(false);
     setNewPostSlug("");
   };
@@ -252,7 +324,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
-    
+
     if (!newSlug || newSlug === activeSlug) {
       setIsRenameDialogOpen(false);
       return;
@@ -276,7 +348,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
 
   const confirmDeleteAsset = async () => {
     if (!deleteTarget) return;
-    
+
     const { slug, filename } = deleteTarget;
     setIsSaving(true);
     const result = await deleteAssetAction(slug, filename);
@@ -329,13 +401,13 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
         icon={<Plus size={20} />}
         footer={
           <>
-            <button 
+            <button
               onClick={() => setIsDialogOpen(false)}
               className="px-6 py-2 text-xs font-bold uppercase tracking-widest text-foreground/40 hover:text-foreground transition"
             >
               Cancel
             </button>
-            <button 
+            <button
               onClick={confirmNewPost}
               disabled={!newPostSlug.trim()}
               className="bg-foreground px-8 py-2.5 text-xs font-bold uppercase tracking-widest text-background transition hover:bg-foreground/80 disabled:opacity-30 disabled:hover:bg-foreground"
@@ -350,9 +422,9 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
             <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 px-1">Post Slug</label>
             <div className="relative">
               <Type className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-foreground/20" />
-              <input 
+              <input
                 autoFocus
-                type="text" 
+                type="text"
                 value={newPostSlug}
                 onChange={(e) => setNewPostSlug(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && confirmNewPost()}
@@ -375,13 +447,13 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
         variant="warning"
         footer={
           <>
-            <button 
+            <button
               onClick={() => setIsRenameDialogOpen(false)}
               className="px-6 py-2 text-xs font-bold uppercase tracking-widest text-foreground/40 hover:text-foreground transition"
             >
               Cancel
             </button>
-            <button 
+            <button
               onClick={confirmRenameSlug}
               disabled={!renameValue.trim() || renameValue === activeSlug}
               className="bg-foreground px-8 py-2.5 text-xs font-bold uppercase tracking-widest text-background transition hover:bg-foreground/80 disabled:opacity-30 disabled:hover:bg-foreground"
@@ -396,9 +468,9 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
             <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 px-1">New Slug</label>
             <div className="relative">
               <Type className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-foreground/20" />
-              <input 
+              <input
                 autoFocus
-                type="text" 
+                type="text"
                 value={renameValue}
                 onChange={(e) => setRenameValue(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && confirmRenameSlug()}
@@ -420,13 +492,13 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
         variant="danger"
         footer={
           <>
-            <button 
+            <button
               onClick={() => setDeleteTarget(null)}
               className="px-6 py-2 text-xs font-bold uppercase tracking-widest text-foreground/40 hover:text-foreground transition"
             >
               Cancel
             </button>
-            <button 
+            <button
               onClick={confirmDeleteAsset}
               className="bg-red-600 px-8 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-red-700 active:scale-95 shadow-sm"
             >
@@ -449,16 +521,16 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
           <span className="text-xs font-medium text-foreground/50 italic">{activeSlug ? `Editing: ${activeSlug}` : "New Draft"}</span>
           {(isUploading || isPending) && <Loader2 className="size-3 animate-spin text-primary" />}
         </div>
-        
+
         <div className="flex items-center gap-2">
           <button onClick={() => setIsSplit(!isSplit)} className={`p-2 rounded-lg transition ${isSplit ? "bg-black/5 text-foreground" : "text-foreground/40 hover:bg-black/5"}`}>
             <Maximize2 className="size-4" />
           </button>
           <div className="w-px h-4 bg-black/10 mx-1" />
-          
+
           {activeSlug && (
             <div className="flex items-center gap-2">
-              <button 
+              <button
                 onClick={() => {
                   setRenameValue(activeSlug);
                   setIsRenameDialogOpen(true);
@@ -468,9 +540,9 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
                 <FileEdit size={14} className="opacity-40" />
                 Rename
               </button>
-              <a 
-                href={getLiveUrl()} 
-                target="_blank" 
+              <a
+                href={getLiveUrl()}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-foreground/60 hover:text-foreground px-4 py-1.5 transition text-xs font-bold uppercase tracking-widest border border-black/5 bg-white shadow-sm rounded hover:shadow-md active:scale-95"
               >
@@ -480,9 +552,9 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
             </div>
           )}
 
-          <button 
-            onClick={handleSave} 
-            disabled={isSaving || !isDirty} 
+          <button
+            onClick={handleSave}
+            disabled={isSaving || !isDirty}
             className="flex items-center gap-2 bg-foreground px-5 py-2 text-xs font-bold text-background transition hover:bg-foreground/80 disabled:opacity-20 shadow-sm"
           >
             {isSaving ? <Loader2 className="size-3 animate-spin" /> : <Save className="size-3" />}
@@ -494,15 +566,15 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
       {/* WORKSPACE */}
       <div className="flex flex-1 overflow-hidden relative">
         {/* SIDEBAR */}
-        <div 
+        <div
           className="bg-[#FAF9F6] border-r border-black/5 transition-all duration-75 overflow-hidden flex flex-col shrink-0 shadow-[inset_-10px_0_15px_-15px_rgba(0,0,0,0.1)]"
           style={{ width: showSidebar ? sidebarWidth : 0 }}
         >
           <div className="p-4 flex flex-col gap-6 overflow-y-auto h-full" style={{ width: sidebarWidth }}>
             <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.2em] text-foreground/60 px-1">
               <span>Post Explorer</span>
-              <button 
-                onClick={() => { setActiveSlug(null); setContent(initialContent); setLastSavedContent(""); setPreviewAsset(null); }} 
+              <button
+                onClick={() => { setActiveSlug(null); setContent(initialContent); setLastSavedContent(""); setPreviewAsset(null); }}
                 disabled={!activeSlug}
                 className={`transition ${!activeSlug ? "opacity-10 cursor-not-allowed" : "hover:text-primary active:scale-95"}`}
                 title={!activeSlug ? "Already in a draft" : "New Post"}
@@ -510,7 +582,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
                 <Plus size={16} strokeWidth={3} />
               </button>
             </div>
-            
+
             <div className="flex flex-col gap-1.5">
               {/* VIRTUAL NEW DRAFT ITEM */}
               {!activeSlug && (
@@ -525,7 +597,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
                       <FileCode size={14} strokeWidth={2.5} className="text-primary opacity-80" />
                       <span className="truncate">index.mdx</span>
                     </div>
-                    
+
                     {/* Placeholder Assets */}
                     <div className="flex items-center gap-2.5 px-4 py-2 text-[12px] text-foreground/30 font-semibold italic">
                       <ImageIcon size={14} strokeWidth={2.5} className="opacity-30" />
@@ -575,7 +647,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
                                 <span className="truncate pr-6">{file}</span>
                               </button>
                               {!isMdx && (
-                                <button 
+                                <button
                                   onClick={(e) => { e.stopPropagation(); handleDeleteAsset(folder.slug, file); }}
                                   className="absolute right-1.5 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-50 hover:text-red-600 transition rounded text-foreground/20"
                                   title="Delete File"
@@ -586,7 +658,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
                             </div>
                           );
                         })}
-                        <button 
+                        <button
                           onClick={() => { setActiveSlug(folder.slug); fileInputRef.current?.click(); }}
                           className="flex items-center gap-2 px-4 py-2 text-[11px] font-black text-primary hover:bg-primary/5 transition uppercase tracking-[0.1em] mt-1 rounded-md"
                         >
@@ -610,7 +682,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
         )}
 
         {/* INPUT PANE */}
-        <div 
+        <div
           className={`flex flex-col transition-all duration-75 w-full bg-white overflow-y-auto ${!isSplit ? "items-center" : ""}`}
           style={{ width: isSplit ? editorWidth : "100%" }}
         >
@@ -640,7 +712,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
               </div>
               {isPending && !previewAsset && <Loader2 className="size-4 animate-spin text-primary" />}
             </div>
-            
+
             <div className="px-10 pb-20 prose prose-slate max-w-none">
               {previewAsset ? (
                 <div className="flex flex-col items-center gap-8 pt-12">
@@ -652,8 +724,8 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
                     </div>
                   </div>
                 </div>
-              ) : mdxSource ? (
-                <MDXRemote {...mdxSource} components={previewComponents} />
+              ) : previewHtml ? (
+                <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
               ) : (
                 <div className="flex flex-col items-center justify-center pt-32 text-foreground/10">
                   <Eye className="size-20 mb-6 opacity-50" />
