@@ -1,8 +1,10 @@
+"use client";
+
 import type { Blog } from "@/types/blog";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 const dotStyle: CSSProperties = {
   backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.5) 1.7px, transparent 1.5px)`,
@@ -10,14 +12,32 @@ const dotStyle: CSSProperties = {
 };
 
 export default function LandingHero({ latestPost }: { latestPost: Blog }) {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <section className="relative mt-4 w-full overflow-hidden bg-gradient-to-b from-transparent to-primary/50 z-10">
+    <section className="relative mt-4 w-full overflow-hidden z-10">
+      {/* Background Gradient with Smooth Scroll Transition */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 min-h-screen "
+        className={`absolute inset-0 bg-gradient-to-b from-transparent to-primary/80 transition-opacity duration-200 -z-10 ${isScrolled ? "opacity-0" : "opacity-100"
+          }`}
         aria-hidden
       />
 
-      <div className="relative mx-auto flex min-h-[min(100svh,42rem)] max-w-[60%] flex-col gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-14 lg:flex-row lg:justify-between lg:gap-16 lg:pb-16">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 min-h-screen"
+        aria-hidden
+      />
+
+      <div className="relative mx-auto flex min-h-[82.5svh] max-w-[60%] flex-col gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-14 lg:flex-row lg:justify-between lg:gap-16 lg:pb-16">
         <div className="max-w-xl shrink-0 lg:max-w-lg">
           <span className="mb-4 inline-flex items-center bg-[#F0D8A1] px-3 py-1 text-sm text-black">
             Latest Featured
