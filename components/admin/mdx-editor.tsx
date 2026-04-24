@@ -7,9 +7,12 @@ import {
   getBlogContentAction, 
   saveBlogContentAction,
   uploadAssetAction,
-  getAssetDataAction
+  getAssetDataAction,
+  renameBlogSlugAction,
+  deleteAssetAction
 } from "@/app/actions/blog-actions";
 import { MDXRemote } from "next-mdx-remote";
+import Modal from "./modal";
 import { 
   Eye, 
   FileText, 
@@ -30,7 +33,8 @@ import {
   FileEdit,
   Info,
   Search,
-  ExternalLink
+  ExternalLink,
+  Trash2
 } from "lucide-react";
 
 type BlogFolder = {
@@ -63,6 +67,13 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
   // New Post Dialog State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newPostSlug, setNewPostSlug] = useState("");
+
+  // Rename Dialog State
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+  const [renameValue, setRenameValue] = useState("");
+
+  // Delete Dialog State
+  const [deleteTarget, setDeleteTarget] = useState<{ slug: string, filename: string } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -230,6 +241,57 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
     setNewPostSlug("");
   };
 
+  const confirmRenameSlug = async () => {
+    if (!activeSlug || !renameValue.trim() || renameValue === activeSlug) {
+      setIsRenameDialogOpen(false);
+      return;
+    }
+
+    const newSlug = renameValue
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    
+    if (!newSlug || newSlug === activeSlug) {
+      setIsRenameDialogOpen(false);
+      return;
+    }
+
+    setIsSaving(true);
+    const result = await renameBlogSlugAction(activeSlug, newSlug);
+    if (result.success) {
+      setActiveSlug(newSlug);
+      await refreshList();
+    } else {
+      alert(result.error || "Failed to rename slug");
+    }
+    setIsSaving(false);
+    setIsRenameDialogOpen(false);
+  };
+
+  const handleDeleteAsset = async (slug: string, filename: string) => {
+    setDeleteTarget({ slug, filename });
+  };
+
+  const confirmDeleteAsset = async () => {
+    if (!deleteTarget) return;
+    
+    const { slug, filename } = deleteTarget;
+    setIsSaving(true);
+    const result = await deleteAssetAction(slug, filename);
+    if (result.success) {
+      if (previewAsset?.slug === slug && previewAsset?.filename === filename) {
+        setPreviewAsset(null);
+      }
+      refreshList();
+    } else {
+      alert(result.error || "Failed to delete file");
+    }
+    setIsSaving(false);
+    setDeleteTarget(null);
+  };
+
   const getLiveUrl = () => {
     if (!activeSlug) return "#";
     const tagsMatch = content.match(/tags:\s*\["(.*?)"/);
@@ -259,58 +321,120 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
       }} className="hidden" accept="image/*,.mdx" />
 
       {/* NEW POST DIALOG */}
-      {isDialogOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 ring-1 ring-black/10">
-            <div className="p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex items-center justify-center size-10 bg-primary/10 rounded-full text-primary">
-                  <Plus size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground">Create or Find Story</h3>
-                  <p className="text-sm text-foreground/50">Enter a slug to start a new post or open an existing one.</p>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 px-1">Post Slug</label>
-                  <div className="relative">
-                    <Type className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-foreground/20" />
-                    <input 
-                      autoFocus
-                      type="text" 
-                      value={newPostSlug}
-                      onChange={(e) => setNewPostSlug(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && confirmNewPost()}
-                      placeholder="e.g. why-positivity-matters"
-                      className="w-full bg-black/5 border-none px-10 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/40 focus:bg-white transition-all outline-none"
-                    />
-                  </div>
-                  <p className="text-[10px] text-foreground/30 px-1 italic">Note: If this slug already exists, we will jump to that post.</p>
-                </div>
-              </div>
+      <Modal
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        title="Create or Find Story"
+        description="Enter a slug to start a new post or open an existing one."
+        icon={<Plus size={20} />}
+        footer={
+          <>
+            <button 
+              onClick={() => setIsDialogOpen(false)}
+              className="px-6 py-2 text-xs font-bold uppercase tracking-widest text-foreground/40 hover:text-foreground transition"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={confirmNewPost}
+              disabled={!newPostSlug.trim()}
+              className="bg-foreground px-8 py-2.5 text-xs font-bold uppercase tracking-widest text-background transition hover:bg-foreground/80 disabled:opacity-30 disabled:hover:bg-foreground"
+            >
+              Go to Story
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 px-1">Post Slug</label>
+            <div className="relative">
+              <Type className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-foreground/20" />
+              <input 
+                autoFocus
+                type="text" 
+                value={newPostSlug}
+                onChange={(e) => setNewPostSlug(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && confirmNewPost()}
+                placeholder="e.g. why-positivity-matters"
+                className="w-full bg-black/5 border-none px-10 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/40 focus:bg-white transition-all outline-none"
+              />
             </div>
-            
-            <div className="flex items-center justify-end gap-3 px-8 py-4 bg-[#FAF9F6] border-t border-black/5">
-              <button 
-                onClick={() => setIsDialogOpen(false)}
-                className="px-6 py-2 text-xs font-bold uppercase tracking-widest text-foreground/40 hover:text-foreground transition"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={confirmNewPost}
-                disabled={!newPostSlug.trim()}
-                className="bg-foreground px-8 py-2.5 text-xs font-bold uppercase tracking-widest text-background transition hover:bg-foreground/80 disabled:opacity-30 disabled:hover:bg-foreground"
-              >
-                Go to Story
-              </button>
+            <p className="text-[10px] text-foreground/30 px-1 italic">Note: If this slug already exists, we will jump to that post.</p>
+          </div>
+        </div>
+      </Modal>
+
+      {/* RENAME SLUG DIALOG */}
+      <Modal
+        isOpen={isRenameDialogOpen}
+        onClose={() => setIsRenameDialogOpen(false)}
+        title="Rename Story Slug"
+        description="Changing the slug will change the post's URL."
+        icon={<FileEdit size={20} />}
+        variant="warning"
+        footer={
+          <>
+            <button 
+              onClick={() => setIsRenameDialogOpen(false)}
+              className="px-6 py-2 text-xs font-bold uppercase tracking-widest text-foreground/40 hover:text-foreground transition"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={confirmRenameSlug}
+              disabled={!renameValue.trim() || renameValue === activeSlug}
+              className="bg-foreground px-8 py-2.5 text-xs font-bold uppercase tracking-widest text-background transition hover:bg-foreground/80 disabled:opacity-30 disabled:hover:bg-foreground"
+            >
+              Rename Slug
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 px-1">New Slug</label>
+            <div className="relative">
+              <Type className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-foreground/20" />
+              <input 
+                autoFocus
+                type="text" 
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && confirmRenameSlug()}
+                placeholder="e.g. why-positivity-matters"
+                className="w-full bg-black/5 border-none px-10 py-4 text-sm font-medium focus:ring-2 focus:ring-primary/40 focus:bg-white transition-all outline-none"
+              />
             </div>
           </div>
         </div>
-      )}
+      </Modal>
+
+      {/* DELETE ASSET DIALOG */}
+      <Modal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete File"
+        description={`Are you sure you want to delete "${deleteTarget?.filename}"? This action cannot be undone.`}
+        icon={<Trash2 size={20} />}
+        variant="danger"
+        footer={
+          <>
+            <button 
+              onClick={() => setDeleteTarget(null)}
+              className="px-6 py-2 text-xs font-bold uppercase tracking-widest text-foreground/40 hover:text-foreground transition"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={confirmDeleteAsset}
+              className="bg-red-600 px-8 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-red-700 active:scale-95 shadow-sm"
+            >
+              Delete Permanently
+            </button>
+          </>
+        }
+      />
 
       {/* TOOLBAR */}
       <div className="flex items-center justify-between px-6 py-3 border-b border-black/5 bg-[#FAF9F6]">
@@ -333,15 +457,27 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
           <div className="w-px h-4 bg-black/10 mx-1" />
           
           {activeSlug && (
-            <a 
-              href={getLiveUrl()} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-foreground/60 hover:text-foreground px-4 py-1.5 transition text-xs font-bold uppercase tracking-widest border border-black/5 bg-white shadow-sm rounded hover:shadow-md active:scale-95"
-            >
-              <ExternalLink size={14} className="opacity-40" />
-              View Saved Post
-            </a>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => {
+                  setRenameValue(activeSlug);
+                  setIsRenameDialogOpen(true);
+                }}
+                className="flex items-center gap-2 text-foreground/60 hover:text-foreground px-4 py-1.5 transition text-xs font-bold uppercase tracking-widest border border-black/5 bg-white shadow-sm rounded hover:shadow-md active:scale-95"
+              >
+                <FileEdit size={14} className="opacity-40" />
+                Rename
+              </button>
+              <a 
+                href={getLiveUrl()} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-foreground/60 hover:text-foreground px-4 py-1.5 transition text-xs font-bold uppercase tracking-widest border border-black/5 bg-white shadow-sm rounded hover:shadow-md active:scale-95"
+              >
+                <ExternalLink size={14} className="opacity-40" />
+                View Saved Post
+              </a>
+            </div>
           )}
 
           <button 
@@ -366,7 +502,7 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
             <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.2em] text-foreground/60 px-1">
               <span>Post Explorer</span>
               <button 
-                onClick={() => { setActiveSlug(null); setContent(""); setLastSavedContent(""); setPreviewAsset(null); }} 
+                onClick={() => { setActiveSlug(null); setContent(initialContent); setLastSavedContent(""); setPreviewAsset(null); }} 
                 disabled={!activeSlug}
                 className={`transition ${!activeSlug ? "opacity-10 cursor-not-allowed" : "hover:text-primary active:scale-95"}`}
                 title={!activeSlug ? "Already in a draft" : "New Post"}
@@ -383,10 +519,29 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
                     <FileEdit size={16} strokeWidth={2.5} className="shrink-0 text-primary" />
                     <span className="truncate">unsaved-draft</span>
                   </div>
-                  <div className="ml-6 mt-1 flex flex-col border-l-2 border-primary/20 p-4 bg-primary/5 gap-2">
-                    <div className="flex items-start gap-2.5 text-[11px] text-foreground font-bold leading-tight">
-                      <Info size={14} className="shrink-0 mt-0.5 text-primary opacity-60" />
-                      <span>Save this post to enable image uploads.</span>
+                  <div className="ml-6 mt-1 flex flex-col border-l-2 border-primary/20 pl-2 gap-1">
+                    {/* Placeholder MDX */}
+                    <div className="flex items-center gap-2.5 px-4 py-2 text-[12px] text-foreground font-black bg-primary/10 shadow-sm rounded-md">
+                      <FileCode size={14} strokeWidth={2.5} className="text-primary opacity-80" />
+                      <span className="truncate">index.mdx</span>
+                    </div>
+                    
+                    {/* Placeholder Assets */}
+                    <div className="flex items-center gap-2.5 px-4 py-2 text-[12px] text-foreground/30 font-semibold italic">
+                      <ImageIcon size={14} strokeWidth={2.5} className="opacity-30" />
+                      <span className="truncate">cover.jpg (pending)</span>
+                    </div>
+
+                    <div className="p-4 bg-primary/5 rounded-lg mt-2 mr-2 flex flex-col gap-4">
+                      <div className="relative aspect-video rounded-lg bg-black/5 border border-dashed border-black/10 flex items-center justify-center overflow-hidden">
+                        <ImageIcon className="size-8 text-black/10" />
+                        <div className="absolute inset-0 bg-primary/5 animate-pulse" />
+                        <span className="absolute bottom-2 right-2 text-[8px] font-black uppercase tracking-tighter text-black/20">Thumbnail Placeholder</span>
+                      </div>
+                      <div className="flex items-start gap-2.5 text-[11px] text-foreground font-bold leading-tight">
+                        <Info size={14} className="shrink-0 mt-0.5 text-primary opacity-60" />
+                        <span>Save this post to enable actual image uploads.</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -413,11 +568,22 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
                           const isMdx = file === "index.mdx";
                           const isCurrentlyPreviewing = previewAsset?.slug === folder.slug && previewAsset?.filename === file;
                           return (
-                            <button key={file} onClick={() => { if (isMdx) handleLoadPost(folder.slug); else if (isImage(file)) handlePreviewImage(folder.slug, file); }}
-                              className={`flex items-center gap-2.5 px-4 py-2 text-[12px] transition text-left rounded-md ${isCurrentlyPreviewing ? "text-foreground font-black bg-primary/10 shadow-sm" : "text-foreground/60 font-semibold hover:bg-primary/5 hover:text-foreground"}`}>
-                              {isMdx ? <FileCode size={14} strokeWidth={2.5} className={isCurrentlyPreviewing ? "text-primary opacity-80" : "opacity-60"} /> : isImage(file) ? <ImageIcon size={14} strokeWidth={2.5} className={isCurrentlyPreviewing ? "text-primary opacity-80" : "opacity-60"} /> : <FileText size={14} strokeWidth={2.5} className={isCurrentlyPreviewing ? "text-primary opacity-80" : "opacity-60"} />}
-                              <span className="truncate">{file}</span>
-                            </button>
+                            <div key={file} className="group relative flex items-center">
+                              <button onClick={() => { if (isMdx) handleLoadPost(folder.slug); else if (isImage(file)) handlePreviewImage(folder.slug, file); }}
+                                className={`flex-1 flex items-center gap-2.5 px-4 py-2 text-[12px] transition text-left rounded-md ${isCurrentlyPreviewing ? "text-foreground font-black bg-primary/10 shadow-sm" : "text-foreground/60 font-semibold hover:bg-primary/5 hover:text-foreground"}`}>
+                                {isMdx ? <FileCode size={14} strokeWidth={2.5} className={isCurrentlyPreviewing ? "text-primary opacity-80" : "opacity-60"} /> : isImage(file) ? <ImageIcon size={14} strokeWidth={2.5} className={isCurrentlyPreviewing ? "text-primary opacity-80" : "opacity-60"} /> : <FileText size={14} strokeWidth={2.5} className={isCurrentlyPreviewing ? "text-primary opacity-80" : "opacity-60"} />}
+                                <span className="truncate pr-6">{file}</span>
+                              </button>
+                              {!isMdx && (
+                                <button 
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteAsset(folder.slug, file); }}
+                                  className="absolute right-1.5 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-50 hover:text-red-600 transition rounded text-foreground/20"
+                                  title="Delete File"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              )}
+                            </div>
                           );
                         })}
                         <button 
@@ -445,14 +611,14 @@ export default function MdxEditor({ initialContent = "" }: { initialContent?: st
 
         {/* INPUT PANE */}
         <div 
-          className={`flex flex-col transition-all duration-75 shrink-0 bg-white overflow-y-auto ${!isSplit ? "items-center" : ""}`}
+          className={`flex flex-col transition-all duration-75 w-full bg-white overflow-y-auto ${!isSplit ? "items-center" : ""}`}
           style={{ width: isSplit ? editorWidth : "100%" }}
         >
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Start writing your story..."
-            className={`flex-1 p-10 font-mono text-sm leading-relaxed resize-none focus:outline-none bg-transparent select-text text-foreground/80 ${!isSplit ? "max-w-4xl w-full" : "w-full"}`}
+            className={`flex-1 p-10 font-mono text-sm leading-relaxed resize-none focus:outline-none bg-transparent select-text text-foreground/80 ${!isSplit ? "max-w-7xl w-full" : "w-full"}`}
             spellCheck={false}
           />
         </div>

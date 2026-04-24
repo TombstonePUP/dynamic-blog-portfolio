@@ -115,4 +115,33 @@ export async function getAssetDataAction(slug: string, filename: string) {
   }
 }
 
+/**
+ * Renames a blog post folder (slug).
+ */
+export async function renameBlogSlugAction(oldSlug: string, newSlug: string) {
+  try {
+    const oldPath = path.join(POSTS_PATH, oldSlug);
+    const newPath = path.join(POSTS_PATH, newSlug);
 
+    if (!fs.existsSync(oldPath)) throw new Error("Source post not found");
+    if (fs.existsSync(newPath)) throw new Error("Destination slug already exists");
+
+    fs.renameSync(oldPath, newPath);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}/**
+ * Deletes an asset from a post folder.
+ */
+export async function deleteAssetAction(slug: string, filename: string) {
+  try {
+    const filePath = path.join(POSTS_PATH, slug, filename);
+    if (!fs.existsSync(filePath)) throw new Error("File not found");
+    
+    fs.unlinkSync(filePath);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
