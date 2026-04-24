@@ -2,13 +2,13 @@ import BackButton from "@/components/guest/back-button";
 import CommentsSection from "@/components/guest/comments-section";
 import ScrollArrow from "@/components/guest/scroll-arrow";
 import {
-  blogs,
-  getBlogBySlug,
-  getRelatedBlogs,
   MAIN_CATEGORIES,
   readingMinutesFromContent,
   tagToSlug,
 } from "@/data/blog";
+import { getBlogs, getBlogBySlug, getRelatedBlogs } from "@/lib/blogs.server";
+
+
 import { getThemeColor } from "@/lib/theme";
 import type { Blog, Tag } from "@/types/blog";
 import {
@@ -22,6 +22,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CustomMDX } from "@/components/mdx/mdx-remote";
+import { getPostBySlug as getMdxPostBySlug } from "@/lib/mdx";
 export const dynamic = "force-static";
 export const dynamicParams = false;
 function seriesLabel(tags: Tag[]): string {
@@ -42,6 +44,7 @@ type PageProps = {
 };
 
 export async function generateStaticParams() {
+  const blogs = getBlogs();
   return blogs.map((post) => ({ slug: post.slug }));
 }
 
@@ -97,9 +100,11 @@ export default async function BlogArticlePage({
   params,
   searchParams,
 }: PageProps) {
+  const blogs = getBlogs();
   const { slug } = await params;
   const { topic } = await searchParams;
   const post = getBlogBySlug(slug);
+
   if (!post) notFound();
 
   // Use the topic from the referring Topics page if provided, else fall back to post tags
@@ -107,7 +112,8 @@ export default async function BlogArticlePage({
     ? getThemeColor([decodeURIComponent(topic) as import("@/types/blog").Tag])
     : getThemeColor(post.tags);
 
-  const minutes = readingMinutesFromContent(post.content);
+  const mdxPost = getMdxPostBySlug(slug);
+  const minutes = post.content ? readingMinutesFromContent(post.content) : 5;
   const related = getRelatedBlogs(post);
 
   // Pad with recent posts to always reach 3
@@ -236,9 +242,12 @@ export default async function BlogArticlePage({
         }
       >
         <div className="space-y-6 text-base leading-[1.8] text-foreground/90 md:text-[1.0625rem] md:leading-[1.85] [&>p:first-of-type]:text-[1.0625rem] [&>p:first-of-type]:leading-relaxed md:[&>p:first-of-type]:text-lg md:[&>p:first-of-type]:leading-relaxed [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:mr-3 [&>p:first-of-type]:first-letter:-mt-2 [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-black [&>p:first-of-type]:first-letter:text-[var(--theme-color)] [&>p:first-of-type]:first-letter:leading-[0.75]">
-          {post.content.map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
+          {mdxPost ? (
+            <CustomMDX source={mdxPost.content} slug={slug} />
+          ) : (
+            post.content.map((paragraph, i) => <p key={i}>{paragraph}</p>)
+          )}
+
         </div>
 
         <div

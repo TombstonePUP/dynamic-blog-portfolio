@@ -1,0 +1,47 @@
+import fs from 'fs/promises';
+import path from 'path';
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ path: string[] }> }
+) {
+  try {
+    const { path: pathSegments } = await params;
+    
+    // Construct the absolute path
+    const filePath = path.resolve(process.cwd(), 'content', 'posts', ...pathSegments);
+
+    try {
+      const fileBuffer = await fs.readFile(filePath);
+      const ext = path.extname(filePath).toLowerCase();
+      
+      const mimeTypes: Record<string, string> = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp',
+        '.svg': 'image/svg+xml',
+        '.avif': 'image/avif',
+      };
+
+      const contentType = mimeTypes[ext] || 'application/octet-stream';
+
+      return new Response(fileBuffer, {
+        headers: {
+          'Content-Type': contentType,
+          'Content-Length': fileBuffer.length.toString(),
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      });
+    } catch (e) {
+      console.error(`[Asset API] File not found: ${filePath}`);
+      return new Response('File not found', { status: 404 });
+    }
+  } catch (error) {
+    console.error(`[Asset API] Server error:`, error);
+    return new Response('Internal Server Error', { status: 500 });
+  }
+}
+
+

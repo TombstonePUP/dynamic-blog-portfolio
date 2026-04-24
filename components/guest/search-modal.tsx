@@ -1,6 +1,5 @@
 "use client";
 
-import { blogs } from "@/data/blog";
 import { getThemeColor } from "@/lib/theme";
 import type { Blog } from "@/types/blog";
 import { ArrowRight, Search, X } from "lucide-react";
@@ -61,10 +60,13 @@ function SearchResult({ post, query, onClose }: { post: Blog; query: string; onC
 export default function SearchModal({
   open,
   onClose,
+  blogs = [],
 }: {
   open: boolean;
   onClose: () => void;
+  blogs?: Blog[];
 }) {
+
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 

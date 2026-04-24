@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LogoIcon, LogoText } from "../app-logo";
+import type { Blog } from "@/types/blog";
 
 const leftNav = [
   { label: "Featured", href: "#featured" },
@@ -33,7 +34,7 @@ function NavContainer({
   );
 }
 
-export default function GuestHeader() {
+export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -48,7 +49,12 @@ export default function GuestHeader() {
 
   return (
     <>
-      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchModal 
+        open={searchOpen} 
+        onClose={() => setSearchOpen(false)} 
+        blogs={blogs}
+      />
+
 
       <header className="sticky top-0 z-50 w-full bg-[#FAF9F6]">
         <div

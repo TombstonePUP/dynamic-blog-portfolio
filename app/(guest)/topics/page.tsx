@@ -1,4 +1,6 @@
-import { MAIN_CATEGORIES, blogs, tagToSlug } from "@/data/blog";
+import { MAIN_CATEGORIES, tagToSlug } from "@/data/blog";
+import { getBlogs } from "@/lib/blogs.server";
+
 import { getThemeColor } from "@/lib/theme";
 import type { Blog, Tag } from "@/types/blog";
 import { ArrowRight } from "lucide-react";
@@ -54,7 +56,9 @@ function TopicCard({ post, topic }: { post: Blog; topic: Tag }) {
 }
 
 export default function TopicsPage() {
+  const blogs = getBlogs();
   const topics = MAIN_CATEGORIES;
+
 
   return (
     <main className="relative min-h-screen pb-24 font-sans bg-gradient-to-b to-[#72dbcc]/10 from-transparent">

@@ -1,5 +1,7 @@
 import BackButton from "@/components/guest/back-button";
-import { ALL_TAGS, blogs, slugToTag, tagToSlug } from "@/data/blog";
+import { ALL_TAGS, slugToTag, tagToSlug } from "@/data/blog";
+import { getBlogs } from "@/lib/blogs.server";
+
 import { getThemeColor } from "@/lib/theme";
 import type { Blog, Tag } from "@/types/blog";
 import { ArrowRight } from "lucide-react";
@@ -79,8 +81,11 @@ export default async function TagPage({ params }: PageProps) {
 
   if (!tag) notFound();
 
+  const blogs = getBlogs();
+
   const themeColor = getThemeColor([tag]);
   const tagBlogs = blogs.filter((b) => b.tags.includes(tag));
+
 
   return (
     <main className="relative min-h-screen pb-24 font-sans bg-[#fbfbfb]">

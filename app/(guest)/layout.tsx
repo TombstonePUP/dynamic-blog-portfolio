@@ -6,6 +6,8 @@ import ScrollToTop from "@/components/scroll-to-top";
 import { Metadata } from "next";
 import { Hanken_Grotesk } from "next/font/google";
 
+import { getBlogs } from "@/lib/blogs.server";
+
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
   variable: "--font-hanken",
@@ -22,11 +24,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const blogs = getBlogs();
+
   return (
     <html lang="en" className={`${hanken.variable} antialiased`}>
       <body className="flex flex-col">
         <LenisProvider />
-        <GuestHeader />
+        <GuestHeader blogs={blogs} />
         {children}
         <GuestFooter />
         <ScrollToTop />
@@ -34,3 +38,4 @@ export default function RootLayout({
     </html>
   );
 }
+

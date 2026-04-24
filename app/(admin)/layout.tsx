@@ -11,6 +11,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import AdminHeader from "@/components/admin/header";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,7 +23,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="flex flex-col">{children}</body>
+      <body className="flex flex-col bg-[#FAF9F6] min-h-screen">
+        <AdminHeader />
+        {children}
+      </body>
     </html>
   );
 }
+
