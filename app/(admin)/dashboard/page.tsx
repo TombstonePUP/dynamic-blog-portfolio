@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export default async function DashboardHome() {
   const { posts, profile, supabase } = await getOwnedPosts();
+  const recentStories = posts.slice(0, 6);
   const publishedCount = posts.filter((post) => post.status === "published").length;
   const draftCount = posts.filter((post) => post.status === "draft").length;
   const archivedCount = posts.filter((post) => post.status === "archived").length;
@@ -79,10 +80,8 @@ export default async function DashboardHome() {
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
           <div className="p-10 shadow-sm ring-1 flex flex-col gap-6">
             <h3 className="text-xl font-bold tracking-tight">Quick Actions</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Button
-                variant="outline"
-              >
+            <div className={`grid grid-cols-1 gap-4 ${isAdmin ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+              <Button variant="outline">
                 <Link href="/editor" className="flex items-center justify-center gap-2">
                   <Plus size={16} />
                   New Story
@@ -94,6 +93,14 @@ export default async function DashboardHome() {
                   View Site
                 </Link>
               </Button>
+              {isAdmin ? (
+                <Button variant="outline">
+                  <Link href="/users" className="flex items-center justify-center gap-2">
+                    <Users size={16} />
+                    Manage Users
+                  </Link>
+                </Button>
+              ) : null}
             </div>
           </div>
 
@@ -108,6 +115,57 @@ export default async function DashboardHome() {
               <Users size={12} />
               {archivedCount} archived {archivedCount === 1 ? "story" : "stories"}
             </div>
+          </div>
+        </section>
+
+        <section className="border border-black/8 bg-white p-8 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-admin-text/45">
+                Story Library
+              </p>
+              <h3 className="mt-2 text-2xl font-bold tracking-tight text-admin-text">
+                Your story library now runs from Supabase
+              </h3>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-admin-text/60">
+                Drafts, published posts, author bylines, and migrated story assets now live in
+                the database-backed publishing system instead of local content folders.
+              </p>
+            </div>
+            <Link
+              href="/posts"
+              className="inline-flex items-center justify-center border border-black/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-admin-text transition hover:bg-black/5"
+            >
+              Open Explorer
+            </Link>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {recentStories.map((post) => (
+              <Link
+                key={post.id}
+                href={`/editor?slug=${encodeURIComponent(post.slug)}`}
+                className="group border border-black/8 bg-[#fbfaf6] p-5 transition hover:-translate-y-0.5 hover:border-black/15 hover:shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="inline-flex rounded-full bg-black/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-admin-text/55">
+                    {post.status}
+                  </span>
+                  <span className="text-[11px] text-admin-text/40">
+                    {new Date(post.updated_at).toLocaleDateString("en-US")}
+                  </span>
+                </div>
+                <h4 className="mt-4 text-lg font-bold leading-snug text-admin-text transition group-hover:text-black">
+                  {post.title}
+                </h4>
+                <p className="mt-2 line-clamp-3 text-sm leading-6 text-admin-text/60">
+                  {post.excerpt || "Open this story in the editor to continue refining it."}
+                </p>
+                <p className="mt-4 text-[11px] font-black uppercase tracking-[0.14em] text-admin-text/40">
+                  {post.slug}
+                </p>
+              </Link>
+            ))}
           </div>
         </section>
       </div>
