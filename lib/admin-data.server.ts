@@ -3,14 +3,24 @@ import type { User } from "@supabase/supabase-js";
 import { buildEditorDocument } from "./post-documents";
 import { createClient } from "@/utils/supabase/server";
 
+export type UserRole = "author" | "editor" | "admin";
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
+export const PRIMARY_ADMIN_EMAIL = "sanjuanregie@gmail.com";
+
 export type ProfileRecord = {
   id: string;
   email: string | null;
+  first_name: string | null;
+  last_name: string | null;
   display_name: string | null;
   slug: string | null;
   bio: string | null;
   avatar_url: string | null;
-  role: string | null;
+  role: UserRole | null;
+  approval_status: ApprovalStatus | null;
+  approved_at: string | null;
+  approved_by: string | null;
 };
 
 export type OwnedPostRecord = {
@@ -38,21 +48,46 @@ type AuthContext = {
 
 function buildFallbackProfile(user: User): ProfileRecord {
   const emailName = user.email?.split("@")[0] || "writer";
+  const firstName =
+    (typeof user.user_metadata.first_name === "string" &&
+      user.user_metadata.first_name.trim()) ||
+    (typeof user.user_metadata.display_name === "string" &&
+      user.user_metadata.display_name.trim().split(/\s+/)[0]) ||
+    emailName;
+  const lastName =
+    (typeof user.user_metadata.last_name === "string" &&
+      user.user_metadata.last_name.trim()) ||
+    null;
+  const displayName =
+    (typeof user.user_metadata.display_name === "string" &&
+      user.user_metadata.display_name.trim()) ||
+    [firstName, lastName].filter(Boolean).join(" ") ||
+    emailName;
 
   return {
     id: user.id,
     email: user.email || null,
-    display_name:
-      (typeof user.user_metadata.display_name === "string" &&
-        user.user_metadata.display_name) ||
-      emailName,
+    first_name: firstName,
+    last_name: lastName,
+    display_name: displayName,
     slug:
       (typeof user.user_metadata.slug === "string" && user.user_metadata.slug) ||
       emailName.toLowerCase(),
     bio: null,
     avatar_url: null,
     role: "author",
+    approval_status: "pending",
+    approved_at: null,
+    approved_by: null,
   };
+}
+
+export function isApprovedProfile(profile: ProfileRecord | null) {
+  return profile?.approval_status === "approved";
+}
+
+export function isAdminProfile(profile: ProfileRecord | null) {
+  return profile?.role === "admin" && isApprovedProfile(profile);
 }
 
 export async function getAuthenticatedContext(): Promise<AuthContext | null> {
@@ -67,7 +102,9 @@ export async function getAuthenticatedContext(): Promise<AuthContext | null> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, email, display_name, slug, bio, avatar_url, role")
+    .select(
+      "id, email, first_name, last_name, display_name, slug, bio, avatar_url, role, approval_status, approved_at, approved_by",
+    )
     .eq("id", user.id)
     .maybeSingle();
 
@@ -88,8 +125,28 @@ export async function requireAuthenticatedContext(): Promise<AuthContext> {
   return context;
 }
 
-export async function getOwnedPosts() {
+export async function requireApprovedContext(): Promise<AuthContext> {
   const context = await requireAuthenticatedContext();
+
+  if (!isApprovedProfile(context.profile)) {
+    redirect("/pending");
+  }
+
+  return context;
+}
+
+export async function requireAdminContext(): Promise<AuthContext> {
+  const context = await requireApprovedContext();
+
+  if (!isAdminProfile(context.profile)) {
+    redirect("/dashboard");
+  }
+
+  return context;
+}
+
+export async function getOwnedPosts() {
+  const context = await requireApprovedContext();
   const { data } = await context.supabase
     .from("posts")
     .select(

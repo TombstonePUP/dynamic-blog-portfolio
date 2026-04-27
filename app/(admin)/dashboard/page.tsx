@@ -1,13 +1,24 @@
 import { Button } from "@/components/admin/ui/button";
-import { getOwnedPosts } from "@/lib/admin-data.server";
+import { getOwnedPosts, isAdminProfile } from "@/lib/admin-data.server";
 import { Eye, FileEdit, Layout, Users } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardHome() {
-  const { posts, profile } = await getOwnedPosts();
+  const { posts, profile, supabase } = await getOwnedPosts();
   const publishedCount = posts.filter((post) => post.status === "published").length;
   const draftCount = posts.filter((post) => post.status === "draft").length;
   const archivedCount = posts.filter((post) => post.status === "archived").length;
+  const isAdmin = isAdminProfile(profile);
+  let pendingApprovals = 0;
+
+  if (isAdmin) {
+    const { count } = await supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("approval_status", "pending");
+
+    pendingApprovals = count || 0;
+  }
 
   const stats = [
     { label: "Total Stories", value: String(posts.length), icon: Layout, color: "text-blue-600", bg: "bg-blue-100" },
@@ -39,6 +50,30 @@ export default async function DashboardHome() {
             </div>
           ))}
         </div>
+
+        {isAdmin ? (
+          <section className="border border-[#1f3d39]/12 bg-[#1f3d39]/[0.03] p-8">
+            <div className="flex items-center justify-between gap-6">
+              <div className="max-w-2xl">
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#1f3d39]/55">
+                  User Management
+                </p>
+                <h3 className="mt-2 text-2xl font-bold tracking-tight text-admin-text">
+                  {pendingApprovals} account{pendingApprovals === 1 ? "" : "s"} waiting for approval
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-admin-text/60">
+                  Review new registrations, approve writers, and manage who can enter the publishing dashboard.
+                </p>
+              </div>
+              <Link
+                href="/users"
+                className="inline-flex items-center justify-center bg-[#111111] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:bg-black/85"
+              >
+                Open User Management
+              </Link>
+            </div>
+          </section>
+        ) : null}
 
         {/* Quick Actions */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">

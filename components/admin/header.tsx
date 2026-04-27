@@ -8,14 +8,17 @@ import { Separator } from "./ui/separator";
 export default function AdminHeader({
   userName,
   userEmail,
+  isAdmin,
 }: {
   userName: string;
   userEmail: string;
+  isAdmin: boolean;
 }) {
   const pathname = usePathname();
   const isDashboard = pathname === "/dashboard";
   const isEditor = pathname?.startsWith("/editor");
   const isPosts = pathname?.startsWith("/posts");
+  const isUsers = pathname?.startsWith("/users");
 
   if (isEditor) {
     return null;
@@ -49,6 +52,14 @@ export default function AdminHeader({
             >
               Explorer
             </Link>
+            {isAdmin ? (
+              <Link
+                href="/users"
+                className={`transition ${isUsers ? "text-admin-text font-semibold" : "hover:text-admin-text"}`}
+              >
+                Users
+              </Link>
+            ) : null}
           </nav>
           <Separator orientation="vertical" className="mx-2" />
           <div className="rounded-full p-2 hover:bg-admin-contrast/5 cursor-pointer relative before:absolute before:left-1/2 before:z-10 before:w-1.5 before:h-1.5 before:rounded-full before:bg-red-500 before:top-2 text-admin-text/60 hover:text-admin-text transition">

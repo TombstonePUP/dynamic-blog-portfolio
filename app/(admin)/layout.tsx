@@ -1,5 +1,5 @@
 import "@/app/globals.css";
-import { requireAuthenticatedContext } from "@/lib/admin-data.server";
+import { isAdminProfile, requireApprovedContext } from "@/lib/admin-data.server";
 import { Geist, Geist_Mono } from "next/font/google";
 
 const geistSans = Geist({
@@ -19,9 +19,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, profile } = await requireAuthenticatedContext();
+  const { user, profile } = await requireApprovedContext();
   const userName = profile?.display_name || user.email?.split("@")[0] || "Writer";
   const userEmail = user.email || "No email";
+  const isAdmin = isAdminProfile(profile);
 
   return (
     <html
@@ -41,7 +42,7 @@ export default async function RootLayout({
 
         {/* Desktop Content */}
         <div className="hidden md:flex flex-col flex-1 w-full">
-          <AdminHeader userName={userName} userEmail={userEmail} />
+          <AdminHeader userName={userName} userEmail={userEmail} isAdmin={isAdmin} />
           {children}
         </div>
       </body>
