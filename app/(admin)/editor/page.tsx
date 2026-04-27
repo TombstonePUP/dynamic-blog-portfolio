@@ -1,21 +1,29 @@
 import MdxEditor from "@/components/admin/mdx-editor";
+import { buildEditorContentFromPost, getOwnedPosts } from "@/lib/admin-data.server";
 import { Suspense } from "react";
 import { Metadata } from "next";
-import fs from "fs";
-import path from "path";
 
 export const metadata: Metadata = {
   title: "Writer | The Strengths Writer",
   description: "Create and preview your stories.",
 };
 
-export default function EditorPage() {
+type EditorPageProps = {
+  searchParams: Promise<{ slug?: string }>;
+};
+
+export default async function EditorPage({ searchParams }: EditorPageProps) {
+  const { posts, profile } = await getOwnedPosts();
+  const { slug } = await searchParams;
+  const selectedPost = slug ? posts.find((post) => post.slug === slug) : null;
+
   const initialContent = `---
 title: "A New Journey"
+status: "draft"
 date: "${new Date().toISOString().split('T')[0]}"
-author: "ian"
-image: "./cover.jpg"
-thumbnail: "./thumbnail.jpg"
+author: "${profile?.slug || "writer"}"
+image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=1400"
+thumbnail: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800"
 excerpt: "The beginning of a new chapter in positive psychology."
 tags: ["featured", "personal blog"]
 ---
@@ -37,32 +45,20 @@ Use the editor on the left to write your content, and see the preview update liv
 3. **Portability**: Your files are just plain text.
 `;
 
-  const POSTS_PATH = path.join(process.cwd(), "content/posts");
-  let initialBlogFolders: any[] = [];
-  const initialBlogContents: Record<string, string> = {};
-
-  try {
-    if (fs.existsSync(POSTS_PATH)) {
-      const entries = fs.readdirSync(POSTS_PATH);
-      initialBlogFolders = entries.map(slug => {
-        const folderPath = path.join(POSTS_PATH, slug);
-        const stat = fs.statSync(folderPath);
-        if (!stat.isDirectory()) return null;
-        
-        const files = fs.readdirSync(folderPath);
-        
-        // Load the index.mdx content for this post
-        const mdxPath = path.join(folderPath, "index.mdx");
-        if (fs.existsSync(mdxPath)) {
-          initialBlogContents[slug] = fs.readFileSync(mdxPath, "utf8");
-        }
-        
-        return { slug, files };
-      }).filter(Boolean);
-    }
-  } catch (error) {
-    console.error("Error loading posts for editor:", error);
-  }
+  const initialBlogFolders = posts.map((post) => ({
+    slug: post.slug,
+    title: post.title,
+    status: post.status,
+    updatedAt: post.updated_at,
+  }));
+  const initialBlogContents: Record<string, string> = selectedPost
+    ? {
+        [selectedPost.slug]: buildEditorContentFromPost(
+          selectedPost,
+          profile?.slug || "writer",
+        ),
+      }
+    : {};
 
   return (
     <main className="px-8 pb-8 pt-6 flex-1 flex flex-col">

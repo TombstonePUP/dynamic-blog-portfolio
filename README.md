@@ -9,6 +9,28 @@ A Next.js 16 portfolio/blog project featuring a robust, folder-based MDX system 
 - **Content:** MDX (via `next-mdx-remote`)
 - **Icons:** Lucide React, React Icons
 
+## Database Migrations
+
+Add your remote Postgres connection string to `.env.local`:
+
+```bash
+SUPABASE_DB_URL=postgresql://postgres:your-password@db.your-project-ref.supabase.co:5432/postgres
+```
+
+Then push any pending migrations to your Supabase project with:
+
+```bash
+npm run supabase:push
+```
+
+Preview what would run without applying it:
+
+```bash
+npm run supabase:push:dry
+```
+
+Important: once a migration has already been applied to Supabase, editing that old file will not automatically re-run it. Put later schema changes into a new migration file instead of changing an already-applied one.
+
 ## 🚀 Getting Started
 
 1.  **Installation:**
