@@ -47,9 +47,9 @@ function SocialIcon({ social }: { social: (typeof socials)[0] }) {
 
 export default function GuestFooter() {
   return (
-    <footer className="relative h-110 bg-foreground overflow-hidden flex flex-col justify-center items-center p-20">
-      <LogoIcon className="absolute -bottom-20 -right-10 size-100 invert" />
-      <LogoText className="text-5xl leading-none invert" />
+    <footer className="relative min-h-[250px] lg:h-110 bg-foreground overflow-hidden flex flex-col justify-center items-center p-10 py-16 lg:p-20">
+      <LogoIcon className="absolute -bottom-10 -right-5 lg:-bottom-20 lg:-right-10 size-60 lg:size-100 invert opacity-20 lg:opacity-100 pointer-events-none" />
+      <LogoText className="text-3xl lg:text-5xl leading-none invert z-10" />
       <div className="flex gap-3 mt-10">
         {socials.map((s) => (
           <SocialIcon key={s.label} social={s} />

@@ -1,7 +1,7 @@
 "use client";
 
 import SearchModal from "@/components/guest/search-modal";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,6 +36,7 @@ function NavContainer({
 
 export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
@@ -115,7 +116,7 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
           </nav>
 
           {/* MOBILE CONTROLS */}
-          <div className="flex flex-1 justify-end items-center gap-4 md:hidden">
+          <div className="flex flex-1 justify-end items-center gap-4 md:hidden z-50 relative">
             <button
               onClick={() => setSearchOpen(true)}
               className="h-fit hover:text-foreground/80 transition hover:bg-transparent focus:bg-transparent focus:outline-none cursor-pointer"
@@ -123,12 +124,55 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
             >
               <Search className="size-6" strokeWidth={2.3} />
             </button>
-            <button className="flex flex-col gap-1 cursor-pointer">
-              <Menu className="size-6" strokeWidth={2.3} />
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex flex-col gap-1 cursor-pointer"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="size-6" strokeWidth={2.3} />
+              ) : (
+                <Menu className="size-6" strokeWidth={2.3} />
+              )}
             </button>
           </div>
         </div>
       </header>
+
+      {/* MOBILE MENU */}
+      <div
+        className={`fixed inset-0 z-40 bg-[#FAF9F6] px-5 pt-32 transition-transform duration-300 ease-in-out md:hidden ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <nav className="flex flex-col gap-8 text-3xl font-bold">
+          {[...leftNav, ...rightNav].map((link) => {
+            const isHome = pathname === "/";
+            const targetHref =
+              link.href === "#featured" && !isHome ? "/#featured" : link.href;
+
+            return targetHref.startsWith("#") ? (
+              <a
+                key={link.href}
+                href={targetHref}
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-foreground/80 transition-colors"
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.href}
+                href={targetHref}
+                onClick={() => setMobileMenuOpen(false)}
+                className="hover:text-foreground/80 transition-colors"
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </>
   );
 }
