@@ -19,12 +19,12 @@ export const metadata: Metadata = {
     "Positive psychology and personal development newsletter focused on helping readers identify and leverage their unique strengths to achieve their goals and live fulfilling lives.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const blogs = getBlogs();
+  const blogs = await getBlogs();
 
   return (
     <html lang="en" className={`${hanken.variable} antialiased`}>

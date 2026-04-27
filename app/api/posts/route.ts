@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
-export const dynamic = "force-static";
+import { getBlogs } from "@/lib/blogs.server";
 
 export async function GET() {
-  return NextResponse.json([
-    { id: 1, title: "First Post" },
-  ]);
-}
+  const blogs = await getBlogs();
 
-export async function POST(req: Request) {
-  const body = await req.json();
-
-  return NextResponse.json({
-    message: "Post created",
-    data: body,
-  });
+  return NextResponse.json(
+    blogs.map((post) => ({
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      tags: post.tags,
+      date: post.date,
+      href: post.href,
+      source: post.source,
+    })),
+  );
 }

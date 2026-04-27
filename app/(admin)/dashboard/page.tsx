@@ -1,21 +1,28 @@
 import { Button } from "@/components/admin/ui/button";
-import { Eye, FileEdit, Layout, Settings, Users } from "lucide-react";
+import { getOwnedPosts } from "@/lib/admin-data.server";
+import { Eye, FileEdit, Layout, Users } from "lucide-react";
 import Link from "next/link";
 
-export default function DashboardHome() {
+export default async function DashboardHome() {
+  const { posts, profile } = await getOwnedPosts();
+  const publishedCount = posts.filter((post) => post.status === "published").length;
+  const draftCount = posts.filter((post) => post.status === "draft").length;
+  const archivedCount = posts.filter((post) => post.status === "archived").length;
+
   const stats = [
-    { label: "Total Stories", value: "8", icon: Layout, color: "text-blue-600", bg: "bg-blue-100" },
-    { label: "Active Drafts", value: "3", icon: FileEdit, color: "text-amber-600", bg: "bg-amber-100" },
-    { label: "Total Views", value: "1.2k", icon: Users, color: "text-emerald-600", bg: "bg-emerald-100" },
+    { label: "Total Stories", value: String(posts.length), icon: Layout, color: "text-blue-600", bg: "bg-blue-100" },
+    { label: "Active Drafts", value: String(draftCount), icon: FileEdit, color: "text-amber-600", bg: "bg-amber-100" },
+    { label: "Published", value: String(publishedCount), icon: Eye, color: "text-emerald-600", bg: "bg-emerald-100" },
   ];
+  const displayName = profile?.display_name || "Writer";
 
   return (
     <main className="px-8 py-10 max-w-7xl mx-auto w-full">
       <div className="flex flex-col gap-8">
         {/* Welcome Section */}
         <section className="flex flex-col gap-2">
-          <h2 className="text-3xl font-black tracking-tight text-admin-text">Welcome back, Ian.</h2>
-          <p className="text-admin-text/50 font-medium">Here&apos;s what&apos;s happening with your journal today.</p>
+          <h2 className="text-3xl font-black tracking-tight text-admin-text">Welcome back, {displayName}.</h2>
+          <p className="text-admin-text/50 font-medium">Here&apos;s what&apos;s happening with your publishing desk today.</p>
         </section>
 
         {/* Stats Grid */}
@@ -58,11 +65,13 @@ export default function DashboardHome() {
           <div className="bg-[#72dbcc]/5 border border-[#72dbcc]/20 p-10 flex flex-col gap-4">
             <h3 className="text-xl font-bold tracking-tight text-[#2b776a]">Writing Tip</h3>
             <p className="text-[#2b776a]/80 leading-relaxed text-sm italic">
-              &quot;Positive psychology is not just about being happy. It&apos;s about building resilience and finding meaning in the everyday moments.&quot;
+              {draftCount > 0
+                ? `You have ${draftCount} draft${draftCount === 1 ? "" : "s"} waiting. A short revision session can turn one of them into your next published piece.`
+                : "You do not need a big writing window to make progress. A clean headline, a stronger excerpt, and one honest paragraph can move a draft forward."}
             </p>
             <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#2b776a]/60">
-              <Settings size={12} />
-              Customize Dashboard
+              <Users size={12} />
+              {archivedCount} archived {archivedCount === 1 ? "story" : "stories"}
             </div>
           </div>
         </section>
