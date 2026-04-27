@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node sync-assets.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -14,7 +13,9 @@
     "supabase:test": "node scripts/test-supabase.mjs",
     "supabase:push": "node scripts/supabase-push.mjs",
     "supabase:push:dry": "node scripts/supabase-push.mjs --dry-run",
-    "supabase:seed-admin": "node scripts/seed-admin.mjs"
+    "supabase:seed-admin": "node scripts/seed-admin.mjs",
+    "supabase:import-posts": "node scripts/migrate-local-posts-to-supabase.mjs",
+    "supabase:import-posts:dry": "node scripts/migrate-local-posts-to-supabase.mjs --dry-run"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { buildEditorDocument } from "./post-documents";
+import { resolvePostAssetUrl, rewritePostAssetUrls } from "./post-assets";
 import { createClient } from "@/utils/supabase/server";
 
 export type UserRole = "author" | "editor" | "admin";
@@ -26,6 +27,11 @@ export type ProfileRecord = {
 export type OwnedPostRecord = {
   id: string;
   author_id: string;
+  author_name: string | null;
+  author_slug: string | null;
+  author_role: string | null;
+  author_avatar_url: string | null;
+  asset_folder: string;
   title: string;
   slug: string;
   excerpt: string | null;
@@ -38,6 +44,7 @@ export type OwnedPostRecord = {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  source?: "supabase";
 };
 
 type AuthContext = {
@@ -45,6 +52,9 @@ type AuthContext = {
   user: User;
   profile: ProfileRecord | null;
 };
+
+const OWNED_POST_SELECT =
+  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, cover_image_url, thumbnail_url, tags, status, published_on, published_at, created_at, updated_at";
 
 function buildFallbackProfile(user: User): ProfileRecord {
   const emailName = user.email?.split("@")[0] || "writer";
@@ -88,6 +98,49 @@ export function isApprovedProfile(profile: ProfileRecord | null) {
 
 export function isAdminProfile(profile: ProfileRecord | null) {
   return profile?.role === "admin" && isApprovedProfile(profile);
+}
+
+export async function getManageablePosts(context: AuthContext) {
+  const query = context.supabase
+    .from("posts")
+    .select(OWNED_POST_SELECT)
+    .order("updated_at", { ascending: false });
+
+  const { data } = isAdminProfile(context.profile)
+    ? await query
+    : await query.eq("author_id", context.user.id);
+
+  return ((data as OwnedPostRecord[] | null) || []).map((post) => ({
+    ...post,
+    source: "supabase" as const,
+  }));
+}
+
+export async function getManageablePostBySlug(
+  context: AuthContext,
+  slug: string,
+): Promise<OwnedPostRecord | null> {
+  const { data } = isAdminProfile(context.profile)
+    ? await context.supabase
+        .from("posts")
+        .select(OWNED_POST_SELECT)
+        .eq("slug", slug)
+        .maybeSingle()
+    : await context.supabase
+        .from("posts")
+        .select(OWNED_POST_SELECT)
+        .eq("slug", slug)
+        .eq("author_id", context.user.id)
+        .maybeSingle();
+
+  if (data) {
+    return {
+      ...(data as OwnedPostRecord),
+      source: "supabase",
+    };
+  }
+
+  return null;
 }
 
 export async function getAuthenticatedContext(): Promise<AuthContext | null> {
@@ -147,17 +200,11 @@ export async function requireAdminContext(): Promise<AuthContext> {
 
 export async function getOwnedPosts() {
   const context = await requireApprovedContext();
-  const { data } = await context.supabase
-    .from("posts")
-    .select(
-      "id, author_id, title, slug, excerpt, content_mdx, cover_image_url, thumbnail_url, tags, status, published_on, published_at, created_at, updated_at",
-    )
-    .eq("author_id", context.user.id)
-    .order("updated_at", { ascending: false });
+  const posts = await getManageablePosts(context);
 
   return {
     ...context,
-    posts: (data as OwnedPostRecord[] | null) || [],
+    posts,
   };
 }
 
@@ -165,15 +212,20 @@ export function buildEditorContentFromPost(
   post: OwnedPostRecord,
   authorSlug = "author",
 ) {
+  const assetFolder = post.asset_folder || post.slug;
+
   return buildEditorDocument({
     title: post.title,
     date: post.published_on || post.created_at.slice(0, 10),
-    author: authorSlug,
-    image: post.cover_image_url || "",
-    thumbnail: post.thumbnail_url || post.cover_image_url || "",
+    author: post.author_slug || authorSlug,
+    image: resolvePostAssetUrl(assetFolder, post.cover_image_url) || "",
+    thumbnail:
+      resolvePostAssetUrl(assetFolder, post.thumbnail_url) ||
+      resolvePostAssetUrl(assetFolder, post.cover_image_url) ||
+      "",
     excerpt: post.excerpt || "",
     tags: post.tags || [],
     status: post.status,
-    body: post.content_mdx,
+    body: rewritePostAssetUrls(assetFolder, post.content_mdx),
   });
 }

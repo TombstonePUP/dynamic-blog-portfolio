@@ -1,11 +1,15 @@
-import { AUTHORS } from "@/data/blog";
 import type { Author, Blog, BlogStatus } from "@/types/blog";
 import { createClient } from "@/utils/supabase/server";
-import { getAllPosts } from "./mdx";
+import { resolvePostAssetUrl, rewritePostAssetUrls } from "./post-assets";
 
 type PostRow = {
   id: string;
   author_id: string;
+  author_name: string | null;
+  author_slug: string | null;
+  author_role: string | null;
+  author_avatar_url: string | null;
+  asset_folder: string | null;
   title: string;
   slug: string;
   excerpt: string | null;
@@ -34,94 +38,45 @@ function formatDateLabel(date: string) {
   });
 }
 
-function resolveLegacyImagePath(slug: string, value: string) {
-  if (value.startsWith("./")) {
-    return `/images/posts/${slug}/${value.slice(2)}`;
-  }
-
-  return value;
-}
-
-function resolveAuthor(profile?: ProfileRow | null): Author {
-  if (!profile) {
-    return {
-      name: "Author",
-      slug: "author",
-      role: "Writer",
-    };
-  }
-
+function resolveAuthor(row: PostRow, profile?: ProfileRow | null): Author {
   return {
-    id: profile.id,
-    name: profile.display_name || "Author",
-    slug: profile.slug || "author",
-    role: profile.role || "Writer",
-    image: profile.avatar_url || undefined,
+    id: profile?.id,
+    name: row.author_name || profile?.display_name || "Author",
+    slug: row.author_slug || profile?.slug || "author",
+    role: row.author_role || profile?.role || "Writer",
+    image: row.author_avatar_url || profile?.avatar_url || undefined,
   };
 }
 
 function mapSupabasePost(row: PostRow, profile?: ProfileRow | null): Blog {
   const date = row.published_on || row.created_at.slice(0, 10);
+  const assetFolder = row.asset_folder || row.slug;
+  const contentMdx = rewritePostAssetUrls(assetFolder, row.content_mdx);
 
   return {
     id: row.id,
     source: "supabase",
+    assetFolder,
     slug: row.slug,
     title: row.title,
     href: `/blog/${row.slug}`,
-    image: row.cover_image_url || "/images/blog/unsplash-1499750310107-5fef28a66643.jpg",
-    thumbnail:
-      row.thumbnail_url ||
-      row.cover_image_url ||
+    image:
+      resolvePostAssetUrl(assetFolder, row.cover_image_url) ||
       "/images/blog/unsplash-1499750310107-5fef28a66643.jpg",
-    author: resolveAuthor(profile),
+    thumbnail:
+      resolvePostAssetUrl(assetFolder, row.thumbnail_url) ||
+      resolvePostAssetUrl(assetFolder, row.cover_image_url) ||
+      "/images/blog/unsplash-1499750310107-5fef28a66643.jpg",
+    author: resolveAuthor(row, profile),
     date,
     dateLabel: formatDateLabel(date),
     tags: row.tags || [],
     excerpt: row.excerpt || "",
-    content: row.content_mdx.split(/\n\s*\n/).filter(Boolean),
-    contentMdx: row.content_mdx,
+    content: contentMdx.split(/\n\s*\n/).filter(Boolean),
+    contentMdx,
     commentCount: 0,
     status: row.status,
   };
-}
-
-function getLegacyBlogs(): Blog[] {
-  return getAllPosts().map((post) => {
-    const { frontmatter, slug } = post;
-    const authorKey =
-      typeof frontmatter.author === "string" && frontmatter.author in AUTHORS
-        ? (frontmatter.author as keyof typeof AUTHORS)
-        : "ian";
-    const date =
-      typeof frontmatter.date === "string"
-        ? frontmatter.date
-        : new Date().toISOString().slice(0, 10);
-
-    return {
-      id: `mdx:${slug}`,
-      source: "mdx",
-      slug,
-      title: String(frontmatter.title ?? slug),
-      href: `/blog/${slug}`,
-      image: resolveLegacyImagePath(slug, String(frontmatter.image ?? "")),
-      thumbnail: resolveLegacyImagePath(
-        slug,
-        String(frontmatter.thumbnail ?? frontmatter.image ?? ""),
-      ),
-      author: AUTHORS[authorKey] || AUTHORS.ian,
-      date,
-      dateLabel: formatDateLabel(date),
-      tags: Array.isArray(frontmatter.tags)
-        ? frontmatter.tags.map((tag) => String(tag))
-        : [],
-      excerpt: String(frontmatter.excerpt ?? ""),
-      content: post.content.split(/\n\s*\n/).filter(Boolean),
-      contentMdx: post.content,
-      commentCount: 0,
-      status: "published",
-    };
-  });
 }
 
 async function getPublishedSupabaseBlogs(): Promise<Blog[]> {
@@ -129,7 +84,7 @@ async function getPublishedSupabaseBlogs(): Promise<Blog[]> {
   const { data: posts, error: postsError } = await supabase
     .from("posts")
     .select(
-      "id, author_id, title, slug, excerpt, content_mdx, cover_image_url, thumbnail_url, status, tags, published_on, created_at",
+      "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, cover_image_url, thumbnail_url, status, tags, published_on, created_at",
     )
     .eq("status", "published")
     .order("published_on", { ascending: false, nullsFirst: false })
@@ -159,21 +114,9 @@ async function getPublishedSupabaseBlogs(): Promise<Blog[]> {
 }
 
 export async function getBlogs(): Promise<Blog[]> {
-  const supabaseBlogs = await getPublishedSupabaseBlogs();
-  const legacyBlogs = getLegacyBlogs();
-  const blogsBySlug = new Map<string, Blog>();
+  const blogs = await getPublishedSupabaseBlogs();
 
-  for (const post of supabaseBlogs) {
-    blogsBySlug.set(post.slug, post);
-  }
-
-  for (const post of legacyBlogs) {
-    if (!blogsBySlug.has(post.slug)) {
-      blogsBySlug.set(post.slug, post);
-    }
-  }
-
-  return [...blogsBySlug.values()].sort(
+  return [...blogs].sort(
     (left, right) => new Date(right.date).getTime() - new Date(left.date).getTime(),
   );
 }

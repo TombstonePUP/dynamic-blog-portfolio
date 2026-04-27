@@ -1,9 +1,9 @@
 import BackButton from "@/components/guest/back-button";
 import CommentsSection from "@/components/guest/comments-section";
 import ScrollArrow from "@/components/guest/scroll-arrow";
+import { CustomMDX } from "@/components/mdx/mdx-remote";
 import { MAIN_CATEGORIES, readingMinutesFromContent, tagToSlug } from "@/data/blog";
 import { getBlogBySlug, getBlogs, getRelatedBlogs } from "@/lib/blogs.server";
-import { getPostBySlug as getMdxPostBySlug } from "@/lib/mdx";
 import { getThemeColor } from "@/lib/theme";
 import type { Blog } from "@/types/blog";
 import { ArrowRight, Calendar, Clock, MessageCircle, UserCircle } from "lucide-react";
@@ -11,7 +11,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CustomMDX } from "@/components/mdx/mdx-remote";
 
 function seriesLabel(tags: string[]): string {
   const tag = tags.find((value) => value !== "featured");
@@ -27,7 +26,6 @@ function capitalizeTopic(tag: string): string {
 
 type PageProps = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ topic?: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -81,21 +79,15 @@ function RelatedCard({ post }: { post: Blog }) {
   );
 }
 
-export default async function BlogArticlePage({ params, searchParams }: PageProps) {
+export default async function BlogArticlePage({ params }: PageProps) {
   const blogs = await getBlogs();
   const { slug } = await params;
-  const { topic } = await searchParams;
   const post = await getBlogBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  const themeColor = topic
-    ? getThemeColor([decodeURIComponent(topic)])
-    : getThemeColor(post.tags);
-
-  const legacyMdxPost = post.source === "mdx" ? getMdxPostBySlug(slug) : null;
   const minutes = readingMinutesFromContent(post.contentMdx || post.content);
   const related = await getRelatedBlogs(post);
 
@@ -199,13 +191,11 @@ export default async function BlogArticlePage({ params, searchParams }: PageProp
         style={{ "--theme-color": getThemeColor(post.tags) } as React.CSSProperties}
       >
         <div className="space-y-6 text-base leading-[1.8] text-foreground/90 md:text-[1.0625rem] md:leading-[1.85] [&>p:first-of-type]:text-[1.0625rem] [&>p:first-of-type]:leading-relaxed md:[&>p:first-of-type]:text-lg md:[&>p:first-of-type]:leading-relaxed [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:mr-3 [&>p:first-of-type]:first-letter:-mt-2 [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-black [&>p:first-of-type]:first-letter:text-[var(--theme-color)] [&>p:first-of-type]:first-letter:leading-[0.75]">
-          {legacyMdxPost ? (
-            <CustomMDX source={legacyMdxPost.content} slug={slug} />
-          ) : post.contentMdx ? (
-            <CustomMDX source={post.contentMdx} />
-          ) : (
+          {post.contentMdx ? (
+            <CustomMDX source={post.contentMdx} assetFolder={post.assetFolder} />
+          ) : post.content.length > 0 ? (
             post.content.map((paragraph, index) => <p key={index}>{paragraph}</p>)
-          )}
+          ) : null}
         </div>
 
         <div

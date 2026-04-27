@@ -4,6 +4,12 @@ import matter from "gray-matter";
 
 const POSTS_PATH = path.join(process.cwd(), "content/posts");
 
+type MdxPost = {
+  slug: string;
+  frontmatter: Record<string, unknown>;
+  content: string;
+};
+
 export function getPostSlugs() {
   if (!fs.existsSync(POSTS_PATH)) return [];
   
@@ -25,17 +31,23 @@ export function getPostBySlug(slug: string) {
 
   return {
     slug,
-    frontmatter: data as Record<string, any>,
+    frontmatter: data as Record<string, unknown>,
     content,
-  };
+  } satisfies MdxPost;
 }
 
 export function getAllPosts() {
   const slugs = getPostSlugs();
   const posts = slugs
     .map((slug) => getPostBySlug(slug))
-    .filter((post) => post !== null)
-    .sort((post1, post2) => (post1.frontmatter.date > post2.frontmatter.date ? -1 : 1));
+    .filter((post): post is MdxPost => post !== null)
+    .sort((post1, post2) => {
+      const leftDate = typeof post1.frontmatter.date === "string" ? post1.frontmatter.date : "";
+      const rightDate =
+        typeof post2.frontmatter.date === "string" ? post2.frontmatter.date : "";
+
+      return leftDate > rightDate ? -1 : 1;
+    });
 
   return posts;
 }

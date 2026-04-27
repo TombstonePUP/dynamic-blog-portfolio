@@ -64,12 +64,13 @@ export interface Author {
   }
 }
 
-export type BlogSource = "mdx" | "supabase";
+export type BlogSource = "supabase";
 export type BlogStatus = "draft" | "published" | "archived";
 
 export interface Blog {
   id: string;
   source: BlogSource;
+  assetFolder: string;
   slug: string;
   title: string;
   href: string;
