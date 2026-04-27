@@ -38,11 +38,45 @@ loadEnvFile(path.join(process.cwd(), ".env.local"));
 
 const migrationsDir = path.join(process.cwd(), "supabase", "migrations");
 const dbUrl = process.env.SUPABASE_DB_URL;
+const migrationFilePattern = /^\d{14}_.+\.sql$/;
+
+function validateMigrationFilenames(directoryPath) {
+  const invalidFiles = fs
+    .readdirSync(directoryPath, { withFileTypes: true })
+    .filter(
+      (entry) =>
+        entry.isFile() &&
+        entry.name.endsWith(".sql") &&
+        !migrationFilePattern.test(entry.name),
+    )
+    .map((entry) => entry.name)
+    .sort();
+
+  if (invalidFiles.length === 0) {
+    return;
+  }
+
+  console.error(
+    'Supabase only recognizes migration files named "YYYYMMDDHHmmss_description.sql".',
+  );
+  console.error("Rename these files before rerunning npm run supabase:push:");
+
+  for (const fileName of invalidFiles) {
+    console.error(`  - ${fileName}`);
+  }
+
+  console.error(
+    "If any of those files were already applied remotely under a different version, repair the remote migration history after renaming them.",
+  );
+  process.exit(1);
+}
 
 if (!fs.existsSync(migrationsDir)) {
   console.error("Missing supabase/migrations directory.");
   process.exit(1);
 }
+
+validateMigrationFilenames(migrationsDir);
 
 if (!dbUrl) {
   console.error("Missing SUPABASE_DB_URL in .env.local.");

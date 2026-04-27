@@ -1,6 +1,10 @@
 "use server";
 
-import { buildEditorContentFromPost, getAuthenticatedContext, type OwnedPostRecord } from "@/lib/admin-data.server";
+import {
+  buildEditorContentFromPost,
+  requireApprovedContext,
+  type OwnedPostRecord,
+} from "@/lib/admin-data.server";
 import { normalizeSlug, parseEditorDocument, toIsoDate } from "@/lib/post-documents";
 
 function mapDatabaseError(message: string) {
@@ -12,11 +16,7 @@ function mapDatabaseError(message: string) {
 }
 
 export async function getBlogListAction() {
-  const context = await getAuthenticatedContext();
-
-  if (!context) {
-    return { success: false, error: "You must be signed in to view your stories." };
-  }
+  const context = await requireApprovedContext();
 
   const { data, error } = await context.supabase
     .from("posts")
@@ -40,11 +40,7 @@ export async function getBlogListAction() {
 }
 
 export async function getBlogContentAction(slug: string) {
-  const context = await getAuthenticatedContext();
-
-  if (!context) {
-    return { success: false, error: "You must be signed in to load a story." };
-  }
+  const context = await requireApprovedContext();
 
   const normalizedSlug = normalizeSlug(slug);
   const { data, error } = await context.supabase
@@ -74,11 +70,7 @@ export async function getBlogContentAction(slug: string) {
 }
 
 export async function saveBlogContentAction(slug: string, content: string) {
-  const context = await getAuthenticatedContext();
-
-  if (!context) {
-    return { success: false, error: "You must be signed in to save a story." };
-  }
+  const context = await requireApprovedContext();
 
   const normalizedSlug = normalizeSlug(slug);
   if (!normalizedSlug) {
@@ -148,11 +140,7 @@ export async function saveBlogContentAction(slug: string, content: string) {
 }
 
 export async function renameBlogSlugAction(oldSlug: string, newSlug: string) {
-  const context = await getAuthenticatedContext();
-
-  if (!context) {
-    return { success: false, error: "You must be signed in to rename a story." };
-  }
+  const context = await requireApprovedContext();
 
   const normalizedOldSlug = normalizeSlug(oldSlug);
   const normalizedNewSlug = normalizeSlug(newSlug);

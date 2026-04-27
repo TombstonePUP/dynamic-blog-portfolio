@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import AuthForm from "./auth-form";
-import { getAuthenticatedContext } from "@/lib/admin-data.server";
+import { getAuthenticatedContext, isApprovedProfile } from "@/lib/admin-data.server";
 
 export const metadata = {
   title: "Login | The Strengths Writer",
@@ -11,7 +11,7 @@ export default async function LoginPage() {
   const context = await getAuthenticatedContext();
 
   if (context) {
-    redirect("/dashboard");
+    redirect(isApprovedProfile(context.profile) ? "/dashboard" : "/pending");
   }
 
   return (
@@ -28,14 +28,14 @@ export default async function LoginPage() {
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-white/75">
               Your editor now runs on Supabase-backed authentication and post storage, so drafts,
-              profiles, and publishing live in one system instead of local files.
+              profiles, publishing, and access approvals live in one system instead of local files.
             </p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               { label: "Profiles", value: "Auth-backed" },
-              { label: "Drafts", value: "Private" },
+              { label: "Review", value: "Admin approval" },
               { label: "Publishing", value: "Live DB" },
             ].map((item) => (
               <div key={item.label} className="border border-white/12 bg-white/6 px-4 py-4 backdrop-blur-sm">

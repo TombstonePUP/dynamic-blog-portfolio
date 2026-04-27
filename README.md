@@ -15,6 +15,8 @@ Add your remote Postgres connection string to `.env.local`:
 
 ```bash
 SUPABASE_DB_URL=postgresql://postgres:your-password@db.your-project-ref.supabase.co:5432/postgres
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_ADMIN_PASSWORD=choose-a-strong-admin-password
 ```
 
 Then push any pending migrations to your Supabase project with:
@@ -29,7 +31,24 @@ Preview what would run without applying it:
 npm run supabase:push:dry
 ```
 
+Supabase migration files must use the `YYYYMMDDHHmmss_description.sql` format. For example: `20260427000000_auth_blog_schema.sql`.
+
 Important: once a migration has already been applied to Supabase, editing that old file will not automatically re-run it. Put later schema changes into a new migration file instead of changing an already-applied one.
+
+If you rename a migration that has already been applied remotely, repair the old version in the remote migration history before pushing again:
+
+```bash
+supabase migration repair --status reverted <old_version>
+supabase migration repair --status applied <new_version>
+```
+
+After the migrations are in place, you can seed or repair the primary admin account with:
+
+```bash
+npm run supabase:seed-admin
+```
+
+By default, this seeds `sanjuanregie@gmail.com` as an approved admin. You can optionally override the seeded name and email with `SUPABASE_ADMIN_FIRST_NAME`, `SUPABASE_ADMIN_LAST_NAME`, and `SUPABASE_ADMIN_EMAIL`.
 
 ## 🚀 Getting Started
 

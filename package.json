@@ -13,7 +13,8 @@
     "pages:deploy": "echo This app now requires a Next.js server runtime for auth. Deploy it to a Node-compatible host such as Vercel or a supported adapter target.",
     "supabase:test": "node scripts/test-supabase.mjs",
     "supabase:push": "node scripts/supabase-push.mjs",
-    "supabase:push:dry": "node scripts/supabase-push.mjs --dry-run"
+    "supabase:push:dry": "node scripts/supabase-push.mjs --dry-run",
+    "supabase:seed-admin": "node scripts/seed-admin.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

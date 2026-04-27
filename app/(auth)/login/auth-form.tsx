@@ -12,7 +12,8 @@ const supabase = createClient();
 export default function AuthForm() {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("sign-in");
-  const [displayName, setDisplayName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -26,13 +27,25 @@ export default function AuthForm() {
     setNotice(null);
 
     if (mode === "sign-up") {
+      const trimmedFirstName = firstName.trim();
+      const trimmedLastName = lastName.trim();
+      const normalizedEmail = email.trim().toLowerCase();
+
+      if (!trimmedFirstName || !trimmedLastName) {
+        setErrorMessage("Please enter your first and last name.");
+        setSubmitting(false);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/pending`,
           data: {
-            display_name: displayName.trim(),
+            first_name: trimmedFirstName,
+            last_name: trimmedLastName,
+            display_name: `${trimmedFirstName} ${trimmedLastName}`,
           },
         },
       });
@@ -44,18 +57,20 @@ export default function AuthForm() {
       }
 
       if (data.session) {
-        router.replace("/dashboard");
+        router.replace("/pending");
         router.refresh();
         return;
       }
 
-      setNotice("Check your email to confirm your account, then come back and sign in.");
+      setNotice(
+        "Check your email to confirm your account. After that, an admin will review your access.",
+      );
       setSubmitting(false);
       return;
     }
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim().toLowerCase(),
       password,
     });
 
@@ -94,21 +109,39 @@ export default function AuthForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {mode === "sign-up" ? (
-          <label className="block">
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
-              Display name
-            </span>
-            <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
-              <UserRound className="size-4 text-foreground/35" />
-              <input
-                value={displayName}
-                onChange={(event) => setDisplayName(event.target.value)}
-                required
-                placeholder="Ian Llenares"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
-              />
-            </div>
-          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+                First name
+              </span>
+              <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+                <UserRound className="size-4 text-foreground/35" />
+                <input
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  required
+                  placeholder="Regie"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+                />
+              </div>
+            </label>
+
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+                Last name
+              </span>
+              <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+                <UserRound className="size-4 text-foreground/35" />
+                <input
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  required
+                  placeholder="San Juan"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+                />
+              </div>
+            </label>
+          </div>
         ) : null}
 
         <label className="block">
