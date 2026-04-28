@@ -73,7 +73,7 @@ export default function AdminHeader({
               <form action="/auth/signout" method="post">
                 <button
                   type="submit"
-                  className="flex w-full items-center gap-2 border border-admin-surface-hover px-3 py-2 text-sm font-semibold text-admin-text transition-colors hover:bg-admin-surface-hover hover:text-admin-heading"
+                  className="flex w-full items-center gap-2 border border-admin-surface-hover px-3 py-2 text-sm font-semibold text-admin-text transition-colors hover:bg-admin-surface-hover hover:text-admin-heading cursor-pointer"
                 >
                   <LogOut className="size-4" />
                   Sign out

@@ -33,16 +33,22 @@ export default async function ProfilePage() {
             </p>
             <p className="text-sm text-admin-muted">
               <span className="font-semibold text-admin-text">Joined:</span>{" "}
-              {new Date(profile?.approved_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {new Date(profile?.approved_at || new Date()).toLocaleDateString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                },
+              )}
             </p>
           </section>
           <section className="flex gap-8">
             <div className="rounded-lg border border-admin-surface-hover bg-admin-surface p-8 h-fit min-w-[520px]">
-              <ProfileForm userName={userName} userEmail={profile?.email} />
+              <ProfileForm
+                userName={userName}
+                userEmail={profile?.email || ""}
+              />
             </div>
             <div className="rounded-lg border border-admin-surface-hover bg-admin-surface p-8 h-fit min-w-[520px]">
               <ChangePasswordForm />
