@@ -34,9 +34,9 @@ export default async function LoginPage() {
         <nav className="absolute top-16 left-16 right-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <LogoIcon className="size-8 brightness-0 invert opacity-90" />
-            <Link href="/" className="text-base font-semibold text-white">
-              TheStrengthsWriter
-            </Link>
+            {/* <Link href="/" className="text-base font-semibold text-white">
+              theStrengthsWriter
+            </Link> */}
           </div>
           <div className="flex items-center gap-8 text-sm font-medium text-white/80 hover:[&_a]:text-white [&_a]:transition-colors">
             <Link href="/topics" className="hover:text-white">
@@ -77,7 +77,7 @@ export default async function LoginPage() {
         <AuthForm />
         <footer className="absolute bottom-8 text-center text-sm text-gray-500">
           <p>
-            &copy; {new Date().getFullYear()} The Strengths Writer. All rights
+            &copy; {new Date().getFullYear()} theStrengthsWriter. All rights
             reserved.
           </p>
         </footer>

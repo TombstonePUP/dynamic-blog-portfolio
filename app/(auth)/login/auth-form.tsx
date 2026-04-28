@@ -1,10 +1,10 @@
 "use client";
 
 import { createClient } from "@/utils/supabase/client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -12,16 +12,18 @@ type AuthMode = "sign-in" | "sign-up";
 
 const supabase = createClient();
 
-const authSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-}).refine((data) => {
-  // If we wanted to enforce firstName/lastName here, we'd need the mode.
-  // But we can also do it in the handleSubmit or with a dynamic schema.
-  return true;
-}, {});
+const authSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email address."),
+    password: z.string().min(6, "Password must be at least 6 characters."),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+  })
+  .refine((data) => {
+    // If we wanted to enforce firstName/lastName here, we'd need the mode.
+    // But we can also do it in the handleSubmit or with a dynamic schema.
+    return true;
+  }, {});
 
 type AuthFormValues = z.infer<typeof authSchema>;
 
@@ -156,16 +158,22 @@ export default function AuthForm() {
         <button
           type="button"
           onClick={() => setMode("sign-in")}
-          className={`flex-1 px-4 py-2 text-sm font-semibold transition ${mode === "sign-in" ? "bg-white text-foreground shadow-sm" : "text-foreground/55"
-            }`}
+          className={`flex-1 px-4 py-2 text-sm font-semibold transition ${
+            mode === "sign-in"
+              ? "bg-white text-foreground shadow-sm"
+              : "text-foreground/55"
+          }`}
         >
           Sign in
         </button>
         <button
           type="button"
           onClick={() => setMode("sign-up")}
-          className={`flex-1 px-4 py-2 text-sm font-semibold transition ${mode === "sign-up" ? "bg-white text-foreground shadow-sm" : "text-foreground/55"
-            }`}
+          className={`flex-1 px-4 py-2 text-sm font-semibold transition ${
+            mode === "sign-up"
+              ? "bg-white text-foreground shadow-sm"
+              : "text-foreground/55"
+          }`}
         >
           Create account
         </button>
@@ -187,7 +195,9 @@ export default function AuthForm() {
                 />
               </div>
               {errors.firstName && (
-                <p className="mt-1 text-xs text-red-500">{errors.firstName.message}</p>
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.firstName.message}
+                </p>
               )}
             </label>
 
@@ -204,7 +214,9 @@ export default function AuthForm() {
                 />
               </div>
               {errors.lastName && (
-                <p className="mt-1 text-xs text-red-500">{errors.lastName.message}</p>
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.lastName.message}
+                </p>
               )}
             </label>
           </div>
@@ -242,14 +254,27 @@ export default function AuthForm() {
             />
           </div>
           {errors.password && (
-            <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
+            <p className="mt-1 text-xs text-red-500">
+              {errors.password.message}
+            </p>
           )}
 
           {mode === "sign-up" && password && (
             <div className="mt-3 space-y-1.5">
               <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
                 <span className="text-foreground/40">Strength</span>
-                <span style={{ color: strength <= 2 ? '#ef4444' : strength <= 3 ? '#eab308' : strength <= 4 ? '#3b82f6' : '#22c55e' }}>
+                <span
+                  style={{
+                    color:
+                      strength <= 2
+                        ? "#ef4444"
+                        : strength <= 3
+                          ? "#eab308"
+                          : strength <= 4
+                            ? "#3b82f6"
+                            : "#22c55e",
+                  }}
+                >
                   {getStrengthLabel(strength)}
                 </span>
               </div>
@@ -267,16 +292,14 @@ export default function AuthForm() {
           <p className="text-sm text-red-600">{errorMessage}</p>
         ) : null}
 
-        {notice ? (
-          <p className="text-sm text-[#2b776a]">{notice}</p>
-        ) : null}
+        {notice ? <p className="text-sm text-[#2b776a]">{notice}</p> : null}
 
         <button
           type="submit"
           disabled={submitting}
           className="flex w-full items-center justify-center gap-2 bg-[#111111] px-5 py-3 text-sm font-semibold text-white transition hover:bg-black/85 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {mode === "sign-in" ? "Login" : "Create account"}
+          {mode === "sign-in" ? "Sign in" : "Sign up"}
           {submitting && <Loader2 className="size-4 animate-spin" />}
         </button>
       </form>
