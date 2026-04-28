@@ -286,22 +286,21 @@ export default function ExplorerGrid({
                 {selectedPost.excerpt}
               </p>
             )}
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-3">
-              <Link
-                href={`/editor?slug=${encodeURIComponent(selectedPost.slug)}`}
-                className="block w-full text-center border border-admin-accent bg-admin-accent px-4 py-2 text-sm font-semibold text-admin-contrast transition-colors hover:bg-admin-accent/90"
-              >
-                Edit Story
-              </Link>
-              <Link
-                href={`/blog/${selectedPost.slug}`}
-                className="block w-full text-center border border-admin-surface-hover bg-transparent px-4 py-2 text-sm font-semibold text-admin-heading transition-colors hover:bg-admin-surface-hover"
-              >
-                View Published
-              </Link>
-            </div>
+          </div>
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-3 mt-auto px-6 py-6">
+            <Link
+              href={`/editor?slug=${encodeURIComponent(selectedPost.slug)}`}
+              className="block w-full text-center border border-admin-accent bg-admin-accent px-4 py-2 text-sm font-semibold text-admin-contrast transition-colors hover:bg-admin-accent/90"
+            >
+              Edit Story
+            </Link>
+            <Link
+              href={`/blog/${selectedPost.slug}`}
+              className="block w-full text-center border border-admin-surface-hover bg-transparent px-4 py-2 text-sm font-semibold text-admin-heading transition-colors hover:bg-admin-surface-hover"
+            >
+              View Published
+            </Link>
           </div>
         </div>
       )}
