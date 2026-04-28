@@ -137,7 +137,7 @@ export default async function UsersPage() {
           Dashboard / Users
         </p>
         <h1 className="text-3xl font-black tracking-tight text-admin-heading">
-          User management
+          User Management
         </h1>
         <p className="max-w-3xl text-sm leading-6 text-admin-text">
           Review new registrations, approve access to the writing tools, and

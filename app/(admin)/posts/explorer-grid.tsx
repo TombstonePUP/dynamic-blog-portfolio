@@ -67,7 +67,7 @@ export default function ExplorerGrid({
   });
 
   return (
-    <div className="flex w-full min-h-full">
+    <div className="flex w-full max-h-[93dvh]">
       {/* Contextual Sidebar */}
       <div className="flex w-64 shrink-0 flex-col overflow-y-auto border-r border-admin-surface-hover bg-admin-surface">
         <div className="p-6 pb-2">
