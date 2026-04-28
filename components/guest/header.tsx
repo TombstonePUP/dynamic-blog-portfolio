@@ -42,7 +42,7 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
 
       <header className="sticky top-0 z-50 w-full bg-[#FAF9F6]">
         <div
-          className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-24 ${isCompact ? "h-20 pt-7" : "md:h-40 md:pt-10"}`}
+          className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-24 pt-7 ${isCompact ? "h-20 " : "md:h-40 md:pt-10"}`}
         >
           <LogoIcon className="size-8 md:hidden" />
           {/* LEFT NAV */}
