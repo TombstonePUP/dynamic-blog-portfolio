@@ -1,6 +1,4 @@
-import type { Tag } from "@/types/blog";
-
-export function getThemeColor(tags: Tag[]): string {
+export function getThemeColor(tags: string[]): string {
   if (tags.includes("featured")) return "#F0D8A1"; // Gold
   if (tags.includes("why positive psychology?")) return "#F0D8A1"; // Gold
   if (tags.includes("movie Review")) return "#E29578"; // Coral

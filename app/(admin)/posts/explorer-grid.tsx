@@ -7,19 +7,39 @@ import { useState } from "react";
 
 type PostFolder = {
   slug: string;
-  files: string[];
+  title: string;
+  status: "draft" | "published" | "archived";
   date: string;
+  updatedAt: string;
 };
 
 export default function ExplorerGrid({ initialFolders }: { initialFolders: PostFolder[] }) {
   const [activeDateFilter, setActiveDateFilter] = useState<string>("All");
 
   // Extract unique dates for pills (sort in reverse chronological if possible, but alphabetical is fine for string months)
-  const availableDates = ["All", ...Array.from(new Set(initialFolders.map(f => f.date).filter(d => d !== "Unknown"))).sort()];
+  const availableDates = [
+    "All",
+    ...Array.from(
+      new Set(
+        initialFolders.map((folder) =>
+          new Date(folder.date).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+          }),
+        ),
+      ),
+    ).sort(),
+  ];
 
   const filteredFolders = activeDateFilter === "All"
     ? initialFolders
-    : initialFolders.filter(f => f.date === activeDateFilter);
+    : initialFolders.filter(
+        (folder) =>
+          new Date(folder.date).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+          }) === activeDateFilter,
+      );
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto">
@@ -27,7 +47,7 @@ export default function ExplorerGrid({ initialFolders }: { initialFolders: PostF
         <div>
           <div>
             <h1 className="text-3xl font-black tracking-tight text-admin-text">Explorer</h1>
-            <p className="text-admin-text/50 font-medium mt-2">Manage your blog post folders and assets.</p>
+            <p className="text-admin-text/50 font-medium mt-2">Manage your stories and jump back into any draft.</p>
           </div>
         </div>
         <Button
@@ -63,7 +83,7 @@ export default function ExplorerGrid({ initialFolders }: { initialFolders: PostF
       {filteredFolders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-admin-text/20">
           <Folder className="size-16 mb-4 opacity-50" />
-          <p className="font-bold uppercase tracking-widest">No folders found</p>
+          <p className="font-bold uppercase tracking-widest">No stories found</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
@@ -77,15 +97,21 @@ export default function ExplorerGrid({ initialFolders }: { initialFolders: PostF
                 <Folder className="size-20 text-admin-primary/40 group-hover:text-admin-primary transition-colors fill-admin-primary/10 group-hover:fill-admin-primary/20" strokeWidth={0.5} />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="px-2 py-0.5 rounded text-[9px] font-black uppercase text-admin-text/60 group-hover:text-admin-text">
-                    {folder.files.length} {folder.files.length === 1 ? 'item' : 'items'}
+                    {folder.status}
                   </div>
                 </div>
               </div>
               <div className="text-center w-full">
-                <p className="text-sm font-bold text-admin-text truncate w-full">{folder.slug}</p>
-                {folder.date && folder.date !== "Unknown" && (
-                  <p className="text-[10px]  uppercase font-bold tracking-widest mt-1">{folder.date}</p>
-                )}
+                <p className="text-sm font-bold text-admin-text truncate w-full">{folder.title}</p>
+                <p className="mt-1 text-[11px] text-admin-text/45">{folder.slug}</p>
+                {folder.date ? (
+                  <p className="text-[10px]  uppercase font-bold tracking-widest mt-1">
+                    {new Date(folder.date).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                    })}
+                  </p>
+                ) : null}
               </div>
             </Link>
           ))}

@@ -48,6 +48,7 @@ export type SubTag =
 export type Tag = Category | SubTag | "latest" | "advice";
 
 export interface Author {
+  id?: string;
   name: string;
   slug: string;
   role?: string;
@@ -63,8 +64,13 @@ export interface Author {
   }
 }
 
+export type BlogSource = "supabase";
+export type BlogStatus = "draft" | "published" | "archived";
+
 export interface Blog {
-  id: number;
+  id: string;
+  source: BlogSource;
+  assetFolder: string;
   slug: string;
   title: string;
   href: string;
@@ -77,16 +83,18 @@ export interface Blog {
   date: string;
   /** Human-readable date e.g. "August 13, 2025" */
   dateLabel: string;
-  tags: Tag[];
+  tags: string[];
   excerpt: string;
   /** Article body as plain-text paragraphs (rendered as prose) */
   content: string[];
+  contentMdx?: string;
   commentCount: number;
+  status?: BlogStatus;
   comments?: Comment[];
 }
 
 export type Comment = {
-  id: number;
+  id: string;
   author: string;
   date: string;
   dateLabel: string;

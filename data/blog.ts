@@ -1,4 +1,4 @@
-import type { Author, Blog, Tag } from "@/types/blog";
+import type { Author, Tag } from "@/types/blog";
 
 // ─── Authors ────────────────────────────────────────────────────────────────
 
@@ -117,4 +117,4 @@ export function readingMinutesFromContent(paragraphs: string[] | string): number
   return Math.max(1, Math.round(words / 200));
 }
 
-
+

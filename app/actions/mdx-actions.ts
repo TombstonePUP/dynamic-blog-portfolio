@@ -17,7 +17,10 @@ export async function compileMdxAction(content: string) {
       parseFrontmatter: true,
     });
     return { success: true, source: mdxSource };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to compile MDX.",
+    };
   }
 }

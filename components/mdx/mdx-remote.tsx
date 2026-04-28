@@ -1,50 +1,72 @@
 import { MDXRemote } from "next-mdx-remote/rsc";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import type { MDXComponents } from "mdx/types";
+import type { ComponentPropsWithoutRef } from "react";
+import { resolvePostAssetUrl } from "@/lib/post-assets";
 
-const createComponents = (slug?: string) => ({
-  h1: (props: any) => (
+type HeadingProps = ComponentPropsWithoutRef<"h1">;
+type SubheadingProps = ComponentPropsWithoutRef<"h2">;
+type ParagraphProps = ComponentPropsWithoutRef<"p">;
+type LinkProps = ComponentPropsWithoutRef<typeof Link>;
+type MdxImageProps = ComponentPropsWithoutRef<"img"> & {
+  src?: string;
+};
+
+const createComponents = (assetFolder?: string): MDXComponents => ({
+  h1: (props: HeadingProps) => (
     <h1 className="mt-8 mb-4 text-3xl font-bold" {...props} />
   ),
-  h2: (props: any) => (
+  h2: (props: SubheadingProps) => (
     <h2 className="mt-8 mb-4 text-2xl font-bold" {...props} />
   ),
-  p: (props: any) => <p className="mb-6" {...props} />,
-  a: (props: any) => (
+  p: (props: ParagraphProps) => <p className="mb-6" {...props} />,
+  a: (props: LinkProps) => (
     <Link className="text-primary hover:underline" {...props} />
   ),
-  img: (props: any) => {
-    let src = props.src;
-    if (slug && src.startsWith("./")) {
-      src = `/images/posts/${slug}/${src.slice(2)}`;
+  img: (props: MdxImageProps) => {
+    const src =
+      typeof props.src === "string" && assetFolder
+        ? resolvePostAssetUrl(assetFolder, props.src) || props.src
+        : props.src;
+
+    if (!src) {
+      return null;
     }
+
     return (
       <div className="my-8 overflow-hidden rounded-xl">
-        <Image 
+        <Image
           src={src}
-          width={1200} 
-          height={675} 
-          className="w-full object-cover" 
+          width={1200}
+          height={675}
+          className="w-full object-cover"
           alt={props.alt || ""}
         />
       </div>
     );
   },
   // Keep Image component for compatibility if used as a component
-  Image: (props: any) => {
-    let src = props.src;
-    if (slug && src.startsWith("./")) {
-      src = `/images/posts/${slug}/${src.slice(2)}`;
+  Image: (props: MdxImageProps) => {
+    const src =
+      typeof props.src === "string" && assetFolder
+        ? resolvePostAssetUrl(assetFolder, props.src) || props.src
+        : props.src;
+    const restProps = { ...props };
+    delete restProps.src;
+
+    if (!src) {
+      return null;
     }
+
     return (
       <div className="my-8 overflow-hidden rounded-xl">
-        <Image 
+        <Image
+          {...restProps}
           src={src}
-          width={1200} 
-          height={675} 
-          className="w-full object-cover" 
-          {...props} 
+          width={1200}
+          height={675}
+          className="w-full object-cover"
           alt={props.alt || ""}
         />
       </div>
@@ -52,8 +74,17 @@ const createComponents = (slug?: string) => ({
   },
 });
 
-export function CustomMDX({ source, slug, components: manualComponents }: { source: string, slug?: string, components?: any }) {
-  const components = createComponents(slug);
+export function CustomMDX({
+  source,
+  assetFolder,
+  components: manualComponents,
+}: {
+  source: string;
+  assetFolder?: string;
+  components?: MDXComponents;
+}) {
+  const components = createComponents(assetFolder);
+
   return (
     <MDXRemote
       source={source}

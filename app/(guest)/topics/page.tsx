@@ -55,8 +55,8 @@ function TopicCard({ post, topic }: { post: Blog; topic: Tag }) {
   );
 }
 
-export default function TopicsPage() {
-  const blogs = getBlogs();
+export default async function TopicsPage() {
+  const blogs = await getBlogs();
   const topics = MAIN_CATEGORIES;
 
 
@@ -110,7 +110,13 @@ export default function TopicsPage() {
           const themeColor = getThemeColor([topic]);
 
           const topicSubTags = Array.from(new Set(
-            topicBlogs.flatMap((b) => b.tags).filter((t) => !MAIN_CATEGORIES.includes(t) && t !== "featured")
+            topicBlogs
+              .flatMap((blog) => blog.tags)
+              .filter(
+                (tag) =>
+                  !(MAIN_CATEGORIES as readonly string[]).includes(tag) &&
+                  tag !== "featured",
+              )
           ));
 
           return (

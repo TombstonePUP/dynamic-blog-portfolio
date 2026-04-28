@@ -2,8 +2,8 @@ import LandingHero from "@/components/guest/landing-hero";
 import LandingScrollFeed from "@/components/guest/landing-scroll-feed";
 import { getBlogs } from "@/lib/blogs.server";
 
-export default function LandingPage() {
-  const blogs = getBlogs();
+export default async function LandingPage() {
+  const blogs = await getBlogs();
   const sortedBlogs = [...blogs].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );

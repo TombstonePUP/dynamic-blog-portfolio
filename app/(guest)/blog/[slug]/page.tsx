@@ -1,61 +1,43 @@
 import BackButton from "@/components/guest/back-button";
 import CommentsSection from "@/components/guest/comments-section";
 import ScrollArrow from "@/components/guest/scroll-arrow";
-import {
-  MAIN_CATEGORIES,
-  readingMinutesFromContent,
-  tagToSlug,
-} from "@/data/blog";
-import { getBlogs, getBlogBySlug, getRelatedBlogs } from "@/lib/blogs.server";
-
-
+import { CustomMDX } from "@/components/mdx/mdx-remote";
+import { MAIN_CATEGORIES, readingMinutesFromContent, tagToSlug } from "@/data/blog";
+import { getBlogBySlug, getBlogs, getRelatedBlogs } from "@/lib/blogs.server";
 import { getThemeColor } from "@/lib/theme";
-import type { Blog, Tag } from "@/types/blog";
-import {
-  ArrowRight,
-  Calendar,
-  Clock,
-  MessageCircle,
-  UserCircle
-} from "lucide-react";
+import type { Blog } from "@/types/blog";
+import { ArrowRight, Calendar, Clock, MessageCircle, UserCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CustomMDX } from "@/components/mdx/mdx-remote";
-import { getPostBySlug as getMdxPostBySlug } from "@/lib/mdx";
-export const dynamic = "force-static";
-export const dynamicParams = false;
-function seriesLabel(tags: Tag[]): string {
-  const t = tags.find((x) => x !== "featured");
-  return t ? capitalizeTopic(t) : "Story";
+
+function seriesLabel(tags: string[]): string {
+  const tag = tags.find((value) => value !== "featured");
+  return tag ? capitalizeTopic(tag) : "Story";
 }
 
 function capitalizeTopic(tag: string): string {
   return tag
     .split(" ")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
 
 type PageProps = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ topic?: string }>;
 };
 
-export async function generateStaticParams() {
-  const blogs = getBlogs();
-  return blogs.map((post) => ({ slug: post.slug }));
-}
-
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogBySlug(slug);
-  if (!post) return { title: "Post not found" };
+  const post = await getBlogBySlug(slug);
+
+  if (!post) {
+    return { title: "Post not found" };
+  }
+
   return {
-    title: `${post.title} · The Strengths Writer`,
+    title: `${post.title} | The Strengths Writer`,
     description: post.excerpt.slice(0, 155),
   };
 }
@@ -63,6 +45,7 @@ export async function generateMetadata({
 function RelatedCard({ post }: { post: Blog }) {
   const label = seriesLabel(post.tags);
   const color = getThemeColor(post.tags);
+
   return (
     <Link
       href={post.href}
@@ -96,44 +79,28 @@ function RelatedCard({ post }: { post: Blog }) {
   );
 }
 
-export default async function BlogArticlePage({
-  params,
-  searchParams,
-}: PageProps) {
-  const blogs = getBlogs();
+export default async function BlogArticlePage({ params }: PageProps) {
+  const blogs = await getBlogs();
   const { slug } = await params;
-  const { topic } = await searchParams;
-  const post = getBlogBySlug(slug);
+  const post = await getBlogBySlug(slug);
 
-  if (!post) notFound();
+  if (!post) {
+    notFound();
+  }
 
-  // Use the topic from the referring Topics page if provided, else fall back to post tags
-  const themeColor = topic
-    ? getThemeColor([decodeURIComponent(topic) as import("@/types/blog").Tag])
-    : getThemeColor(post.tags);
+  const minutes = readingMinutesFromContent(post.contentMdx || post.content);
+  const related = await getRelatedBlogs(post);
 
-  const mdxPost = getMdxPostBySlug(slug);
-  const minutes = post.content ? readingMinutesFromContent(post.content) : 5;
-  const related = getRelatedBlogs(post);
-
-  // Pad with recent posts to always reach 3
-  const relatedSlugs = new Set([post.slug, ...related.map((b) => b.slug)]);
+  const relatedSlugs = new Set([post.slug, ...related.map((blog) => blog.slug)]);
   const padBlogs = blogs
-    .filter((b) => !relatedSlugs.has(b.slug))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .filter((blog) => !relatedSlugs.has(blog.slug))
+    .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime());
   const more = [...related, ...padBlogs].slice(0, 3);
 
   return (
     <article className="relative min-h-screen pb-20 font-sans">
-      <header className="relative w-full min-h-[min(85svh,52rem)] overflow-hidden sm:min-h-[min(88svh,58rem)] md:min-h-[min(92svh,64rem)]">
-        <Image
-          src={post.image}
-          alt=""
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
+      <header className="relative min-h-[min(85svh,52rem)] w-full overflow-hidden sm:min-h-[min(88svh,58rem)] md:min-h-[min(92svh,64rem)]">
+        <Image src={post.image} alt="" fill priority className="object-cover" sizes="100vw" />
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/45"
           aria-hidden
@@ -156,7 +123,7 @@ export default async function BlogArticlePage({
             </Link>
           </div>
 
-          <div className="mt-auto mb-10 px-5 pb-10 pt-16 sm:px-8 sm:pb-12 md:px-10 md:pb-14">
+          <div className="mb-10 mt-auto px-5 pb-10 pt-16 sm:px-8 sm:pb-12 md:px-10 md:pb-14">
             <div className="mx-auto max-w-4xl">
               <span
                 className="mb-4 inline-flex items-center px-3 py-1 text-sm font-semibold text-black"
@@ -176,35 +143,22 @@ export default async function BlogArticlePage({
                   <div className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white/90 ring-1 ring-white/20">
                     <UserCircle className="size-5" strokeWidth={1.75} />
                   </div>
-                  <span className="font-semibold text-white">
-                    {post.author.name}
-                  </span>
+                  <span className="font-semibold text-white">{post.author.name}</span>
                 </Link>
 
-                <div
-                  className="hidden h-4 w-px bg-white/20 sm:block"
-                  aria-hidden
-                />
+                <div className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden />
 
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20">
-                    <Calendar
-                      className="size-4 text-white/70"
-                      strokeWidth={1.5}
-                    />
-                    <time
-                      dateTime={post.date}
-                      className="font-medium text-white/90"
-                    >
+                    <Calendar className="size-4 text-white/70" strokeWidth={1.5} />
+                    <time dateTime={post.date} className="font-medium text-white/90">
                       {post.dateLabel}
                     </time>
                   </div>
 
                   <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20">
                     <Clock className="size-4 text-white/70" strokeWidth={1.5} />
-                    <span className="font-medium text-white/90">
-                      {minutes} min read
-                    </span>
+                    <span className="font-medium text-white/90">{minutes} min read</span>
                   </div>
 
                   <a
@@ -212,10 +166,7 @@ export default async function BlogArticlePage({
                     className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20 transition hover:bg-white/20"
                   >
                     <MessageCircle className="size-4" strokeWidth={1.5} />
-                    <span className="font-medium">
-                      {post.commentCount}{" "}
-                      {post.commentCount === 1 ? "comment" : "comments"}
-                    </span>
+                    <span className="font-medium">Comments</span>
                   </a>
                 </div>
               </div>
@@ -236,18 +187,15 @@ export default async function BlogArticlePage({
 
       <div
         id="article-content"
-        className="mx-auto mt-12 max-w-5xl px-5 md:mt-14 md:px-8 scroll-mt-34"
-        style={
-          { "--theme-color": getThemeColor(post.tags) } as React.CSSProperties
-        }
+        className="mx-auto mt-12 max-w-5xl scroll-mt-34 px-5 md:mt-14 md:px-8"
+        style={{ "--theme-color": getThemeColor(post.tags) } as React.CSSProperties}
       >
         <div className="space-y-6 text-base leading-[1.8] text-foreground/90 md:text-[1.0625rem] md:leading-[1.85] [&>p:first-of-type]:text-[1.0625rem] [&>p:first-of-type]:leading-relaxed md:[&>p:first-of-type]:text-lg md:[&>p:first-of-type]:leading-relaxed [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:mr-3 [&>p:first-of-type]:first-letter:-mt-2 [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-black [&>p:first-of-type]:first-letter:text-[var(--theme-color)] [&>p:first-of-type]:first-letter:leading-[0.75]">
-          {mdxPost ? (
-            <CustomMDX source={mdxPost.content} slug={slug} />
-          ) : (
-            post.content.map((paragraph, i) => <p key={i}>{paragraph}</p>)
-          )}
-
+          {post.contentMdx ? (
+            <CustomMDX source={post.contentMdx} assetFolder={post.assetFolder} />
+          ) : post.content.length > 0 ? (
+            post.content.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+          ) : null}
         </div>
 
         <div
@@ -258,48 +206,40 @@ export default async function BlogArticlePage({
             The Strengths Writer
           </p>
           <p className="mt-2 text-sm leading-relaxed text-foreground/70">
-            Positive psychology and stories for personal and professional
-            growth.
+            Positive psychology and stories for personal and professional growth.
           </p>
         </div>
 
         <CommentsSection
+          postSlug={post.slug}
           themeColor={getThemeColor(post.tags)}
-          initialCount={post.commentCount}
-          seedComments={
-            post.commentCount > 0
-              ? [
-                {
-                  id: 1,
-                  name: "Reader",
-                  date: "February 10, 2021",
-                  body: "This was such an insightful read! Really changed how I think about strengths-based approaches in daily life.",
-                },
-              ]
-              : []
-          }
+          enabled={post.source === "supabase"}
         />
 
         <div className="mt-16 flex flex-wrap items-center gap-2 border-t border-foreground/10 pt-8">
-          <span className="text-sm font-semibold text-foreground/70 mr-2">Tags:</span>
-          {post.tags.filter(t => t !== "featured" && !MAIN_CATEGORIES.includes(t)).map((tag) => (
-            <Link
-              key={tag}
-              href={`/tags/${tagToSlug(tag)}`}
-              className="inline-flex items-center rounded-full bg-black/5 px-3 py-1 text-xs font-medium text-foreground/70 transition hover:bg-black/10 hover:text-black"
-            >
-              {capitalizeTopic(tag)}
-            </Link>
-          ))}
+          <span className="mr-2 text-sm font-semibold text-foreground/70">Tags:</span>
+          {post.tags
+            .filter(
+              (tag) =>
+                tag !== "featured" &&
+                !(MAIN_CATEGORIES as readonly string[]).includes(tag),
+            )
+            .map((tag) => (
+              <Link
+                key={tag}
+                href={`/tags/${tagToSlug(tag)}`}
+                className="inline-flex items-center rounded-full bg-black/5 px-3 py-1 text-xs font-medium text-foreground/70 transition hover:bg-black/10 hover:text-black"
+              >
+                {capitalizeTopic(tag)}
+              </Link>
+            ))}
         </div>
       </div>
 
       {more.length > 0 ? (
         <section className="mx-auto mt-20 max-w-7xl px-5 pb-10 sm:px-8">
           <div className="border-t border-foreground/10 pt-10">
-            <h2 className="text-2xl font-bold text-foreground/80">
-              More stories
-            </h2>
+            <h2 className="text-2xl font-bold text-foreground/80">More stories</h2>
             <Link
               href="/topics"
               className="group mt-2 inline-flex items-center gap-2 text-sm font-medium text-foreground/60 transition hover:text-foreground"
@@ -309,8 +249,8 @@ export default async function BlogArticlePage({
             </Link>
           </div>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {more.map((p) => (
-              <RelatedCard key={p.id} post={p} />
+            {more.map((item) => (
+              <RelatedCard key={item.id} post={item} />
             ))}
           </div>
         </section>

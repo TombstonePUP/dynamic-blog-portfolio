@@ -1,5 +1,5 @@
 import BackButton from "@/components/guest/back-button";
-import { ALL_TAGS, slugToTag, tagToSlug } from "@/data/blog";
+import { slugToTag, tagToSlug } from "@/data/blog";
 import { getBlogs } from "@/lib/blogs.server";
 
 import { getThemeColor } from "@/lib/theme";
@@ -10,16 +10,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-static";
-export const dynamicParams = false;
-
 type PageProps = {
   params: Promise<{ tag: string }>;
 };
-
-export async function generateStaticParams() {
-  return ALL_TAGS.map((tag) => ({ tag: tagToSlug(tag) }));
-}
 
 function capitalizeTopic(tag: string): string {
   return tag
@@ -81,7 +74,7 @@ export default async function TagPage({ params }: PageProps) {
 
   if (!tag) notFound();
 
-  const blogs = getBlogs();
+  const blogs = await getBlogs();
 
   const themeColor = getThemeColor([tag]);
   const tagBlogs = blogs.filter((b) => b.tags.includes(tag));
