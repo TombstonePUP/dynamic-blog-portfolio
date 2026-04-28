@@ -2,6 +2,7 @@
 
 import { ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import SmoothScrollLink from "./smooth-scroll-link";
 
 export default function ScrollToTop() {
   const [visible, setVisible] = useState(false);
@@ -16,22 +17,17 @@ export default function ScrollToTop() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
   return (
-    <button
-      onClick={scrollToTop}
-      aria-label="Scroll to top"
+    <SmoothScrollLink
+      target="top"
       className={`fixed bottom-8 right-8 z-50 flex size-12 cursor-pointer items-center justify-center border-2 border-foreground bg-background text-foreground shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-foreground hover:text-background ${
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
+        visible
+          ? "translate-y-0 opacity-100"
+          : "pointer-events-none translate-y-4 opacity-0"
       }`}
+      ariaLabel="Scroll to top"
     >
       <ChevronUp className="size-6" strokeWidth={2.5} />
-    </button>
+    </SmoothScrollLink>
   );
 }
