@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type PostFolder = {
@@ -29,6 +30,7 @@ export default function ExplorerGrid({
 }: {
   initialFolders: PostFolder[];
 }) {
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [filterMode, setFilterMode] = useState<"status" | "date">("status");
   const [selectedPost, setSelectedPost] = useState<PostFolder | null>(null);
@@ -197,6 +199,11 @@ export default function ExplorerGrid({
                 <div
                   key={folder.slug}
                   onClick={() => setSelectedPost(folder)}
+                  onDoubleClick={() =>
+                    router.push(
+                      `/editor?slug=${encodeURIComponent(folder.slug)}`,
+                    )
+                  }
                   className={`cursor-pointer transition-all ${
                     selectedPost?.slug === folder.slug
                       ? "ring-2 ring-admin-accent"
