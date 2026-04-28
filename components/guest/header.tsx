@@ -1,12 +1,12 @@
 "use client";
 
 import SearchModal from "@/components/guest/search-modal";
+import type { Blog } from "@/types/blog";
 import { Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LogoIcon, LogoText } from "../app-logo";
-import type { Blog } from "@/types/blog";
 
 const leftNav = [
   { label: "Featured", href: "#featured" },
@@ -17,22 +17,6 @@ const rightNav = [
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
-
-function NavContainer({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <nav
-      className={`hidden md:flex gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80 ${className}`}
-    >
-      {children}
-    </nav>
-  );
-}
 
 export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -50,17 +34,17 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
 
   return (
     <>
-      <SearchModal 
-        open={searchOpen} 
-        onClose={() => setSearchOpen(false)} 
+      <SearchModal
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
         blogs={blogs}
       />
 
-
       <header className="sticky top-0 z-50 w-full bg-[#FAF9F6]">
         <div
-          className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-24 ${isCompact ? "h-20 pt-7" : "h-40 pt-10"}`}
+          className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-24 ${isCompact ? "h-20 pt-7" : "md:h-40 md:pt-10"}`}
         >
+          <LogoIcon className="size-8 md:hidden" />
           {/* LEFT NAV */}
           <nav className="hidden md:flex flex-1 gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80">
             {leftNav.map((link) => {
@@ -81,13 +65,11 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
           </nav>
 
           {/* CENTER LOGO */}
-          <div
-            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pt-1"
-          >
+          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pt-1">
             <div
-              className={`transition-all duration-300 ease-in-out overflow-hidden ${isCompact ?"max-h-0 opacity-0 mb-0":"max-h-20 opacity-100"}`}
+              className={`transition-all duration-300 ease-in-out overflow-hidden max-h-0 opacity-0 mb-0 ${isCompact ? "max-h-0 opacity-0 mb-0" : "md:max-h-20 md:opacity-100"}`}
             >
-              <LogoIcon className="size-20" />
+              <LogoIcon className="hidden md:block md:size-20" />
             </div>
 
             <LogoText className="text-lg leading-none" />
@@ -124,7 +106,7 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
             >
               <Search className="size-6" strokeWidth={2.3} />
             </button>
-            <button 
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="flex flex-col gap-1 cursor-pointer"
               aria-label="Toggle menu"

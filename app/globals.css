@@ -1,21 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #FAF9F6;
+  --color-background: #faf9f6;
   --color-foreground: #302c2c;
   --color-primary: #beb09a;
 
-  /* Admin Theme Variables */
-  /* --color-admin-bg: #ffffff;
-  --color-admin-surface: #FAF9F6;
-  --color-admin-text: #302c2c;
-  --color-admin-primary: #0f172a; 
-  --color-admin-contrast: #000000;
-  --color-admin-inverse: #ffffff; */
+  /* Admin Theme Variables (Login-inspired) */
+  --color-admin-bg: #f7f2ea;
+  --color-admin-surface: #ffffff;
+  --color-admin-surface-hover: #efe7dc;
+  --color-admin-text: #3a332f;
+  --color-admin-heading: #1f3d39;
+  --color-admin-muted: #7b6f64;
+  --color-admin-accent: #1f3d39;
+  --color-admin-primary: #1f3d39;
+  --color-admin-contrast: #f7f2ea;
+  --color-admin-success: #2b776a;
+  --color-admin-danger: #b4534a;
+  --color-admin-info: #3a6b8f;
 
-  /* --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-hanken: var(--font-hanken); */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  /* --font-hanken: var(--font-hanken); */
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -26,8 +32,6 @@
 } */
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
   font-family: var(--font-hanken);
 }
 

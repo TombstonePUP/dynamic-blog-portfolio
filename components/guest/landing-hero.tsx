@@ -4,12 +4,7 @@ import type { Blog } from "@/types/blog";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, type CSSProperties } from "react";
-
-const dotStyle: CSSProperties = {
-  backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.5) 1.7px, transparent 1.5px)`,
-  backgroundSize: "28px 28px",
-};
+import { useEffect, useState } from "react";
 
 export default function LandingHero({ latestPost }: { latestPost: Blog }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -27,8 +22,9 @@ export default function LandingHero({ latestPost }: { latestPost: Blog }) {
     <section className="relative mt-4 w-full overflow-hidden z-10">
       {/* Background Gradient with Smooth Scroll Transition */}
       <div
-        className={`absolute inset-0 bg-gradient-to-b from-transparent to-primary/80 transition-opacity duration-200 -z-10 ${isScrolled ? "opacity-0" : "opacity-100"
-          }`}
+        className={`absolute inset-0 bg-gradient-to-b from-transparent to-primary/80 transition-opacity duration-200 -z-10 ${
+          isScrolled ? "opacity-0" : "opacity-100"
+        }`}
         aria-hidden
       />
 

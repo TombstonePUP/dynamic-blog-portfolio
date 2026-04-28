@@ -56,18 +56,26 @@ export default function Modal({
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-3">
               {icon && (
-                <div className={`flex items-center justify-center size-10 rounded-full shrink-0 ${iconStyles[variant]}`}>
+                <div
+                  className={`flex items-center justify-center size-10 shrink-0 ${iconStyles[variant]}`}
+                >
                   {icon}
                 </div>
               )}
               <div>
-                <h3 className="text-xl font-bold text-admin-text leading-tight">{title}</h3>
-                {description && <p className="text-sm text-admin-text/50 mt-1">{description}</p>}
+                <h3 className="text-xl font-bold text-admin-text leading-tight">
+                  {title}
+                </h3>
+                {description && (
+                  <p className="text-sm text-admin-text/50 mt-1">
+                    {description}
+                  </p>
+                )}
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-admin-contrast/5 rounded-full transition text-admin-text/20 hover:text-admin-text shrink-0 -mr-2 -mt-2"
+              className="p-2 hover:bg-admin-contrast/5 transition text-admin-text/20 hover:text-admin-text shrink-0 -mr-2 -mt-2"
             >
               <X size={18} />
             </button>

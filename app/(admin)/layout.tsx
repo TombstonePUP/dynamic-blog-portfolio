@@ -1,15 +1,20 @@
 import "@/app/globals.css";
-import { isAdminProfile, requireApprovedContext } from "@/lib/admin-data.server";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  isAdminProfile,
+  requireApprovedContext,
+} from "@/lib/admin-data.server";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  weight: ["400", "600"],
 });
 
 import AdminHeader from "@/components/admin/header";
@@ -20,33 +25,40 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { user, profile } = await requireApprovedContext();
-  const userName = profile?.display_name || user.email?.split("@")[0] || "Writer";
+  const userName =
+    profile?.display_name || user.email?.split("@")[0] || "Writer";
   const userEmail = user.email || "No email";
   const isAdmin = isAdminProfile(profile);
 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
     >
-      <body className="flex flex-col bg-[#FAF9F6] min-h-screen">
+      <body className="flex min-h-screen flex-col bg-admin-bg font-sans text-admin-text selection:bg-admin-accent selection:text-admin-contrast">
         {/* Mobile Blocker */}
-        <div className="flex md:hidden fixed inset-0 z-[9999] bg-[#FAF9F6] flex-col items-center justify-center p-6 text-center">
-          <div className="bg-white p-8 border border-black/10 shadow-lg max-w-sm">
-            <h1 className="text-xl font-bold mb-3">Desktop Required</h1>
-            <p className="text-sm text-foreground/70">
-              The admin dashboard is optimized for desktop screens. Please access this page from a larger device.
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-admin-bg p-6 text-center md:hidden">
+          <div className="max-w-sm border border-admin-surface-hover bg-admin-surface p-8">
+            <h1 className="mb-3 text-xl font-bold text-admin-heading">
+              Desktop Required
+            </h1>
+            <p className="text-sm text-admin-muted">
+              The admin dashboard is optimized for desktop screens. Please
+              access this page from a larger device.
             </p>
           </div>
         </div>
 
         {/* Desktop Content */}
         <div className="hidden md:flex flex-col flex-1 w-full">
-          <AdminHeader userName={userName} userEmail={userEmail} isAdmin={isAdmin} />
+          <AdminHeader
+            userName={userName}
+            userEmail={userEmail}
+            isAdmin={isAdmin}
+          />
           {children}
         </div>
       </body>
     </html>
   );
 }
-

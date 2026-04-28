@@ -1,5 +1,5 @@
 import BackButton from "@/components/guest/back-button";
-import { slugToTag, tagToSlug } from "@/data/blog";
+import { slugToTag } from "@/data/blog";
 import { getBlogs } from "@/lib/blogs.server";
 
 import { getThemeColor } from "@/lib/theme";
@@ -21,7 +21,9 @@ function capitalizeTopic(tag: string): string {
     .join(" ");
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { tag: slug } = await params;
   const tag = slugToTag(slug);
 
@@ -78,7 +80,6 @@ export default async function TagPage({ params }: PageProps) {
 
   const themeColor = getThemeColor([tag]);
   const tagBlogs = blogs.filter((b) => b.tags.includes(tag));
-
 
   return (
     <main className="relative min-h-screen pb-24 font-sans bg-[#fbfbfb]">

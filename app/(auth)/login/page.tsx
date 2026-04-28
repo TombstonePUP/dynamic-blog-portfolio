@@ -1,6 +1,12 @@
+import { LogoIcon } from "@/components/app-logo";
+import {
+  getAuthenticatedContext,
+  isApprovedProfile,
+} from "@/lib/admin-data.server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import AuthForm from "./auth-form";
-import { getAuthenticatedContext, isApprovedProfile } from "@/lib/admin-data.server";
+import DashboardPreview from "./dashboard-preview";
 
 export const metadata = {
   title: "Login | The Strengths Writer",
@@ -16,41 +22,65 @@ export default async function LoginPage() {
 
   return (
     <main className="grid min-h-screen lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="relative overflow-hidden bg-[#1f3d39] px-8 py-14 text-[#f7f2ea] sm:px-12 lg:px-16 lg:py-18">
+      {/* ── Left panel ── */}
+      <section className="relative flex flex-col overflow-hidden bg-[#1f3d39] px-8 text-[#f7f2ea] sm:px-12 lg:px-16">
+        {/* Diagonal overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),transparent_48%)]" />
-        <div className="relative flex h-full max-w-xl flex-col justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
-              The Strengths Writer
-            </p>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.02] sm:text-5xl">
-              Write, refine, and publish from one place.
-            </h1>
-            <p className="mt-6 max-w-lg text-base leading-7 text-white/75">
-              Your editor now runs on Supabase-backed authentication and post storage, so drafts,
-              profiles, publishing, and access approvals live in one system instead of local files.
-            </p>
-          </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { label: "Profiles", value: "Auth-backed" },
-              { label: "Review", value: "Admin approval" },
-              { label: "Publishing", value: "Live DB" },
-            ].map((item) => (
-              <div key={item.label} className="border border-white/12 bg-white/6 px-4 py-4 backdrop-blur-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">
-                  {item.label}
-                </p>
-                <p className="mt-2 text-lg font-semibold text-white">{item.value}</p>
-              </div>
-            ))}
+        {/* Watermark logo */}
+        <LogoIcon className="pointer-events-none absolute -bottom-32 -right-32 size-[600px] brightness-0 invert opacity-[0.05]" />
+
+        {/* Nav */}
+        <nav className="absolute top-16 left-16 right-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <LogoIcon className="size-8 brightness-0 invert opacity-90" />
+            <Link href="/" className="text-base font-semibold text-white">
+              TheStrengthsWriter
+            </Link>
           </div>
+          <div className="flex items-center gap-8 text-sm font-medium text-white/80 hover:[&_a]:text-white [&_a]:transition-colors">
+            <Link href="/topics" className="hover:text-white">
+              Blog
+            </Link>
+            <Link href="/about" className="hover:text-white">
+              About
+            </Link>
+            <Link href="/contact" className="hover:text-white">
+              Contact
+            </Link>
+          </div>
+        </nav>
+
+        {/* 3D perspective container */}
+        <div className="pointer-events-none relative z-20 h-full mt-14  shrink-0 overflow-hidden [mask-image:radial-gradient(white_30%,transparent_90%)] [perspective:4000px] [perspective-origin:center]">
+          <div className="[-translate-y-10] [-translate-z-10] [transform:rotateX(10deg)_rotateY(20deg)_rotateZ(-10deg)] [transform-style:preserve-3d]">
+            <DashboardPreview />
+          </div>
+        </div>
+
+        {/* Hero copy */}
+        <div className="absolute z-20 bottom-16">
+          <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl">
+            Write, refine, and <br />
+            <span className="text-white/40">publish from one place.</span>
+          </h1>
+          <p className="mt-4 max-w-xl text-base leading-7 text-white/60">
+            Your editor now runs on Supabase-backed authentication and post
+            storage, so drafts, profiles, publishing, and access approvals live
+            in one system.
+          </p>
         </div>
       </section>
 
-      <section className="flex items-center justify-center px-6 py-14 sm:px-10">
+      {/* ── Right panel ── */}
+      <section className="relative flex flex-col items-center justify-center px-6 py-14 sm:px-10">
         <AuthForm />
+        <footer className="absolute bottom-8 text-center text-sm text-gray-500">
+          <p>
+            &copy; {new Date().getFullYear()} The Strengths Writer. All rights
+            reserved.
+          </p>
+        </footer>
       </section>
     </main>
   );
