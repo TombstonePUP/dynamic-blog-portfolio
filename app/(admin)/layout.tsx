@@ -3,6 +3,7 @@ import {
   isAdminProfile,
   requireApprovedContext,
 } from "@/lib/admin-data.server";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
 const inter = Inter({
@@ -34,9 +35,11 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
+      suppressHydrationWarning
     >
       <body className="flex min-h-screen flex-col bg-admin-bg font-sans text-admin-text selection:bg-admin-accent selection:text-admin-contrast">
-        {/* Mobile Blocker */}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* Mobile Blocker */}
         <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-admin-bg p-6 text-center md:hidden">
           <div className="max-w-sm border border-admin-surface-hover bg-admin-surface p-8">
             <h1 className="mb-3 text-xl font-bold text-admin-heading">
@@ -58,6 +61,7 @@ export default async function RootLayout({
           />
           {children}
         </div>
+        </ThemeProvider>
       </body>
     </html>
   );

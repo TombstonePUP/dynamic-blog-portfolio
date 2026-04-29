@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -49,39 +50,42 @@ export default function AdminHeader({
           ) : null}
         </nav>
 
-        <details className="relative">
-          <summary className="list-none cursor-pointer">
-            <span className="flex size-9 items-center justify-center border border-admin-surface-hover bg-admin-surface text-xs font-semibold text-admin-heading">
-              {userName.charAt(0).toUpperCase()}
-            </span>
-          </summary>
-          <div className="absolute right-0 mt-3 w-64 border border-admin-surface-hover bg-admin-surface p-4">
-            <div className="space-y-1 mb-4">
-              <p className="text-sm font-semibold text-admin-heading">
-                {userName}
-              </p>
-              <p className="text-xs text-admin-muted">{userEmail}</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Link
-                href="/profile"
-                className="flex w-full items-center gap-2 border border-admin-surface-hover px-3 py-2 text-sm font-semibold text-admin-text transition-colors hover:bg-admin-surface-hover hover:text-admin-heading"
-              >
-                <User className="size-4" />
-                Edit Profile
-              </Link>
-              <form action="/auth/signout" method="post">
-                <button
-                  type="submit"
-                  className="flex w-full items-center gap-2 border border-admin-surface-hover px-3 py-2 text-sm font-semibold text-admin-text transition-colors hover:bg-admin-surface-hover hover:text-admin-heading cursor-pointer"
+        <div className="flex items-center gap-4">
+          <ThemeToggle className="absolute right-6" />
+          <details className="relative">
+            <summary className="list-none cursor-pointer">
+              <span className="flex size-9 items-center justify-center border border-admin-surface-hover bg-admin-surface text-xs font-semibold text-admin-heading">
+                {userName.charAt(0).toUpperCase()}
+              </span>
+            </summary>
+            <div className="absolute right-0 mt-3 w-64 border border-admin-surface-hover bg-admin-surface p-4">
+              <div className="space-y-1 mb-4">
+                <p className="text-sm font-semibold text-admin-heading">
+                  {userName}
+                </p>
+                <p className="text-xs text-admin-muted">{userEmail}</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/profile"
+                  className="flex w-full items-center gap-2 border border-admin-surface-hover px-3 py-2 text-sm font-semibold text-admin-text transition-colors hover:bg-admin-surface-hover hover:text-admin-heading"
                 >
-                  <LogOut className="size-4" />
-                  Sign out
-                </button>
-              </form>
+                  <User className="size-4" />
+                  Edit Profile
+                </Link>
+                <form action="/auth/signout" method="post">
+                  <button
+                    type="submit"
+                    className="flex w-full items-center gap-2 border border-admin-surface-hover px-3 py-2 text-sm font-semibold text-admin-text transition-colors hover:bg-admin-surface-hover hover:text-admin-heading cursor-pointer"
+                  >
+                    <LogOut className="size-4" />
+                    Sign out
+                  </button>
+                </form>
+              </div>
             </div>
-          </div>
-        </details>
+          </details>
+        </div>
       </div>
     </header>
   );

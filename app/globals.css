@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-background: #faf9f6;
@@ -24,12 +25,23 @@
   /* --font-hanken: var(--font-hanken); */
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #0a0a0a;
-    --color-foreground: #ededed;
-  }
-} */
+.dark {
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+  
+  --color-admin-bg: #111111;
+  --color-admin-surface: #1e1e1e;
+  --color-admin-surface-hover: #2a2a2a;
+  --color-admin-text: #e5e5e5;
+  --color-admin-heading: #f9f9f9;
+  --color-admin-muted: #9ca3af;
+  --color-admin-accent: #4ade80;
+  --color-admin-primary: #4ade80;
+  --color-admin-contrast: #111111;
+  --color-admin-success: #22c55e;
+  --color-admin-danger: #ef4444;
+  --color-admin-info: #3b82f6;
+}
 
 body {
   font-family: var(--font-hanken);
