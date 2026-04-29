@@ -28,7 +28,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${hanken.variable} antialiased`}>
-      <body className="flex flex-col">
+      <body className="flex flex-col bg-background text-foreground">
         <LenisProvider />
         <GuestHeader blogs={blogs} />
         {children}
@@ -38,4 +38,3 @@ export default async function RootLayout({
     </html>
   );
 }
-

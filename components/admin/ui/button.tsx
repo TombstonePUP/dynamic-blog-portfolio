@@ -22,21 +22,26 @@ export function Button({
   ...props
 }: ButtonProps) {
   // Base styles applied to all variants
-  const baseStyles = "inline-flex items-center justify-center gap-2 font-bold uppercase tracking-widest transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0";
+  const baseStyles =
+    "inline-flex items-center justify-center gap-2 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0";
 
   // Visual variants
   const variants = {
-    default: "bg-admin-primary text-admin-inverse hover:bg-admin-primary/80 shadow-sm rounded",
-    ghost: "text-admin-text/50 hover:text-admin-text hover:bg-admin-contrast/5",
-    danger: "bg-red-600 text-white hover:bg-red-700 shadow-sm rounded",
-    outline: "text-admin-text/60 hover:text-admin-text border shadow-sm rounded hover:shadow-md",
+    default:
+      "border border-admin-accent bg-admin-accent text-admin-contrast hover:bg-admin-accent/90",
+    ghost:
+      "border border-transparent text-admin-text hover:bg-admin-surface-hover hover:text-admin-heading",
+    danger:
+      "border border-admin-danger bg-admin-danger text-admin-contrast hover:bg-admin-danger/90",
+    outline:
+      "border border-admin-surface-hover text-admin-text hover:bg-admin-surface-hover hover:text-admin-heading",
   };
 
   // Size variations (includes automatic SVG scaling)
   const sizes = {
-    default: "px-6 py-2 text-xs [&_svg]:size-4",
-    sm: "px-4 py-1.5 text-[11px] [&_svg]:size-3.5",
-    icon: "p-2 rounded-lg [&_svg]:size-4",
+    default: "px-5 py-2 [&_svg]:size-4",
+    sm: "px-4 py-1.5 text-[13px] [&_svg]:size-3.5",
+    icon: "size-9 p-0 [&_svg]:size-4",
   };
 
   return (

@@ -14,19 +14,19 @@ export async function GET(
 ) {
   try {
     const { path: pathSegments } = await params;
-    
+
     // Silence placeholder during build
     if (pathSegments[0] === '_placeholder') {
       return new Response('Placeholder', { status: 200 });
     }
-    
+
     // Construct the absolute path
     const filePath = path.resolve(process.cwd(), 'content', 'posts', ...pathSegments);
 
     try {
       const fileBuffer = await fs.readFile(filePath);
       const ext = path.extname(filePath).toLowerCase();
-      
+
       const mimeTypes: Record<string, string> = {
         '.jpg': 'image/jpeg',
         '.jpeg': 'image/jpeg',
@@ -46,7 +46,7 @@ export async function GET(
           'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
       });
-    } catch (e) {
+    } catch {
       console.error(`[Asset API] File not found: ${filePath}`);
       return new Response('File not found', { status: 404 });
     }

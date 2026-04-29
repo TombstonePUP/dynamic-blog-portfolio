@@ -1,6 +1,11 @@
 import { Mail, MapPin, Send } from "lucide-react";
 import { Metadata } from "next";
-import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaYoutube,
+} from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 export const metadata: Metadata = {
@@ -9,10 +14,26 @@ export const metadata: Metadata = {
 };
 
 const socials = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/ian-llenares-rpm-phd-06aa42103/", icon: <FaLinkedinIn /> },
-  { label: "Instagram", href: "https://www.instagram.com/thestrengthswriter/", icon: <FaInstagram /> },
-  { label: "Facebook", href: "https://www.facebook.com/TheStrengthsWriter", icon: <FaFacebookF /> },
-  { label: "Twitter", href: "https://twitter.com/strengthswriter", icon: <FaXTwitter /> },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/ian-llenares-rpm-phd-06aa42103/",
+    icon: <FaLinkedinIn />,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/thestrengthswriter/",
+    icon: <FaInstagram />,
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/TheStrengthsWriter",
+    icon: <FaFacebookF />,
+  },
+  {
+    label: "Twitter",
+    href: "https://twitter.com/strengthswriter",
+    icon: <FaXTwitter />,
+  },
   { label: "YouTube", href: "#", icon: <FaYoutube /> },
 ];
 
@@ -20,7 +41,10 @@ export default function ContactPage() {
   return (
     <main className="relative min-h-screen pb-24 font-sans bg-gradient-to-b to-[#72dbcc]/10 from-transparent">
       {/* Decorative background elements */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-96 " aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-96 "
+        aria-hidden
+      />
 
       <section className="relative mx-auto max-w-7xl px-5 pt-16 sm:px-8 sm:pt-24 lg:pt-20">
         <div className="mx-auto max-w-3xl text-center">
@@ -28,24 +52,28 @@ export default function ContactPage() {
             Get In Touch
           </span>
           <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Let's start a conversation.
+            Let&apos;s start a conversation.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-foreground/80">
-            Whether you have a question about positive psychology, want to collaborate, or just want to say hello, I'd love to hear from you.
+            Whether you have a question about positive psychology, want to
+            collaborate, or just want to say hello, I&apos;d love to hear from
+            you.
           </p>
         </div>
 
         <div className="mx-auto mt-16 grid max-w-5xl gap-12 lg:mt-24 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
-          
           {/* Contact Info Sidebar */}
           <div className="flex flex-col gap-10">
             <div>
-              <h3 className="text-xl font-bold text-foreground">Contact Information</h3>
+              <h3 className="text-xl font-bold text-foreground">
+                Contact Information
+              </h3>
               <p className="mt-2 text-sm text-foreground/70">
-                Fill out the form and I will get back to you as soon as possible.
+                Fill out the form and I will get back to you as soon as
+                possible.
               </p>
             </div>
-            
+
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#F0D8A1]/30 text-[#D4A373]">
@@ -53,12 +81,15 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Email</p>
-                  <a href="mailto:hello@strengthswriter.com" className="text-sm text-foreground/70 transition hover:text-[#72dbcc]">
+                  <a
+                    href="mailto:hello@strengthswriter.com"
+                    className="text-sm text-foreground/70 transition hover:text-[#72dbcc]"
+                  >
                     hello@strengthswriter.com
                   </a>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#72dbcc]/20 text-[#2b776a]">
                   <MapPin className="size-5" />
@@ -96,7 +127,12 @@ export default function ContactPage() {
             <form className="flex flex-col gap-6">
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="firstName" className="text-sm font-semibold text-foreground">First Name</label>
+                  <label
+                    htmlFor="firstName"
+                    className="text-sm font-semibold text-foreground"
+                  >
+                    First Name
+                  </label>
                   <input
                     type="text"
                     id="firstName"
@@ -105,7 +141,12 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="lastName" className="text-sm font-semibold text-foreground">Last Name</label>
+                  <label
+                    htmlFor="lastName"
+                    className="text-sm font-semibold text-foreground"
+                  >
+                    Last Name
+                  </label>
                   <input
                     type="text"
                     id="lastName"
@@ -114,9 +155,14 @@ export default function ContactPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="flex flex-col gap-2">
-                <label htmlFor="email" className="text-sm font-semibold text-foreground">Email Address</label>
+                <label
+                  htmlFor="email"
+                  className="text-sm font-semibold text-foreground"
+                >
+                  Email Address
+                </label>
                 <input
                   type="email"
                   id="email"
@@ -126,7 +172,12 @@ export default function ContactPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="subject" className="text-sm font-semibold text-foreground">Subject</label>
+                <label
+                  htmlFor="subject"
+                  className="text-sm font-semibold text-foreground"
+                >
+                  Subject
+                </label>
                 <input
                   type="text"
                   id="subject"
@@ -136,7 +187,12 @@ export default function ContactPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="message" className="text-sm font-semibold text-foreground">Message</label>
+                <label
+                  htmlFor="message"
+                  className="text-sm font-semibold text-foreground"
+                >
+                  Message
+                </label>
                 <textarea
                   id="message"
                   rows={4}
@@ -154,7 +210,6 @@ export default function ContactPage() {
               </button>
             </form>
           </div>
-
         </div>
       </section>
     </main>

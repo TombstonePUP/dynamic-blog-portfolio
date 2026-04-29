@@ -64,11 +64,12 @@ export default function CommentsSection({
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const displayComments = enabled ? comments : [];
+  const displayLoading = enabled ? loading : false;
+  const displayErrorMessage = enabled ? errorMessage : null;
+
   useEffect(() => {
     if (!enabled) {
-      setComments([]);
-      setLoading(false);
-      setErrorMessage(null);
       return;
     }
 
@@ -145,25 +146,29 @@ export default function CommentsSection({
   return (
     <div id="comments" className="mt-10 scroll-mt-28 space-y-6">
       <div className="flex items-center gap-3 border-b border-foreground/10 pb-4">
-        <MessageCircle className="size-5 text-foreground/60" strokeWidth={1.5} />
+        <MessageCircle
+          className="size-5 text-foreground/60"
+          strokeWidth={1.5}
+        />
         <h2 className="text-lg font-bold text-foreground">
           {!enabled
             ? "Comments unavailable"
             : loading
-            ? "Loading comments..."
-            : comments.length === 0
-              ? "No comments yet"
-              : `${comments.length} ${comments.length === 1 ? "Comment" : "Comments"}`}
+              ? "Loading comments..."
+              : comments.length === 0
+                ? "No comments yet"
+                : `${comments.length} ${comments.length === 1 ? "Comment" : "Comments"}`}
         </h2>
       </div>
 
       {!enabled ? (
         <p className="text-sm text-foreground/50">
-          Comments will appear here once this post has been migrated into the live publishing database.
+          Comments will appear here once this post has been migrated into the
+          live publishing database.
         </p>
-      ) : comments.length > 0 ? (
+      ) : displayComments.length > 0 ? (
         <div className="space-y-4">
-          {comments.map((comment) => (
+          {displayComments.map((comment) => (
             <div
               key={comment.id}
               className="bg-[#f3f2f0]/60 px-6 py-5"
@@ -177,16 +182,22 @@ export default function CommentsSection({
                   {comment.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground">{comment.name}</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {comment.name}
+                  </p>
                   <p className="text-xs text-foreground/50">{comment.date}</p>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-foreground/80">{comment.body}</p>
+              <p className="text-sm leading-relaxed text-foreground/80">
+                {comment.body}
+              </p>
             </div>
           ))}
         </div>
-      ) : loading ? (
-        <p className="text-sm text-foreground/50">Loading the conversation...</p>
+      ) : displayLoading ? (
+        <p className="text-sm text-foreground/50">
+          Loading the conversation...
+        </p>
       ) : (
         <p className="text-sm text-foreground/50">
           Be the first to share your thoughts on this story.
@@ -195,7 +206,9 @@ export default function CommentsSection({
 
       {enabled ? (
         <div className="pt-4">
-          <h3 className="mb-5 text-base font-bold text-foreground">Leave a comment</h3>
+          <h3 className="mb-5 text-base font-bold text-foreground">
+            Leave a comment
+          </h3>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
               type="text"
@@ -231,8 +244,8 @@ export default function CommentsSection({
                 </p>
               ) : null}
             </div>
-            {errorMessage ? (
-              <p className="text-sm text-red-600">{errorMessage}</p>
+            {displayErrorMessage ? (
+              <p className="text-sm text-red-600">{displayErrorMessage}</p>
             ) : null}
           </form>
         </div>

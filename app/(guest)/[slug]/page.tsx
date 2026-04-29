@@ -2,11 +2,22 @@ import BackButton from "@/components/guest/back-button";
 import CommentsSection from "@/components/guest/comments-section";
 import ScrollArrow from "@/components/guest/scroll-arrow";
 import { CustomMDX } from "@/components/mdx/mdx-remote";
-import { MAIN_CATEGORIES, readingMinutesFromContent, tagToSlug } from "@/data/blog";
+import SmoothScrollLink from "@/components/smooth-scroll-link";
+import {
+  MAIN_CATEGORIES,
+  readingMinutesFromContent,
+  tagToSlug,
+} from "@/data/blog";
 import { getBlogBySlug, getBlogs, getRelatedBlogs } from "@/lib/blogs.server";
 import { getThemeColor } from "@/lib/theme";
 import type { Blog } from "@/types/blog";
-import { ArrowRight, Calendar, Clock, MessageCircle, UserCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  Clock,
+  MessageCircle,
+  UserCircle,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,7 +39,9 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlogBySlug(slug);
 
@@ -91,16 +104,29 @@ export default async function BlogArticlePage({ params }: PageProps) {
   const minutes = readingMinutesFromContent(post.contentMdx || post.content);
   const related = await getRelatedBlogs(post);
 
-  const relatedSlugs = new Set([post.slug, ...related.map((blog) => blog.slug)]);
+  const relatedSlugs = new Set([
+    post.slug,
+    ...related.map((blog) => blog.slug),
+  ]);
   const padBlogs = blogs
     .filter((blog) => !relatedSlugs.has(blog.slug))
-    .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime());
+    .sort(
+      (left, right) =>
+        new Date(right.date).getTime() - new Date(left.date).getTime(),
+    );
   const more = [...related, ...padBlogs].slice(0, 3);
 
   return (
     <article className="relative min-h-screen pb-20 font-sans">
       <header className="relative min-h-[min(85svh,52rem)] w-full overflow-hidden sm:min-h-[min(88svh,58rem)] md:min-h-[min(92svh,64rem)]">
-        <Image src={post.image} alt="" fill priority className="object-cover" sizes="100vw" />
+        <Image
+          src={post.image}
+          alt=""
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/45"
           aria-hidden
@@ -143,31 +169,44 @@ export default async function BlogArticlePage({ params }: PageProps) {
                   <div className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white/90 ring-1 ring-white/20">
                     <UserCircle className="size-5" strokeWidth={1.75} />
                   </div>
-                  <span className="font-semibold text-white">{post.author.name}</span>
+                  <span className="font-semibold text-white">
+                    {post.author.name}
+                  </span>
                 </Link>
 
-                <div className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden />
+                <div
+                  className="hidden h-4 w-px bg-white/20 sm:block"
+                  aria-hidden
+                />
 
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20">
-                    <Calendar className="size-4 text-white/70" strokeWidth={1.5} />
-                    <time dateTime={post.date} className="font-medium text-white/90">
+                    <Calendar
+                      className="size-4 text-white/70"
+                      strokeWidth={1.5}
+                    />
+                    <time
+                      dateTime={post.date}
+                      className="font-medium text-white/90"
+                    >
                       {post.dateLabel}
                     </time>
                   </div>
 
                   <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20">
                     <Clock className="size-4 text-white/70" strokeWidth={1.5} />
-                    <span className="font-medium text-white/90">{minutes} min read</span>
+                    <span className="font-medium text-white/90">
+                      {minutes} min read
+                    </span>
                   </div>
 
-                  <a
-                    href="#comments"
+                  <SmoothScrollLink
+                    target="comments"
                     className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20 transition hover:bg-white/20"
                   >
                     <MessageCircle className="size-4" strokeWidth={1.5} />
                     <span className="font-medium">Comments</span>
-                  </a>
+                  </SmoothScrollLink>
                 </div>
               </div>
             </div>
@@ -188,13 +227,20 @@ export default async function BlogArticlePage({ params }: PageProps) {
       <div
         id="article-content"
         className="mx-auto mt-12 max-w-5xl scroll-mt-34 px-5 md:mt-14 md:px-8"
-        style={{ "--theme-color": getThemeColor(post.tags) } as React.CSSProperties}
+        style={
+          { "--theme-color": getThemeColor(post.tags) } as React.CSSProperties
+        }
       >
         <div className="space-y-6 text-base leading-[1.8] text-foreground/90 md:text-[1.0625rem] md:leading-[1.85] [&>p:first-of-type]:text-[1.0625rem] [&>p:first-of-type]:leading-relaxed md:[&>p:first-of-type]:text-lg md:[&>p:first-of-type]:leading-relaxed [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:mr-3 [&>p:first-of-type]:first-letter:-mt-2 [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-black [&>p:first-of-type]:first-letter:text-[var(--theme-color)] [&>p:first-of-type]:first-letter:leading-[0.75]">
           {post.contentMdx ? (
-            <CustomMDX source={post.contentMdx} assetFolder={post.assetFolder} />
+            <CustomMDX
+              source={post.contentMdx}
+              assetFolder={post.assetFolder}
+            />
           ) : post.content.length > 0 ? (
-            post.content.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+            post.content.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))
           ) : null}
         </div>
 
@@ -206,7 +252,8 @@ export default async function BlogArticlePage({ params }: PageProps) {
             The Strengths Writer
           </p>
           <p className="mt-2 text-sm leading-relaxed text-foreground/70">
-            Positive psychology and stories for personal and professional growth.
+            Positive psychology and stories for personal and professional
+            growth.
           </p>
         </div>
 
@@ -217,7 +264,9 @@ export default async function BlogArticlePage({ params }: PageProps) {
         />
 
         <div className="mt-16 flex flex-wrap items-center gap-2 border-t border-foreground/10 pt-8">
-          <span className="mr-2 text-sm font-semibold text-foreground/70">Tags:</span>
+          <span className="mr-2 text-sm font-semibold text-foreground/70">
+            Tags:
+          </span>
           {post.tags
             .filter(
               (tag) =>
@@ -239,7 +288,9 @@ export default async function BlogArticlePage({ params }: PageProps) {
       {more.length > 0 ? (
         <section className="mx-auto mt-20 max-w-7xl px-5 pb-10 sm:px-8">
           <div className="border-t border-foreground/10 pt-10">
-            <h2 className="text-2xl font-bold text-foreground/80">More stories</h2>
+            <h2 className="text-2xl font-bold text-foreground/80">
+              More stories
+            </h2>
             <Link
               href="/topics"
               className="group mt-2 inline-flex items-center gap-2 text-sm font-medium text-foreground/60 transition hover:text-foreground"

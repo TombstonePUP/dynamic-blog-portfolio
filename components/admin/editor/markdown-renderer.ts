@@ -29,7 +29,7 @@ export function renderMarkdownToHtml(md: string): string {
   content = content.replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-admin-primary/30 pl-4 italic text-admin-text/60 my-4">$1</blockquote>');
 
   // Images
-  content = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<div class="my-8 overflow-hidden rounded-xl bg-admin-contrast/5 p-4 text-center"><p class="text-[10px]  italic mb-2 uppercase tracking-widest">Asset: $2</p><img src="$2" alt="$1" class="mx-auto max-h-96 rounded-lg object-contain shadow-sm" /></div>');
+  content = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<div class="my-8 overflow-hidden bg-admin-contrast/5 p-4 text-center"><p class="text-[10px]  italic mb-2 uppercase tracking-widest">Asset: $2</p><img src="$2" alt="$1" class="mx-auto max-h-96 object-contain shadow-sm" /></div>');
 
   // Links
   content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-admin-primary underline hover:text-admin-primary/80">$1</a>');
@@ -50,12 +50,12 @@ export function renderMarkdownToHtml(md: string): string {
   // Restore code blocks
   codeBlocks.forEach((block, i) => {
     const code = block.replace(/```\w*\n?/, "").replace(/```$/, "");
-    content = content.replace(`__CODE_BLOCK_${i}__`, `<pre class="bg-admin-contrast/5 p-4 rounded-xl font-mono text-xs overflow-x-auto my-4"><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`);
+    content = content.replace(`__CODE_BLOCK_${i}__`, `<pre class="bg-admin-contrast/5 p-4 font-mono text-xs overflow-x-auto my-4"><code>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>`);
   });
 
   // Restore inline code
   inlineCodes.forEach((code, i) => {
-    content = content.replace(`__INLINE_CODE_${i}__`, `<code class="bg-admin-contrast/5 px-1.5 py-0.5 rounded text-xs font-mono">${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`);
+    content = content.replace(`__INLINE_CODE_${i}__`, `<code class="bg-admin-contrast/5 px-1.5 py-0.5 text-xs font-mono">${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`);
   });
 
   // Wrap remaining bare lines in paragraphs

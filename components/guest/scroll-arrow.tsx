@@ -1,23 +1,19 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
+import SmoothScrollLink from "../smooth-scroll-link";
 
 export default function ScrollArrow() {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const target = document.getElementById("article-content");
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
-    <button
-      onClick={handleClick}
+    <SmoothScrollLink
+      target="article-content"
       className="text-white/80 transition hover:text-white cursor-pointer"
-      aria-label="Scroll to content"
+      ariaLabel="Scroll to content"
     >
-      <ChevronDown className="size-6 animate-bounce drop-shadow-md" strokeWidth={2} />
-    </button>
+      <ChevronDown
+        className="size-6 animate-bounce drop-shadow-md"
+        strokeWidth={2}
+      />
+    </SmoothScrollLink>
   );
 }

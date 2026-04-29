@@ -56,7 +56,7 @@ export default function GuestFooter() {
         ))}
       </div>
       <p className="absolute bottom-6 text-sm text-white/40 tracking-widest">
-        © 2026 TombstonePUP. All rights reserved.
+        © 2026 All rights reserved.
       </p>
     </footer>
   );

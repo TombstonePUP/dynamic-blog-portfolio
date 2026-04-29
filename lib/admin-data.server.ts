@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
-import { buildEditorDocument } from "./post-documents";
-import { resolvePostAssetUrl, rewritePostAssetUrls } from "./post-assets";
 import { createClient } from "@/utils/supabase/server";
+import type { User } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
+import { resolvePostAssetUrl, rewritePostAssetUrls } from "./post-assets";
+import { buildEditorDocument } from "./post-documents";
 
 export type UserRole = "author" | "editor" | "admin";
 export type ApprovalStatus = "pending" | "approved" | "rejected";
@@ -11,9 +11,9 @@ export const PRIMARY_ADMIN_EMAIL = "sanjuanregie@gmail.com";
 
 export type ProfileRecord = {
   id: string;
-  email: string | null;
-  first_name: string | null;
-  last_name: string | null;
+  email: string;
+  first_name: string;
+  last_name: string;
   display_name: string | null;
   slug: string | null;
   bio: string | null;
@@ -50,7 +50,7 @@ export type OwnedPostRecord = {
 type AuthContext = {
   supabase: Awaited<ReturnType<typeof createClient>>;
   user: User;
-  profile: ProfileRecord | null;
+  profile: ProfileRecord;
 };
 
 const OWNED_POST_SELECT =
@@ -66,8 +66,7 @@ function buildFallbackProfile(user: User): ProfileRecord {
     emailName;
   const lastName =
     (typeof user.user_metadata.last_name === "string" &&
-      user.user_metadata.last_name.trim()) ||
-    null;
+      user.user_metadata.last_name.trim());
   const displayName =
     (typeof user.user_metadata.display_name === "string" &&
       user.user_metadata.display_name.trim()) ||
@@ -76,7 +75,7 @@ function buildFallbackProfile(user: User): ProfileRecord {
 
   return {
     id: user.id,
-    email: user.email || null,
+    email: user.email,
     first_name: firstName,
     last_name: lastName,
     display_name: displayName,
@@ -122,16 +121,16 @@ export async function getManageablePostBySlug(
 ): Promise<OwnedPostRecord | null> {
   const { data } = isAdminProfile(context.profile)
     ? await context.supabase
-        .from("posts")
-        .select(OWNED_POST_SELECT)
-        .eq("slug", slug)
-        .maybeSingle()
+      .from("posts")
+      .select(OWNED_POST_SELECT)
+      .eq("slug", slug)
+      .maybeSingle()
     : await context.supabase
-        .from("posts")
-        .select(OWNED_POST_SELECT)
-        .eq("slug", slug)
-        .eq("author_id", context.user.id)
-        .maybeSingle();
+      .from("posts")
+      .select(OWNED_POST_SELECT)
+      .eq("slug", slug)
+      .eq("author_id", context.user.id)
+      .maybeSingle();
 
   if (data) {
     return {

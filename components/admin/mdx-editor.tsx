@@ -37,8 +37,11 @@ export default function MdxEditor({
   const initialActiveSlug = searchParams.get("slug");
   const [content, setContent] = useState(initialContent);
   const [lastSavedContent, setLastSavedContent] = useState(initialContent);
-  const [activeSlug, setActiveSlug] = useState<string | null>(initialActiveSlug || null);
-  const [blogFolders, setBlogFolders] = useState<BlogFolder[]>(initialBlogFolders);
+  const [activeSlug, setActiveSlug] = useState<string | null>(
+    initialActiveSlug || null,
+  );
+  const [blogFolders, setBlogFolders] =
+    useState<BlogFolder[]>(initialBlogFolders);
   const [expandedSlugs, setExpandedSlugs] = useState<Set<string>>(
     new Set(initialActiveSlug ? [initialActiveSlug] : []),
   );
@@ -61,15 +64,6 @@ export default function MdxEditor({
 
   const isDirty = content !== lastSavedContent;
 
-  const stopResizing = useCallback(() => {
-    isResizingSidebar.current = false;
-    isResizingEditor.current = false;
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", stopResizing);
-    document.body.style.cursor = "default";
-    document.body.style.userSelect = "auto";
-  }, []);
-
   const handleMouseMove = useCallback(
     (event: MouseEvent) => {
       if (isResizingSidebar.current) {
@@ -82,6 +76,18 @@ export default function MdxEditor({
       }
     },
     [showSidebar, sidebarWidth],
+  );
+
+  const stopResizing = useCallback(
+    function handleStopResizing() {
+      isResizingSidebar.current = false;
+      isResizingEditor.current = false;
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleStopResizing);
+      document.body.style.cursor = "default";
+      document.body.style.userSelect = "auto";
+    },
+    [handleMouseMove],
   );
 
   const startResizingSidebar = useCallback(() => {
@@ -252,11 +258,11 @@ export default function MdxEditor({
       return "#";
     }
 
-    return `/blog/${activeSlug}`;
+    return `/${activeSlug}`;
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl font-sans shadow-2xl ring-1 select-none">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden font-sans shadow-2xl ring-1 select-none">
       <EditorDialogs
         isNewPostOpen={isDialogOpen}
         onCloseNewPost={() => setIsDialogOpen(false)}
@@ -309,7 +315,9 @@ export default function MdxEditor({
           }}
         />
 
-        {showSidebar ? <ResizeHandle onMouseDown={startResizingSidebar} /> : null}
+        {showSidebar ? (
+          <ResizeHandle onMouseDown={startResizingSidebar} />
+        ) : null}
 
         <EditorInput
           content={content}
