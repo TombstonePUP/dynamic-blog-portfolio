@@ -5,9 +5,6 @@ export default function StaticEditorPage() {
     <div className="flex flex-1 flex-col p-6 lg:p-12">
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col space-y-8">
         <div className="flex flex-col gap-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-admin-muted">
-            Dashboard / Editor
-          </p>
           <h1 className="text-4xl font-black tracking-tight text-admin-heading">
             Prototype <span className="text-admin-accent">Editor</span>
           </h1>

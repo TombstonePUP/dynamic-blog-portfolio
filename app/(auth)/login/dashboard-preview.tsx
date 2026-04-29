@@ -106,9 +106,6 @@ export default function DashboardPreview() {
             className="flex flex-col gap-1"
             style={{ animation: "fadeup 0.4s ease both" }}
           >
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/25">
-              Dashboard / Overview
-            </p>
             <div className="mt-1 flex items-baseline gap-2.5">
               <h1 className="text-2xl font-black tracking-tight text-white/85">
                 Welcome back,

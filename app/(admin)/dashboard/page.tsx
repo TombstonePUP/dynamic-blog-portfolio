@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Dashboard | The Strengths Writer",
+  title: "Overview | Writer Dashboard",
   description: "Create and preview your stories.",
 };
 
@@ -44,9 +44,6 @@ export default async function DashboardHome() {
       <div className="flex flex-col gap-10">
         {/* Welcome Section */}
         <section className="flex flex-col gap-2">
-          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-admin-muted/60">
-            Dashboard / Overview
-          </p>
           <h1 className="text-3xl font-black tracking-tight text-admin-heading">
             Welcome back, {displayName}.
           </h1>

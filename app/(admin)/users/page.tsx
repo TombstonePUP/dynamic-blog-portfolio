@@ -6,6 +6,7 @@ import {
   type ApprovalStatus,
   type UserRole,
 } from "@/lib/admin-data.server";
+import { Metadata } from "next";
 
 type ManagedProfile = {
   id: string;
@@ -96,6 +97,12 @@ function AccessAction({
   );
 }
 
+export const metadata: Metadata = {
+  title: "Users | Writer Dashboard",
+  description:
+    "Review and manage user registrations, approve access to the writing tools, and manage author roles.",
+};
+
 export default async function UsersPage() {
   const { profile, supabase } = await requireAdminContext();
   const { data } = await supabase
@@ -133,9 +140,6 @@ export default async function UsersPage() {
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-10 px-8 py-10">
       <section className="flex flex-col gap-2">
-        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-admin-muted/60">
-          Dashboard / Users
-        </p>
         <h1 className="text-3xl font-black tracking-tight text-admin-heading">
           User Management
         </h1>
