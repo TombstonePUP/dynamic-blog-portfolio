@@ -15,9 +15,7 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const { profile, user } = context;
-  const userName =
-    profile?.display_name || user.email?.split("@")[0] || "Writer";
+  const { profile } = context;
 
   return (
     <main className="flex min-h-full flex-col">
@@ -45,10 +43,7 @@ export default async function ProfilePage() {
           </section>
           <section className="flex gap-8">
             <div className="rounded-lg border border-admin-surface-hover bg-admin-surface p-8 h-fit min-w-[520px]">
-              <ProfileForm
-                userName={userName}
-                userEmail={profile?.email || ""}
-              />
+              <ProfileForm profile={profile} />
             </div>
             <div className="rounded-lg border border-admin-surface-hover bg-admin-surface p-8 h-fit min-w-[520px]">
               <ChangePasswordForm />

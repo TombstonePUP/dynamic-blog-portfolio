@@ -79,80 +79,60 @@ export async function updateUserAccessAction(formData: FormData) {
 }
 
 export async function updateUserProfile({
-  name,
+  firstName,
+  lastName,
   currentPassword,
   newPassword,
 }: {
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   currentPassword?: string;
   newPassword?: string;
 }): Promise<{ success: boolean; error?: string }> {
   const context = await getAuthenticatedContext();
 
   if (!context) {
-    return {
-      success: false,
-      error: "Not authenticated",
-    };
+    return { success: false, error: "Not authenticated" };
   }
 
   // Update profile name if provided
-  if (name !== undefined) {
-    if (!name || name.trim().length === 0) {
-      return {
-        success: false,
-        error: "Display name cannot be empty",
-      };
-    }
-
+  if (firstName !== undefined || lastName !== undefined) {
     const { error: profileError } = await context.supabase
       .from("profiles")
       .update({
-        name: name.trim(),
+        first_name: firstName?.trim(),
+        last_name: lastName?.trim(),
         updated_at: new Date().toISOString(),
       })
       .eq("id", context.profile.id);
 
     if (profileError) {
-      return {
-        success: false,
-        error: profileError.message,
-      };
+      return { success: false, error: profileError.message };
     }
   }
 
   // Handle password change if provided
   if (currentPassword && newPassword) {
-    // First, verify current password by attempting to sign in
     const { error: signInError } = await context.supabase.auth.signInWithPassword({
       email: context.profile.email,
       password: currentPassword,
     });
 
     if (signInError) {
-      return {
-        success: false,
-        error: "Current password is incorrect",
-      };
+      return { success: false, error: "Current password is incorrect" };
     }
 
-    // Update password
     const { error: updateError } = await context.supabase.auth.updateUser({
       password: newPassword,
     });
 
     if (updateError) {
-      return {
-        success: false,
-        error: updateError.message,
-      };
+      return { success: false, error: updateError.message };
     }
   }
 
   revalidatePath("/dashboard");
   revalidatePath("/profile");
 
-  return {
-    success: true,
-  };
+  return { success: true };
 }

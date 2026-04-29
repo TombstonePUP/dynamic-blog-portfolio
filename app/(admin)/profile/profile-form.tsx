@@ -8,44 +8,52 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const profileSchema = z.object({
-  name: z
+  firstName: z
     .string()
-    .min(1, "Display name is required")
-    .min(2, "Name must be at least 2 characters"),
+    .min(1, "First name is required")
+    .min(2, "First name must be at least 2 characters"),
+  lastName: z
+    .string()
+    .min(1, "Last name is required")
+    .min(2, "Last name must be at least 2 characters"),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileForm({
-  userName,
-  userEmail,
+  profile,
 }: {
-  userName: string;
-  userEmail: string;
+  profile: {
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+  } | null;
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const firstName = profile?.first_name || "";
+  const lastName = profile?.last_name || "";
+  const userEmail = profile?.email || "";
 
   const {
     register,
     handleSubmit,
     formState: { errors, isValid, isDirty },
     reset,
-    watch,
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: userName,
+      firstName,
+      lastName,
     },
     mode: "onChange",
   });
 
-  const currentNameValue = watch("name");
-
   useEffect(() => {
-    reset({ name: userName });
-  }, [userName, reset]);
+    reset({ firstName, lastName });
+  }, [firstName, lastName, reset]);
 
   async function onSubmit(values: ProfileFormValues) {
     setSubmitting(true);
@@ -54,7 +62,8 @@ export default function ProfileForm({
 
     try {
       const result = await updateUserProfile({
-        name: values.name.trim(),
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
       });
 
       if (result.success) {
@@ -80,30 +89,47 @@ export default function ProfileForm({
         <p className="text-sm text-[#2b776a]">{successMessage}</p>
       ) : null}
 
-      {/* Display Name Field */}
-      <label className="block">
-        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
-          Display Name
-        </span>
-        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
-          <UserRound className="size-4 text-foreground/35" />
-          <input
-            {...register("name")}
-            value={currentNameValue}
-            placeholder="Your display name"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
-          />
-        </div>
-        {errors.name && (
-          <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
-        )}
-        {!errors.name && userName && (
-          <p className="mt-1 text-xs text-foreground/50">
-            Current name: <span className="font-semibold">{userName}</span>
-          </p>
-        )}
-      </label>
+      {/* First Name Field */}
+      <div className="flex items-center gap-3">
+        <label className="block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+            First Name
+          </span>
+          <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+            <UserRound className="size-4 text-foreground/35" />
+            <input
+              {...register("firstName")}
+              placeholder="Your first name"
+              className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            />
+          </div>
+          {errors.firstName && (
+            <p className="mt-1 text-xs text-red-500">
+              {errors.firstName.message}
+            </p>
+          )}
+        </label>
 
+        {/* Last Name Field */}
+        <label className="block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+            Last Name
+          </span>
+          <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+            <UserRound className="size-4 text-foreground/35" />
+            <input
+              {...register("lastName")}
+              placeholder="Your last name"
+              className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            />
+          </div>
+          {errors.lastName && (
+            <p className="mt-1 text-xs text-red-500">
+              {errors.lastName.message}
+            </p>
+          )}
+        </label>
+      </div>
       {/* Email Field (Read-only) */}
       <label className="block">
         <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
