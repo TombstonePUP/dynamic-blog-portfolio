@@ -59,7 +59,7 @@ function mapSupabasePost(row: PostRow, profile?: ProfileRow | null): Blog {
     assetFolder,
     slug: row.slug,
     title: row.title,
-    href: `/blog/${row.slug}`,
+    href: `/${row.slug}`,
     image:
       resolvePostAssetUrl(assetFolder, row.cover_image_url) ||
       "/images/blog/unsplash-1499750310107-5fef28a66643.jpg",

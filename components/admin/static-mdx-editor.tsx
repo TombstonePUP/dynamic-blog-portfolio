@@ -46,7 +46,7 @@ It looks and feels like the real thing, but it doesn't save to the server.
 - Item two
 - Item three
 
-[Check out the blog](/blog/first-post)
+[Check out the blog](/first-post)
 `;
 
 const STATIC_FOLDERS: BlogFolder[] = [

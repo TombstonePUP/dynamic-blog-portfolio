@@ -258,7 +258,7 @@ export default function MdxEditor({
       return "#";
     }
 
-    return `/blog/${activeSlug}`;
+    return `/${activeSlug}`;
   }
 
   return (
@@ -276,8 +276,8 @@ export default function MdxEditor({
         onConfirmRename={confirmRenameSlug}
         activeSlug={activeSlug}
         deleteTarget={null}
-        onCloseDelete={() => { }}
-        onConfirmDelete={() => { }}
+        onCloseDelete={() => {}}
+        onConfirmDelete={() => {}}
       />
 
       <EditorToolbar
@@ -333,7 +333,7 @@ export default function MdxEditor({
             previewHtml={previewHtml}
             previewAsset={null}
             isPending={isPending}
-            onClearPreviewAsset={() => { }}
+            onClearPreviewAsset={() => {}}
           />
         ) : null}
       </div>

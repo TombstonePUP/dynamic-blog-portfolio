@@ -204,10 +204,11 @@ export default function ExplorerGrid({
                       `/editor?slug=${encodeURIComponent(folder.slug)}`,
                     )
                   }
-                  className={`cursor-pointer transition-all ${selectedPost?.slug === folder.slug
+                  className={`cursor-pointer transition-all ${
+                    selectedPost?.slug === folder.slug
                       ? "ring-2 ring-admin-accent"
                       : ""
-                    }`}
+                  }`}
                 >
                   <div className="pointer-events-none h-full">
                     <StoryCard
@@ -295,7 +296,7 @@ export default function ExplorerGrid({
               Edit Story
             </Link>
             <Link
-              href={`/blog/${selectedPost.slug}`}
+              href={`/${selectedPost.slug}`}
               className="block w-full text-center border border-admin-surface-hover bg-transparent px-4 py-2 text-sm font-semibold text-admin-heading transition-colors hover:bg-admin-surface-hover"
             >
               View Published
@@ -323,10 +324,11 @@ function SidebarItem({
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center justify-between px-3 py-2 text-sm transition-colors ${isActive
+      className={`flex w-full items-center justify-between px-3 py-2 text-sm transition-colors ${
+        isActive
           ? "bg-admin-surface text-admin-accent"
           : "text-admin-muted hover:bg-admin-surface hover:text-admin-heading"
-        }`}
+      }`}
     >
       <div className="flex items-center gap-3">
         <Icon
