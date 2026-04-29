@@ -10,6 +10,7 @@ import {
   Maximize2,
   Save,
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "../ui/button";
 
 interface EditorToolbarProps {
@@ -44,13 +45,16 @@ export default function EditorToolbar({
   return (
     <div className="flex items-center justify-between px-6 py-3 border-b  ">
       <div className="flex items-center gap-4">
-        <a
+        <Link
           href="/posts"
-          className="p-1.5 hover:bg-admin-contrast/5 transition hover:text-admin-text"
+          className="group p-1.5 hover:bg-admin-contrast/50 transition hover:text-admin-text"
           title="Back to Explorer"
         >
-          <ArrowLeft size={16} />
-        </a>
+          <ArrowLeft
+            size={16}
+            className="group-hover:-translate-x-1 transition"
+          />
+        </Link>
         <div className="w-px h-4 bg-admin-contrast/10" />
         <button
           onClick={onToggleSidebar}
