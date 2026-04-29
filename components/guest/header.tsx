@@ -30,7 +30,8 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isCompact = scrolled || pathname.startsWith("/blog/");
+  const isCompact =
+    scrolled || blogs.some((blog) => pathname === `/${blog.slug}`);
 
   return (
     <>
