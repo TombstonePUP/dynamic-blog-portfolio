@@ -2,7 +2,13 @@ import DashboardStats from "@/components/admin/dashboard-stats";
 import StoryCard from "@/components/admin/story-card";
 import { getOwnedPosts, isAdminProfile } from "@/lib/admin-data.server";
 import { Eye, FileEdit, Layout, Users } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Dashboard | The Strengths Writer",
+  description: "Create and preview your stories.",
+};
 
 export default async function DashboardHome() {
   const { posts, profile, supabase } = await getOwnedPosts();
