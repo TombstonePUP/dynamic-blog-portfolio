@@ -62,7 +62,7 @@ export default function EditorToolbar({
         >
           <FolderInput
             size={16}
-            className={showSidebar ? "opacity-40" : "opacity-100"}
+            className={showSidebar ? "opacity-100" : "opacity-40"}
           />
         </button>
         <div className="flex items-center gap-2 px-3 py-1 bg-admin-contrast/5 text-xs font-bold uppercase tracking-wider text-admin-text/60">
