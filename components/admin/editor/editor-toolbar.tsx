@@ -2,11 +2,10 @@
 
 import {
   ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
   ExternalLink,
   FileEdit,
   FileText,
+  FolderInput,
   Loader2,
   Maximize2,
   Save,
@@ -57,7 +56,10 @@ export default function EditorToolbar({
           onClick={onToggleSidebar}
           className="p-1.5 hover:bg-admin-contrast/5 transition "
         >
-          {showSidebar ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+          <FolderInput
+            size={16}
+            className={showSidebar ? "opacity-40" : "opacity-100"}
+          />
         </button>
         <div className="flex items-center gap-2 px-3 py-1 bg-admin-contrast/5 text-xs font-bold uppercase tracking-wider text-admin-text/60">
           <FileText className="size-3" /> Editor
