@@ -25,12 +25,8 @@ export default async function ProfilePage() {
             <h1 className="text-3xl font-black tracking-tight text-admin-heading">
               Profile Settings
             </h1>
-            <p className="text-sm leading-6 text-admin-text">
-              <span className="font-semibold text-admin-text">Email:</span>{" "}
-              {profile?.email}
-            </p>
-            <p className="text-sm text-admin-muted">
-              <span className="font-semibold text-admin-text">Joined:</span>{" "}
+            <p className="text-sm text-admin-muted font-semibold">
+              <span className="font-normal text-admin-text">Joined since:</span>{" "}
               {new Date(profile?.approved_at || new Date()).toLocaleDateString(
                 "en-US",
                 {

@@ -124,9 +124,8 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
 
       {/* MOBILE MENU */}
       <div
-        className={`fixed inset-0 z-40 bg-[#FAF9F6] px-5 pt-32 transition-transform duration-300 ease-in-out md:hidden ${
-          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-0 z-40 bg-[#FAF9F6] px-5 pt-32 transition-transform duration-300 ease-in-out md:hidden ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <nav className="flex flex-col gap-8 text-3xl font-bold">
           {[...leftNav, ...rightNav].map((link) => {
