@@ -89,16 +89,16 @@ export default function EditorToolbar({
         {activeSlug && (
           <div className="flex items-center gap-2 shrink-0">
             <Button variant="outline" size="sm" onClick={onRename}>
-              <FileEdit size={14} className="opacity-40" />
+              <FileEdit size={14} />
               <span className="hidden xs:inline">Rename</span>
             </Button>
             <a
               href={getLiveUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-admin-text/60 hover:text-admin-text px-3 py-1.5 md:px-4 md:py-1.5 transition text-[10px] md:text-xs font-bold uppercase tracking-widest border shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap"
+              className="flex items-center gap-2 hover:text-admin-text/60 text-admin-text px-3 py-1.5 md:px-4 md:py-1.5 transition text-[10px] md:text-xs font-bold uppercase tracking-widest border shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap"
             >
-              <ExternalLink size={14} className="opacity-40" />
+              <ExternalLink size={14} />
               <span className="hidden xs:inline">View Saved Post</span>
               <span className="xs:hidden">View</span>
             </a>

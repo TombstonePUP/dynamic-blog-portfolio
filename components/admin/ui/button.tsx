@@ -34,7 +34,7 @@ export function Button({
     danger:
       "border border-admin-danger bg-admin-danger text-admin-contrast hover:bg-admin-danger/90",
     outline:
-      "border border-admin-surface-hover text-admin-text hover:bg-admin-surface-hover hover:text-admin-heading",
+      "border border-admin-surface text-admin-text hover:bg-admin-surface-hover hover:text-admin-heading",
   };
 
   // Size variations (includes automatic SVG scaling)
