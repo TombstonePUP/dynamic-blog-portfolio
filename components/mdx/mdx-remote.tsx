@@ -35,7 +35,7 @@ const createComponents = (assetFolder?: string): MDXComponents => ({
     }
 
     return (
-      <div className="my-8 overflow-hidden rounded-xl">
+      <span className="my-8 block overflow-hidden rounded-xl">
         <Image
           src={src}
           width={1200}
@@ -43,7 +43,7 @@ const createComponents = (assetFolder?: string): MDXComponents => ({
           className="w-full object-cover"
           alt={props.alt || ""}
         />
-      </div>
+      </span>
     );
   },
   // Keep Image component for compatibility if used as a component
@@ -60,7 +60,7 @@ const createComponents = (assetFolder?: string): MDXComponents => ({
     }
 
     return (
-      <div className="my-8 overflow-hidden rounded-xl">
+      <span className="my-8 block overflow-hidden rounded-xl">
         <Image
           {...restProps}
           src={src}
@@ -69,7 +69,7 @@ const createComponents = (assetFolder?: string): MDXComponents => ({
           className="w-full object-cover"
           alt={props.alt || ""}
         />
-      </div>
+      </span>
     );
   },
 });
@@ -89,6 +89,7 @@ export function CustomMDX({
     <MDXRemote
       source={source}
       components={{ ...components, ...(manualComponents || {}) }}
+      options={{ parseFrontmatter: true }}
     />
   );
 }
