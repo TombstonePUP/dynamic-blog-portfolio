@@ -193,7 +193,7 @@ export default function LandingScrollFeed({
                 </p>
               </div>
               <span className="text-xs font-semibold uppercase tracking-wider text-[#72dbcc]">
-                Infinite-style feed
+                Latest feed
               </span>
             </div>
 
