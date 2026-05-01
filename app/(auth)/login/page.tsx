@@ -21,9 +21,9 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen max-h-screen overflow-hidden lg:grid-cols-[1.1fr_0.9fr]">
+    <main className="grid min-h-screen lg:max-h-screen lg:overflow-hidden grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
       {/* ── Left panel ── */}
-      <section className="relative flex flex-col overflow-hidden bg-[#1f3d39] px-8 text-[#f7f2ea] sm:px-12 lg:px-16">
+      <section className="hidden lg:flex relative flex-col overflow-hidden bg-[#1f3d39] px-8 text-[#f7f2ea] sm:px-12 lg:px-16">
         {/* Diagonal overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),transparent_48%)]" />
 

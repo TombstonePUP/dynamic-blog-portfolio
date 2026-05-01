@@ -77,8 +77,8 @@ const CodeMirrorInput = forwardRef<CodeMirrorInputRef, CodeMirrorInputProps>(
 
     return (
       <div 
-        className={`overflow-hidden border-r bg-white font-mono ${editorWidth ? "shrink-0" : "flex-1"}`}
-        style={editorWidth ? { width: editorWidth } : {}}
+        className={`overflow-hidden border-r bg-white font-mono ${editorWidth ? "md:shrink-0 flex-1 md:flex-none" : "flex-1"}`}
+        style={editorWidth ? { flexBasis: editorWidth, width: "100%" } : {}}
       >
         <CodeMirror
           ref={editorRef}

@@ -138,7 +138,7 @@ export default async function UsersPage() {
   ).length;
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-10 px-8 py-10">
+    <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-10 px-4 md:px-8 py-10">
       <section className="flex flex-col gap-2">
         <h1 className="text-3xl font-black tracking-tight text-admin-heading">
           User Management

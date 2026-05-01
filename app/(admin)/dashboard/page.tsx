@@ -40,7 +40,7 @@ export default async function DashboardHome() {
   const displayName = profile?.display_name || "Writer";
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-8 py-10">
+    <main className="mx-auto w-full max-w-7xl px-4 md:px-8 py-10">
       <div className="flex flex-col gap-10">
         {/* Welcome Section */}
         <section className="flex flex-col gap-2">
@@ -56,13 +56,13 @@ export default async function DashboardHome() {
         <DashboardStats stats={stats} isLoading={false} />
 
         {isAdmin ? (
-          <section className="border border-admin-surface-hover bg-admin-surface p-8">
-            <div className="flex items-center justify-between gap-6">
+          <section className="border border-admin-surface-hover bg-admin-surface p-6 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="max-w-2xl">
                 <p className="text-[11px] font-black uppercase tracking-[0.18em] text-admin-accent">
                   User Management
                 </p>
-                <h3 className="mt-2 text-2xl font-bold tracking-tight text-admin-heading">
+                <h3 className="mt-2 text-xl md:text-2xl font-bold tracking-tight text-admin-heading">
                   {pendingApprovals} account{pendingApprovals === 1 ? "" : "s"}{" "}
                   waiting for approval
                 </h3>
@@ -83,7 +83,7 @@ export default async function DashboardHome() {
 
         {/* Quick Actions */}
         <section className="mt-4 grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="flex flex-col gap-6 border border-admin-surface-hover bg-admin-surface p-10 h-fit">
+          <div className="flex flex-col gap-6 border border-admin-surface-hover bg-admin-surface p-6 md:p-10 h-fit">
             <h3 className="text-xl font-bold tracking-tight text-admin-heading">
               Quick Actions
             </h3>
@@ -116,7 +116,7 @@ export default async function DashboardHome() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 border border-admin-surface-hover bg-admin-surface p-10">
+          <div className="flex flex-col gap-4 border border-admin-surface-hover bg-admin-surface p-6 md:p-10">
             <h3 className="text-xl font-bold tracking-tight text-admin-heading">
               Writing Tip
             </h3>
@@ -133,13 +133,13 @@ export default async function DashboardHome() {
           </div>
         </section>
 
-        <section className="border border-admin-surface-hover bg-admin-surface p-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+        <section className="border border-admin-surface-hover bg-admin-surface p-6 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <p className="text-[11px] font-black uppercase tracking-[0.18em] text-admin-accent">
                 Story Library
               </p>
-              <h3 className="mt-2 text-2xl font-bold tracking-tight text-admin-heading">
+              <h3 className="mt-2 text-xl md:text-2xl font-bold tracking-tight text-admin-heading">
                 Your story library now runs from Supabase
               </h3>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-admin-text">

@@ -378,8 +378,9 @@ export default function MdxEditor({
         getLiveUrl={getLiveUrl}
       />
 
-      <div className="relative flex flex-1 overflow-hidden">
-        <EditorSidebar
+      <div className="relative flex flex-col md:flex-row flex-1 overflow-x-hidden overflow-y-auto md:overflow-hidden">
+        <div className="w-full md:w-auto shrink-0 md:h-full">
+          <EditorSidebar
           width={sidebarWidth}
           showSidebar={showSidebar}
           blogFolders={blogFolders}
@@ -395,21 +396,31 @@ export default function MdxEditor({
           onPreviewAsset={setPreviewAsset}
           onInsertAsset={insertAsset}
         />
+        </div>
 
         {showSidebar ? (
-          <ResizeHandle onMouseDown={startResizingSidebar} />
+          <div className="hidden md:flex">
+            <ResizeHandle onMouseDown={startResizingSidebar} />
+          </div>
         ) : null}
 
-        <CodeMirrorInput
-          ref={editorRef}
-          content={content}
-          onChange={setContent}
-          editorWidth={isSplit ? editorWidth : undefined}
-        />
-
-        {isSplit ? <ResizeHandle onMouseDown={startResizingEditor} /> : null}
+        <div className="w-full md:w-auto flex-1 shrink-0 md:h-full min-h-[50vh]">
+          <CodeMirrorInput
+            ref={editorRef}
+            content={content}
+            onChange={setContent}
+            editorWidth={isSplit ? editorWidth : undefined}
+          />
+        </div>
 
         {isSplit ? (
+          <div className="hidden md:flex">
+            <ResizeHandle onMouseDown={startResizingEditor} />
+          </div>
+        ) : null}
+
+        {isSplit ? (
+          <div className="w-full md:w-auto flex-1 shrink-0 md:h-full min-h-[50vh] border-t md:border-t-0">
           <EditorPreview
             previewSource={previewSource}
             activeSlug={activeSlug}
@@ -418,6 +429,7 @@ export default function MdxEditor({
             onClearPreviewAsset={() => setPreviewAsset(null)}
             onInsertAsset={insertAsset}
           />
+          </div>
         ) : null}
       </div>
 

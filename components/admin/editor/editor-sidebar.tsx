@@ -55,8 +55,8 @@ export default function EditorSidebar({
 }: EditorSidebarProps) {
   return (
     <div
-      className="min-h-full shrink-0 overflow-x-hidden overflow-y-auto border-r shadow-[inset_-10px_0_15px_-15px_rgba(0,0,0,0.1)] transition-all duration-75"
-      style={{ width: showSidebar ? width : 0 }}
+      className={`min-h-full overflow-x-hidden overflow-y-auto border-r shadow-[inset_-10px_0_15px_-15px_rgba(0,0,0,0.1)] transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0"}`}
+      style={showSidebar ? { flexBasis: width } : { width: 0 }}
     >
       <div
         className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4"

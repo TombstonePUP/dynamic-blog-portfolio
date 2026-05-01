@@ -39,21 +39,8 @@ export default async function RootLayout({
     >
       <body className="flex min-h-screen flex-col bg-admin-bg font-sans text-admin-text selection:bg-admin-accent selection:text-admin-contrast">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {/* Mobile Blocker */}
-        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-admin-bg p-6 text-center md:hidden">
-          <div className="max-w-sm border border-admin-surface-hover bg-admin-surface p-8">
-            <h1 className="mb-3 text-xl font-bold text-admin-heading">
-              Desktop Required
-            </h1>
-            <p className="text-sm text-admin-muted">
-              The admin dashboard is optimized for desktop screens. Please
-              access this page from a larger device.
-            </p>
-          </div>
-        </div>
-
-        {/* Desktop Content */}
-        <div className="hidden md:flex flex-col flex-1 w-full">
+        {/* Main Content */}
+        <div className="flex flex-col flex-1 w-full">
           <AdminHeader
             userName={userName}
             userEmail={userEmail}

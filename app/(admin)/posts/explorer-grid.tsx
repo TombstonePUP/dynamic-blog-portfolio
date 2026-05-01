@@ -67,9 +67,9 @@ export default function ExplorerGrid({
   });
 
   return (
-    <div className="flex w-full max-h-[93dvh]">
+    <div className="flex flex-col lg:flex-row w-full max-h-[93dvh]">
       {/* Contextual Sidebar */}
-      <div className="flex w-64 shrink-0 flex-col overflow-y-auto border-r border-admin-surface-hover bg-admin-surface">
+      <div className="hidden lg:flex w-64 shrink-0 flex-col overflow-y-auto border-r border-admin-surface-hover bg-admin-surface">
         <div className="p-6 pb-2">
           <Link
             href="/editor"
@@ -173,7 +173,7 @@ export default function ExplorerGrid({
       {/* Main Content Pane */}
       <div className="flex flex-1 flex-col overflow-y-auto bg-admin-bg">
         {/* Top Header for Pane */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-admin-surface-hover bg-admin-bg px-8 py-6">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-admin-surface-hover bg-admin-bg px-4 py-4 md:px-8 md:py-6">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-admin-heading capitalize">
               {activeFilter === "all" ? "All Stories" : activeFilter}
@@ -185,7 +185,7 @@ export default function ExplorerGrid({
         </div>
 
         {/* Grid */}
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           {filteredFolders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-admin-muted/30">
               <Folder className="size-16 mb-4 opacity-50" />
@@ -228,7 +228,7 @@ export default function ExplorerGrid({
 
       {/* Right Preview Panel */}
       {selectedPost && (
-        <div className="w-96 shrink-0 border-l border-admin-surface-hover bg-admin-surface flex flex-col">
+        <div className="hidden xl:flex w-80 2xl:w-96 shrink-0 border-l border-admin-surface-hover bg-admin-surface flex flex-col">
           {/* Header */}
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-admin-surface-hover bg-admin-surface px-6 py-4">
             <h2 className="text-lg font-bold text-admin-heading truncate">
