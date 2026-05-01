@@ -1,108 +1,77 @@
 # Dynamic Blog Portfolio
+> A high-performance portfolio and personal development blog platform powered by Next.js and Supabase.
 
-A Next.js 16 portfolio/blog project with Supabase-backed post storage, MDX editing, and migrated story assets in Supabase Storage.
+![Next.js](https://img.shields.io/badge/Next.js-16.2.3-black?style=for-the-badge&logo=next.js)
+![React](https://img.shields.io/badge/React-19.2.4-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase)
 
-## Tech Stack
+> [!IMPORTANT]
+> This file must be kept up to date. Any feature addition, command change, environment variable change, or setup change must be reflected here immediately.
 
-- **Framework:** Next.js `16.2.3`
-- **UI:** React `19.2.4`, Tailwind CSS `4`
-- **Content:** MDX via `next-mdx-remote`
-- **Backend:** Supabase Auth, Postgres, and Storage
+## Overview
+The **Dynamic Blog Portfolio** (The Strengths Writer) is a professional CMS and blog engine designed for writers focusing on positive psychology and personal growth. It provides a seamless reading experience for guests and a powerful, integrated workspace for authors to manage stories and assets.
 
-## Database Migrations
+## Features
+- **Integrated MDX Editor**: Dual-pane workspace with real-time preview and CodeMirror syntax highlighting.
+- **Unified Media Explorer**: Manage story content and image assets directly within the sidebar.
+- **Supabase Powered**: Dynamic story storage, authentication, and asset management via Supabase.
+- **Responsive Layouts**: Desktop-optimized admin dashboard and mobile-friendly reader site.
+- **Static Export Compatible**: Built to be performant and deployable to modern edge platforms like Cloudflare Pages.
 
-Add your remote Postgres connection string to `.env.local`:
-
-```bash
-SUPABASE_DB_URL=postgresql://postgres:your-password@db.your-project-ref.supabase.co:5432/postgres
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-SUPABASE_ADMIN_PASSWORD=choose-a-strong-admin-password
-```
-
-Push any pending migrations with:
-
-```bash
-npm run supabase:push
-```
-
-Preview what would run without applying it:
-
-```bash
-npm run supabase:push:dry
-```
-
-After the migrations are in place, seed or repair the primary admin account with:
-
-```bash
-npm run supabase:seed-admin
+## Project Structure
+```text
+/
+├── app/               # Core routing and application logic
+├── components/        # Reusable UI components (Admin & Guest)
+├── lib/               # Server-side utilities and data fetching
+├── scripts/           # Migration and admin seeding tools
+├── supabase/          # Database migrations and schema
+└── utils/             # Supabase client and server factories
 ```
 
 ## Getting Started
+1. **Prerequisites**: Ensure you have Node.js 20+ and an active Supabase project.
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Configure Environment**: Create a `.env.local` file with the required keys (see table below).
+4. **Database Setup**:
+   ```bash
+   npm run supabase:push
+   npm run supabase:seed-admin
+   ```
+5. **Run Locally**:
+   ```bash
+   npm run dev
+   ```
 
-1. Install dependencies:
+## Dev Commands
+| Command | Description |
+| :--- | :--- |
+| `npm run dev` | Starts the development server. |
+| `npm run build` | Compiles the production application. |
+| `npm run supabase:push` | Pushes pending database migrations to Supabase. |
+| `npm run supabase:seed-admin` | Seeds or repairs the primary admin account. |
+| `npm run supabase:import-posts`| Migrates legacy local MDX posts to Supabase. |
 
-```bash
-npm install
-```
+## Environment Variables
+| Variable | Purpose | Required |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL. | Yes |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public API key (Anon key). | Yes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Admin API key for migrations/seeding. | Yes (Dev only) |
+| `SUPABASE_DB_URL` | Postgres connection string for migrations. | Yes (Dev only) |
+| `NEXT_PUBLIC_SUPABASE_POST_ASSETS_BUCKET`| Name of the storage bucket for images. | Optional (Default: `post-assets`) |
 
-2. Run locally:
+## Contributing
+Please follow the standard branching strategy:
+- `main`: Production-ready code.
+- `staging`: Integration and testing.
+- Feature branches should be branched from `staging`.
 
-```bash
-npm run dev
-```
+## License
+MIT © 2026 The Strengths Writer
 
-```bash
-npm run build
-```
-
-## Admin Story Editor
-
-The project features a custom, high-performance MDX editor for managing stories:
-
-- **Dual-Pane Interface**: Real-time side-by-side editing with raw MDX on the left and live preview on the right.
-- **CodeMirror Integration**: Full syntax highlighting and advanced text editing capabilities.
-- **Unified Explorer**: Manage both Story content and image assets in a single, collapsible sidebar.
-- **Relative Pathing**: Insert and preview images using simple relative paths (e.g., `./assets/hero.jpg`), which are automatically resolved to Supabase Storage URLs.
-- **Asset Upload**: Drag-and-drop or select images to upload directly into the Story's asset folder within the editor UI.
-
-## Content Storage
-
-Stories now live in **Supabase**:
-
-- Post metadata and MDX body live in the `posts` table.
-- Story assets live in the `post-assets` Supabase Storage bucket under `{slug}/filename`.
-- The admin editor uses Server Actions (`app/actions/`) for secure data mutations.
-- The local `content/posts/` folder is now only used as a legacy import source.
-
-### Import Existing Local Bundles
-
-If you still have legacy MDX folders under `content/posts/`, import them with:
-
-```bash
-npm run supabase:import-posts
-```
-
-Preview the migration without writing to Supabase:
-
-```bash
-npm run supabase:import-posts:dry
-```
-
-The importer uploads sibling assets, rewrites relative asset references, and inserts or updates the matching post rows in Supabase.
-
-## Project Structure
-
-- `app/(guest)/`: Public-facing pages
-- `app/(admin)/`: Authenticated writing and management views
-- `content/posts/`: Legacy import source for older MDX bundles
-- `data/`: Static metadata used by the site
-- `lib/`: Core utilities and server-side data access
-- `public/images/posts/`: Legacy generated assets folder kept only for backward compatibility during migration
-- `scripts/`: Supabase and content migration utilities
-- `supabase/migrations/`: Database and storage schema changes
-
-## Developer Notes
-
-- Dynamic blog data is fetched in `lib/blogs.server.ts`. Do not import it into Client Components.
-- The local `content/posts` folder is no longer the runtime source of truth after import.
-- If you manually upload post assets, keep them under the matching `post-assets/<asset_folder>/...` path.
+<!-- last updated: 2026-05-01 -->

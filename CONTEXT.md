@@ -1,51 +1,92 @@
-# Agent Context & Architecture Rules
+# Project Context & Architecture Rules
 
-This file provides strict architectural context and rules for AI coding agents working on this project.
-It acts as the single source of truth for structural decisions and must be updated whenever the architecture changes.
+> [!IMPORTANT]
+> DESIGN.md is the single source of truth for all visual and design decisions, including color tokens, typography, component structure, and Tailwind classes. This file (CONTEXT.md) must never duplicate those details.
+
+> [!IMPORTANT]
+> **Living Document Rules:**
+> - **CONTEXT.md** must be updated any time the project structure, routing, layout system, tech stack, or constraints change.
+> - **DESIGN.md** must be updated any time a component is added, modified, or removed, or any time a color token, typography rule, or Tailwind class changes.
+> - **README.md** must be updated any time a feature is added, a dev command changes, an environment variable is added or removed, or the setup steps change.
+> - **No code change** that affects any of the above is considered complete until the relevant doc is updated to match.
+
+## Project Overview
+The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professional portfolio and personal development blog platform. It features a high-performance reader experience for guests and a streamlined, custom MDX editor for administrators. The app focuses on identified strengths, positive psychology, and personal growth.
 
 ## Tech Stack
+| Layer | Technology |
+| :--- | :--- |
+| **Framework** | Next.js 16.2.3 (App Router) |
+| **UI Library** | React 19.2.4 |
+| **Styling** | Tailwind CSS 4 |
+| **Icons** | Lucide React |
+| **Database** | Supabase (Postgres) |
+| **Authentication** | Supabase Auth (SSR-compatible) |
+| **Storage** | Supabase Storage (Bucket: `post-assets`) |
+| **Content** | MDX via `next-mdx-remote` |
+| **Runtime** | Node.js / Edge Runtime |
+| **Package Manager**| npm |
 
-- **Framework:** Next.js 16.2.3 (App Router)
-- **UI:** React 19.2.4, Tailwind CSS 4, Lucide React
-- **Content:** MDX via `next-mdx-remote`
-- **Backend:** Supabase Auth, Postgres, and Storage
+## Project Structure
+```text
+/
+├── app/                     # Next.js App Router root
+│   ├── (admin)/             # Authenticated CMS/dashboard routes
+│   │   ├── dashboard/       # Main admin overview
+│   │   ├── editor/          # Custom Story editor (CodeMirror + Preview)
+│   │   ├── layout.tsx       # Admin shell with header and auth checks
+│   │   └── login/           # Admin authentication page
+│   ├── actions/             # Server Actions for mutations (blog-actions.ts, mdx-actions.ts)
+│   ├── api/                 # API Routes for search and admin utilities
+│   ├── globals.css          # Global styles and Tailwind 4 theme tokens
+│   └── layout.tsx           # Global root layout
+├── components/              # Shared UI components
+│   ├── admin/               # Admin-specific components (editor, dashboard)
+│   │   ├── editor/          # Specialized editor sub-components
+│   │   └── ui/              # Low-level admin design system components (Button, Modal)
+│   ├── guest/               # Guest-facing components (search, mobile menu)
+│   ├── mdx/                 # MDX rendering components
+│   └── ui/                  # General UI components
+├── lib/                     # Core business logic and data fetching
+│   ├── admin-data.server.ts # Server-only admin data utilities
+│   ├── blogs.server.ts      # Server-only guest data utilities
+│   └── post-assets.ts       # Asset path resolution logic
+├── scripts/                 # Migration and seeding utilities
+├── services/                # External service integrations (auth.ts)
+├── supabase/                # Local database schema and migrations
+├── types/                   # TypeScript definitions
+└── utils/                   # Shared utility functions (supabase client/server creators)
+```
 
-## App Structure
+## Layout System
+| Layout | File | Used By | Styling Approach |
+| :--- | :--- | :--- | :--- |
+| **Root** | `app/layout.tsx` | All pages | Minimal; manages fonts and global context. |
+| **Guest** | `app/(guest)/layout.tsx` | `/`, `/about`, `/topics`, etc. | Uses `Hanken Grotesk` font; includes `GuestHeader` and `GuestFooter`. |
+| **Admin** | `app/(admin)/layout.tsx` | `/dashboard`, `/editor` | Uses `Inter` font; includes `AdminHeader`; implements mobile blocker. |
 
-- `app/(guest)/`: Public-facing portfolio and blog pages.
-- `app/(admin)/`: Authenticated CMS/dashboard for authors.
-- `app/api/`: API routes.
-- `lib/`: Server-side data fetching (`admin-data.server.ts`, `blogs.server.ts`). **Do NOT import server functions into Client Components.**
-- `components/`: UI components. Grouped by `admin/` and `ui/`.
-- `app/actions/`: Server Actions for data mutations (blog management, MDX compilation).
+## Routing Conventions
+| Pattern | Layout | Note |
+| :--- | :--- | :--- |
+| `/` | Guest | Portfolio landing page with featured stories. |
+| `/topics` | Guest | Filterable list of story categories. |
+| `/login` | Admin | Access point for story authors. |
+| `/dashboard`| Admin | Overview of stories and draft status. |
+| `/editor` | Admin | Specialized workspace for MDX editing. |
+| `/[slug]` | Guest | Dynamic story rendering via MDX. |
 
-## Architectural Rules
+## Render Mode
+- **Hybrid Rendering**: The app uses Server-Side Rendering (SSR) for data fetching in `page.tsx` files and Client-Side Rendering (CSR) for interactive elements (Editor, Search, Modals).
+- **Static Generation**: Designed for static export compatibility where possible, but currently relies on SSR for dynamic story retrieval from Supabase.
+- **Gotchas**: Always use `createClient` from `@/utils/supabase/server` in Server Components and `@/utils/supabase/client` in Client Components.
 
-1. **Server vs Client Components:**
-   - Fetch data exclusively in Server Components (e.g., `page.tsx`) and pass only plain, serializable data down to Client Components.
-   - Avoid passing complex objects (like React elements, instances, or functions) from Server to Client Components to prevent hydration/serialization errors.
-2. **Database & Storage:**
-   - Stories are stored dynamically in the Supabase `posts` table (the local `content/posts` folder is considered legacy).
-   - Story assets (images) live in the `post-assets` Supabase Storage bucket.
-3. **Authentication:**
-   - Admin access requires Supabase Auth and a specific `profile` status (e.g., `approval_status = 'approved'`).
-4. **Admin Editor Architecture**:
-   - Uses CodeMirror (`@uiw/react-codemirror`) for MDX editing with syntax highlighting.
-   - Provides a live preview via `next-mdx-remote/serialize` handled by a Server Action (`compileMdxAction`).
-   - Integrated File Explorer manages both Story content and Assets in a unified sidebar.
-5. **Asset Management & Resolution**:
-   - Assets are stored in the `post-assets` bucket under `{slug}/filename`.
-   - The editor uses relative pathing for assets (e.g., `./assets/image.jpg`).
-   - `lib/post-assets.ts` provides logic to resolve these relative paths to absolute Supabase Storage URLs for both the Admin Preview and the public site.
-6. **Build & Deployment**:
-   - The app is designed to be statically exported and deployed to Cloudflare Pages. Ensure all new routes are compatible with static generation unless dynamic server features are specifically requested.
-7. **Documentation Updates:**
-   - When architectural or design changes are made, update both CONTEXT.md and DESIGN.md to keep them authoritative.
-8. **Admin Layout Standard:**
-   - Admin pages (excluding `/editor`) follow the standard layout and surface rules documented in DESIGN.md.
-9. **Linting Guidance:**
-   - Run lint only when requested, after larger refactors, or before release to avoid excessive token usage from lint output.
+## Styling Approach
+The project uses **Tailwind CSS 4** with a strict design system defined in `globals.css`. We use CSS variables for theme tokens and avoid ad-hoc color values in JSX. Layouts use CSS Grid and Flexbox for responsiveness. Refer to **DESIGN.md** for the full specification of tokens and components.
 
-## Terminology
-
-- Use the term **Stories** (not posts, articles, or folders) in the UI copy to refer to blog entries, ensuring consistency across the Dashboard and Explorer. Code variables and database tables may retain `post` for technical accuracy.
+## Key Constraints and Gotchas
+- **Terminology**: Always use **Stories** in UI copy. Database/Code may use `post`.
+- **Data Fetching**: Never import `*.server.ts` files into Client Components.
+- **Assets**: Assets must be referenced via relative paths (e.g., `./assets/image.jpg`) in MDX.
+- **Admin Access**: Desktop-only restriction enforced via layout; mobile users see a blocker.
+- **Mutations**: All database updates must go through **Server Actions** in `app/actions/`.
+- **MDX**: Use `ClientMDXRemote` for previewing to avoid hostname whitelist issues with `next/image`.
