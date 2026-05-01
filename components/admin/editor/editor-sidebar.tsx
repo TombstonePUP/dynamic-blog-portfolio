@@ -56,11 +56,12 @@ export default function EditorSidebar({
   return (
     <div
       className={`min-h-full overflow-x-hidden overflow-y-auto border-r shadow-[inset_-10px_0_15px_-15px_rgba(0,0,0,0.1)] transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0"}`}
-      style={showSidebar ? { flexBasis: width } : { width: 0 }}
+      style={showSidebar ? { flexBasis: `var(--sidebar-width, ${width}px)` } : { width: 0 }}
     >
+      <style>{`@media (max-width: 768px) { .responsive-sidebar-inner { width: 100% !important; } }`}</style>
       <div
-        className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4"
-        style={{ width }}
+        className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4 responsive-sidebar-inner"
+        style={{ width: `var(--sidebar-width, ${width}px)` }}
       >
         <div className="flex items-center justify-between px-1 text-[11px] font-black uppercase tracking-[0.2em] text-admin-text/60">
           <span>Story Explorer</span>

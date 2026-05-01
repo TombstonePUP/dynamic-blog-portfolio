@@ -43,11 +43,11 @@ export default function EditorToolbar({
   getLiveUrl,
 }: EditorToolbarProps) {
   return (
-    <div className="flex items-center justify-between px-6 py-3 border-b  ">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col md:flex-row md:items-center justify-between px-4 py-3 md:px-6 md:py-3 border-b gap-3 md:gap-0">
+      <div className="flex items-center gap-2 md:gap-4 overflow-hidden w-full md:w-auto">
         <Link
           href="/posts"
-          className="group p-1.5 hover:bg-admin-contrast/50 transition hover:text-admin-text"
+          className="group p-1.5 hover:bg-admin-contrast/50 transition hover:text-admin-text shrink-0"
           title="Back to Explorer"
         >
           <ArrowLeft
@@ -55,51 +55,52 @@ export default function EditorToolbar({
             className="group-hover:-translate-x-1 transition"
           />
         </Link>
-        <div className="w-px h-4 bg-admin-contrast/10" />
+        <div className="w-px h-4 bg-admin-contrast/10 shrink-0" />
         <button
           onClick={onToggleSidebar}
-          className="p-1.5 hover:bg-admin-contrast/5 transition "
+          className="p-1.5 hover:bg-admin-contrast/5 transition hidden md:block shrink-0"
         >
           <FolderInput
             size={16}
             className={showSidebar ? "opacity-100" : "opacity-40"}
           />
         </button>
-        <div className="flex items-center gap-2 px-3 py-1 bg-admin-contrast/5 text-xs font-bold uppercase tracking-wider text-admin-text/60">
-          <FileText className="size-3" /> Editor
+        <div className="flex items-center gap-2 px-2 py-1 md:px-3 md:py-1 bg-admin-contrast/5 text-[10px] md:text-xs font-bold uppercase tracking-wider text-admin-text/60 shrink-0">
+          <FileText className="size-3" /> <span className="hidden xs:inline">Editor</span>
         </div>
-        <span className="text-xs text-admin-text/30">/</span>
-        <span className="text-xs font-medium text-admin-text/50 italic">
+        <span className="hidden xs:inline text-xs text-admin-text/30 shrink-0">/</span>
+        <span className="text-[11px] md:text-xs font-medium text-admin-text/50 italic truncate">
           {activeSlug ? `Editing: ${activeSlug}` : "New Draft"}
         </span>
         {(isUploading || isPending) && (
-          <Loader2 className="size-3 animate-spin text-admin-primary" />
+          <Loader2 className="size-3 animate-spin text-admin-primary shrink-0" />
         )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
         <button
           onClick={onToggleSplit}
-          className={`p-2 transition ${isSplit ? "bg-admin-contrast/5 text-admin-text" : " hover:bg-admin-contrast/5"}`}
+          className={`p-2 transition hidden md:block shrink-0 ${isSplit ? "bg-admin-contrast/5 text-admin-text" : " hover:bg-admin-contrast/5"}`}
         >
           <Maximize2 className="size-4" />
         </button>
-        <div className="w-px h-4 bg-admin-contrast/10 mx-1" />
+        <div className="hidden md:block w-px h-4 bg-admin-contrast/10 mx-1 shrink-0" />
 
         {activeSlug && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Button variant="outline" size="sm" onClick={onRename}>
               <FileEdit size={14} className="opacity-40" />
-              Rename
+              <span className="hidden xs:inline">Rename</span>
             </Button>
             <a
               href={getLiveUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-admin-text/60 hover:text-admin-text px-4 py-1.5 transition text-xs font-bold uppercase tracking-widest border shadow-sm hover:shadow-md active:scale-95"
+              className="flex items-center gap-2 text-admin-text/60 hover:text-admin-text px-3 py-1.5 md:px-4 md:py-1.5 transition text-[10px] md:text-xs font-bold uppercase tracking-widest border shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap"
             >
               <ExternalLink size={14} className="opacity-40" />
-              View Saved Post
+              <span className="hidden xs:inline">View Saved Post</span>
+              <span className="xs:hidden">View</span>
             </a>
           </div>
         )}
@@ -109,6 +110,7 @@ export default function EditorToolbar({
           onClick={onSave}
           disabled={isSaving || !isDirty}
           isLoading={isSaving}
+          className="shrink-0"
         >
           {!isSaving && <Save className="size-3" />}
           {activeSlug ? (isDirty ? "Save Changes" : "Saved") : "Create Post"}

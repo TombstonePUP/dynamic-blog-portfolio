@@ -18,6 +18,7 @@ import EditorPreview from "./editor/editor-preview";
 import EditorSidebar from "./editor/editor-sidebar";
 import EditorToolbar from "./editor/editor-toolbar";
 import ResizeHandle from "./editor/resize-handle";
+import { Eye, FileEdit, FolderOpen } from "lucide-react";
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 
 type BlogFolder = {
@@ -60,6 +61,7 @@ export default function MdxEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [isSplit, setIsSplit] = useState(true);
+  const [activeTab, setActiveTab] = useState<"explorer" | "editor" | "preview">("editor");
 
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const [editorWidth, setEditorWidth] = useState(600);
@@ -342,7 +344,7 @@ export default function MdxEditor({
   }
 
   return (
-    <div className="flex min-h-0 max-h-[93vh] flex-1 flex-col overflow-hidden font-sans shadow-2xl ring-1 select-none">
+    <div className="flex h-[100dvh] md:h-auto md:min-h-0 md:max-h-[93vh] flex-1 flex-col overflow-hidden font-sans shadow-2xl ring-1 select-none">
       <EditorDialogs
         isNewPostOpen={isDialogOpen}
         onCloseNewPost={() => setIsDialogOpen(false)}
@@ -378,8 +380,45 @@ export default function MdxEditor({
         getLiveUrl={getLiveUrl}
       />
 
+      {/* Mobile Tabs */}
+      <div className="flex border-b border-admin-surface-hover bg-admin-surface md:hidden shrink-0">
+        <button
+          onClick={() => setActiveTab("explorer")}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold transition-colors ${
+            activeTab === "explorer"
+              ? "bg-admin-bg text-admin-accent border-b-2 border-admin-accent"
+              : "text-admin-muted hover:text-admin-heading"
+          }`}
+        >
+          <FolderOpen size={14} />
+          Explorer
+        </button>
+        <button
+          onClick={() => setActiveTab("editor")}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold transition-colors ${
+            activeTab === "editor"
+              ? "bg-admin-bg text-admin-accent border-b-2 border-admin-accent"
+              : "text-admin-muted hover:text-admin-heading"
+          }`}
+        >
+          <FileEdit size={14} />
+          Editor
+        </button>
+        <button
+          onClick={() => setActiveTab("preview")}
+          className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold transition-colors ${
+            activeTab === "preview"
+              ? "bg-admin-bg text-admin-accent border-b-2 border-admin-accent"
+              : "text-admin-muted hover:text-admin-heading"
+          }`}
+        >
+          <Eye size={14} />
+          Preview
+        </button>
+      </div>
+
       <div className="relative flex flex-col md:flex-row flex-1 overflow-x-hidden overflow-y-auto md:overflow-hidden">
-        <div className="w-full md:w-auto shrink-0 md:h-full">
+        <div className={`w-full md:w-auto shrink-0 md:h-full ${activeTab === "explorer" ? "block" : "hidden md:block"}`}>
           <EditorSidebar
           width={sidebarWidth}
           showSidebar={showSidebar}
@@ -404,7 +443,10 @@ export default function MdxEditor({
           </div>
         ) : null}
 
-        <div className="w-full md:w-auto flex-1 shrink-0 md:h-full min-h-[50vh]">
+        <div 
+          className={`w-full md:w-auto shrink-0 md:h-full min-h-[50vh] ${isSplit ? "md:flex-none" : "flex-1"} ${activeTab === "editor" ? "block" : "hidden md:block"}`}
+          style={isSplit ? { flexBasis: editorWidth, width: editorWidth } : {}}
+        >
           <CodeMirrorInput
             ref={editorRef}
             content={content}
@@ -419,16 +461,16 @@ export default function MdxEditor({
           </div>
         ) : null}
 
-        {isSplit ? (
-          <div className="w-full md:w-auto flex-1 shrink-0 md:h-full min-h-[50vh] border-t md:border-t-0">
-          <EditorPreview
-            previewSource={previewSource}
-            activeSlug={activeSlug}
-            previewAsset={previewAsset}
-            isPending={isPending}
-            onClearPreviewAsset={() => setPreviewAsset(null)}
-            onInsertAsset={insertAsset}
-          />
+        {isSplit || activeTab === "preview" ? (
+          <div className={`w-full md:w-auto flex-1 shrink-0 md:h-full min-h-[50vh] border-t md:border-t-0 ${activeTab === "preview" ? "flex" : "hidden md:flex"}`}>
+            <EditorPreview
+              previewSource={previewSource}
+              activeSlug={activeSlug}
+              previewAsset={previewAsset}
+              isPending={isPending}
+              onClearPreviewAsset={() => setPreviewAsset(null)}
+              onInsertAsset={insertAsset}
+            />
           </div>
         ) : null}
       </div>
