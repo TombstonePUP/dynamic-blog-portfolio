@@ -40,8 +40,12 @@ export default function MdxEditor({
   const router = useRouter();
   const initialActiveSlug = searchParams.get("slug");
   
-  const [content, setContent] = useState(initialContent);
-  const [lastSavedContent, setLastSavedContent] = useState(initialContent);
+  const defaultContent = initialActiveSlug && initialBlogContents[initialActiveSlug] 
+    ? initialBlogContents[initialActiveSlug] 
+    : initialContent;
+
+  const [content, setContent] = useState(defaultContent);
+  const [lastSavedContent, setLastSavedContent] = useState(defaultContent);
   const [activeSlug, setActiveSlug] = useState<string | null>(initialActiveSlug || null);
   const [blogFolders, setBlogFolders] = useState<BlogFolder[]>(initialBlogFolders);
   const [expandedSlugs, setExpandedSlugs] = useState<Set<string>>(
@@ -144,11 +148,20 @@ export default function MdxEditor({
 
   const handleLoadPost = useCallback(
     async (slug: string) => {
+      if (typeof window !== "undefined") {
+        const currentUrlSlug = new URLSearchParams(window.location.search).get("slug");
+        if (currentUrlSlug !== slug) {
+          router.push(`?slug=${slug}`, { scroll: false });
+        }
+      }
+      
+      // Update synchronously to prevent infinite loops with useSearchParams effect
+      setActiveSlug(slug);
+
       startTransition(async () => {
         if (initialBlogContents[slug]) {
           setContent(initialBlogContents[slug]);
           setLastSavedContent(initialBlogContents[slug]);
-          setActiveSlug(slug);
           setExpandedSlugs((previous) => new Set(previous).add(slug));
           return;
         }
@@ -157,7 +170,6 @@ export default function MdxEditor({
         if (result.success) {
           setContent(result.content || "");
           setLastSavedContent(result.content || "");
-          setActiveSlug(slug);
           setExpandedSlugs((previous) => {
             const next = new Set(previous);
             next.add(slug);
@@ -170,10 +182,15 @@ export default function MdxEditor({
   );
 
   useEffect(() => {
-    if (initialActiveSlug) {
+    if (initialActiveSlug && initialActiveSlug !== activeSlug) {
       void handleLoadPost(initialActiveSlug);
+    } else if (!initialActiveSlug && activeSlug) {
+      setActiveSlug(null);
+      setContent(initialContent);
+      setLastSavedContent(initialContent);
+      setPreviewSource(null);
     }
-  }, [initialActiveSlug, handleLoadPost]);
+  }, [initialActiveSlug, activeSlug, handleLoadPost, initialContent]);
 
   function toggleExpand(slug: string) {
     const next = new Set(expandedSlugs);
@@ -191,6 +208,9 @@ export default function MdxEditor({
 
     if (result.success) {
       const nextSlug = result.slug || slug;
+      if (nextSlug !== activeSlug) {
+        router.replace(`?slug=${nextSlug}`, { scroll: false });
+      }
       setActiveSlug(nextSlug);
       setLastSavedContent(result.content || content);
       await refreshList();
@@ -268,7 +288,9 @@ export default function MdxEditor({
     const result = await renameBlogSlugAction(activeSlug, newSlug);
 
     if (result.success) {
-      setActiveSlug(result.slug || newSlug);
+      const updatedSlug = result.slug || newSlug;
+      setActiveSlug(updatedSlug);
+      router.replace(`?slug=${updatedSlug}`, { scroll: false });
       await refreshList();
     } else {
       alert(result.error || "Failed to rename slug");
