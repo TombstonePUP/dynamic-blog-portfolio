@@ -158,7 +158,7 @@ function FolderItem({
   onPreviewAsset: (asset: { slug: string; filename: string; dataUrl: string } | null) => void;
   onInsertAsset: (path: string) => void;
 }) {
-  const [assets, setAssets] = useState<{ name: string, id: string }[]>([]);
+  const [assets, setAssets] = useState<{ name: string, id: string | null }[]>([]);
   const [isLoadingAssets, startTransition] = useTransition();
   const [hasFetched, setHasFetched] = useState(false);
   const [isAssetsExpanded, setIsAssetsExpanded] = useState(false);

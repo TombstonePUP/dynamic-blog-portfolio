@@ -16,7 +16,7 @@ export interface CodeMirrorInputRef {
 interface CodeMirrorInputProps {
   content: string;
   onChange: (value: string) => void;
-  editorWidth: number;
+  editorWidth?: number;
 }
 
 const adminTheme = createTheme({

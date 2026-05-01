@@ -17,7 +17,7 @@ export default function DashboardStats({
   className?: string;
   variant?: "default" | "glass";
 }) {
-  const defaultStats = [
+  const defaultStats: Stat[] = [
     { label: "Total Stories", icon: Layout },
     { label: "Active Drafts", icon: FileEdit },
     { label: "Published", icon: Eye },

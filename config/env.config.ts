@@ -5,13 +5,13 @@
  * at runtime, enabling flexible deployment across different environments.
  */
 
-import { CLIENT_CONFIG } from "./client.config";
+import { CLIENT_CONFIG, type ClientConfig } from "./client.config";
 
 /**
  * Get merged configuration with environment variable overrides
  */
-export function getClientConfig() {
-  const config = { ...CLIENT_CONFIG };
+export function getClientConfig(): ClientConfig {
+  const config = JSON.parse(JSON.stringify(CLIENT_CONFIG)) as any;
 
   // Override site settings from environment
   if (process.env.NEXT_PUBLIC_SITE_NAME) {

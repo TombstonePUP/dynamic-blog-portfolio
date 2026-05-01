@@ -66,7 +66,7 @@ function buildFallbackProfile(user: User): ProfileRecord {
     emailName;
   const lastName =
     (typeof user.user_metadata.last_name === "string" &&
-      user.user_metadata.last_name.trim());
+      user.user_metadata.last_name.trim()) || "";
   const displayName =
     (typeof user.user_metadata.display_name === "string" &&
       user.user_metadata.display_name.trim()) ||
@@ -75,7 +75,7 @@ function buildFallbackProfile(user: User): ProfileRecord {
 
   return {
     id: user.id,
-    email: user.email,
+    email: user.email || "",
     first_name: firstName,
     last_name: lastName,
     display_name: displayName,
