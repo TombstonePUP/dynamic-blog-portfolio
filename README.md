@@ -51,19 +51,28 @@ npm install
 npm run dev
 ```
 
-3. Build for production:
-
 ```bash
 npm run build
 ```
+
+## Admin Story Editor
+
+The project features a custom, high-performance MDX editor for managing stories:
+
+- **Dual-Pane Interface**: Real-time side-by-side editing with raw MDX on the left and live preview on the right.
+- **CodeMirror Integration**: Full syntax highlighting and advanced text editing capabilities.
+- **Unified Explorer**: Manage both Story content and image assets in a single, collapsible sidebar.
+- **Relative Pathing**: Insert and preview images using simple relative paths (e.g., `./assets/hero.jpg`), which are automatically resolved to Supabase Storage URLs.
+- **Asset Upload**: Drag-and-drop or select images to upload directly into the Story's asset folder within the editor UI.
 
 ## Content Storage
 
 Stories now live in **Supabase**:
 
 - Post metadata and MDX body live in the `posts` table.
-- Story assets live in the `post-assets` Supabase Storage bucket.
-- The admin editor reads and writes against Supabase instead of `content/posts/`.
+- Story assets live in the `post-assets` Supabase Storage bucket under `{slug}/filename`.
+- The admin editor uses Server Actions (`app/actions/`) for secure data mutations.
+- The local `content/posts/` folder is now only used as a legacy import source.
 
 ### Import Existing Local Bundles
 

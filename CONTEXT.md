@@ -17,6 +17,7 @@ It acts as the single source of truth for structural decisions and must be updat
 - `app/api/`: API routes.
 - `lib/`: Server-side data fetching (`admin-data.server.ts`, `blogs.server.ts`). **Do NOT import server functions into Client Components.**
 - `components/`: UI components. Grouped by `admin/` and `ui/`.
+- `app/actions/`: Server Actions for data mutations (blog management, MDX compilation).
 
 ## Architectural Rules
 
@@ -28,13 +29,21 @@ It acts as the single source of truth for structural decisions and must be updat
    - Story assets (images) live in the `post-assets` Supabase Storage bucket.
 3. **Authentication:**
    - Admin access requires Supabase Auth and a specific `profile` status (e.g., `approval_status = 'approved'`).
-4. **Build & Deployment:**
+4. **Admin Editor Architecture**:
+   - Uses CodeMirror (`@uiw/react-codemirror`) for MDX editing with syntax highlighting.
+   - Provides a live preview via `next-mdx-remote/serialize` handled by a Server Action (`compileMdxAction`).
+   - Integrated File Explorer manages both Story content and Assets in a unified sidebar.
+5. **Asset Management & Resolution**:
+   - Assets are stored in the `post-assets` bucket under `{slug}/filename`.
+   - The editor uses relative pathing for assets (e.g., `./assets/image.jpg`).
+   - `lib/post-assets.ts` provides logic to resolve these relative paths to absolute Supabase Storage URLs for both the Admin Preview and the public site.
+6. **Build & Deployment**:
    - The app is designed to be statically exported and deployed to Cloudflare Pages. Ensure all new routes are compatible with static generation unless dynamic server features are specifically requested.
-5. **Documentation Updates:**
+7. **Documentation Updates:**
    - When architectural or design changes are made, update both CONTEXT.md and DESIGN.md to keep them authoritative.
-6. **Admin Layout Standard:**
+8. **Admin Layout Standard:**
    - Admin pages (excluding `/editor`) follow the standard layout and surface rules documented in DESIGN.md.
-7. **Linting Guidance:**
+9. **Linting Guidance:**
    - Run lint only when requested, after larger refactors, or before release to avoid excessive token usage from lint output.
 
 ## Terminology

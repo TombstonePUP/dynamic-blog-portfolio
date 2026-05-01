@@ -63,7 +63,7 @@ export default function EditorSidebar({
         style={{ width }}
       >
         <div className="flex items-center justify-between px-1 text-[11px] font-black uppercase tracking-[0.2em] text-admin-text/60">
-          <span>Post Explorer</span>
+          <span>Story Explorer</span>
           <button
             onClick={onNewDraft}
             disabled={!activeSlug}
