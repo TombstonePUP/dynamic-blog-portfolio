@@ -23,7 +23,11 @@ function normalizeAssetFolder(value: string) {
 }
 
 function normalizeAssetPath(value: string) {
-  return value.trim().replace(/^\.\/+/, "").replace(/^\/+/, "");
+  let normalized = value.trim().replace(/^\.\/+/, "").replace(/^\/+/, "");
+  if (normalized.startsWith("assets/")) {
+    normalized = normalized.slice(7);
+  }
+  return normalized;
 }
 
 function encodeObjectPath(value: string) {

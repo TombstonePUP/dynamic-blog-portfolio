@@ -10,6 +10,7 @@ interface EditorPreviewProps {
   previewAsset: { slug: string; filename: string; dataUrl: string } | null;
   isPending: boolean;
   onClearPreviewAsset: () => void;
+  onInsertAsset: (filename: string) => void;
 }
 
 export default function EditorPreview({
@@ -18,6 +19,7 @@ export default function EditorPreview({
   previewAsset,
   isPending,
   onClearPreviewAsset,
+  onInsertAsset,
 }: EditorPreviewProps) {
   if (previewAsset) {
     return (
@@ -38,7 +40,7 @@ export default function EditorPreview({
             />
           </div>
           
-          <div className="bg-admin-primary/10 px-4 py-3 rounded-sm border border-admin-primary/20 w-full">
+          <div className="bg-admin-primary/10 px-4 py-3 rounded-sm border border-admin-primary/20 w-full mb-4">
             <p className="text-[10px] uppercase font-black tracking-widest text-admin-primary mb-1">
               Relative Path
             </p>
@@ -47,9 +49,15 @@ export default function EditorPreview({
             </code>
           </div>
           
-          <p className="mt-4 text-[11px] text-admin-text/60 italic text-center">
-            Click the "+" icon in the sidebar to insert this image into your post.
-          </p>
+          <button
+            onClick={() => {
+              onInsertAsset(previewAsset.filename);
+              onClearPreviewAsset();
+            }}
+            className="w-full py-2 bg-admin-primary text-white font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-admin-primary/90 transition-colors"
+          >
+            Insert Image
+          </button>
         </div>
       </div>
     );

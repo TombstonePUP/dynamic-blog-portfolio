@@ -333,7 +333,11 @@ export default function MdxEditor({
 
   function insertAsset(filename: string) {
     if (editorRef.current) {
-      editorRef.current.insertText(`\n![Image](${filename})\n`);
+      let cleanName = filename;
+      if (cleanName.startsWith("./assets/")) cleanName = cleanName.slice(9);
+      else if (cleanName.startsWith("assets/")) cleanName = cleanName.slice(7);
+      
+      editorRef.current.insertText(`\n![Image](./assets/${cleanName})\n`);
     }
   }
 
@@ -412,6 +416,7 @@ export default function MdxEditor({
             previewAsset={previewAsset}
             isPending={isPending}
             onClearPreviewAsset={() => setPreviewAsset(null)}
+            onInsertAsset={insertAsset}
           />
         ) : null}
       </div>

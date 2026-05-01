@@ -36,14 +36,14 @@ const createComponents = (assetFolder?: string) => ({
     }
 
     return (
-      <div className="my-8 overflow-hidden rounded-xl">
+      <span className="my-8 block overflow-hidden rounded-xl">
         {/* Using standard img to avoid next/image hostname issues in preview */}
         <img
           src={src}
           className="w-full object-cover max-h-96 shadow-sm"
           alt={props.alt || ""}
         />
-      </div>
+      </span>
     );
   },
 });
