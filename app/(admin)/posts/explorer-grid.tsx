@@ -198,7 +198,15 @@ export default function ExplorerGrid({
               {filteredFolders.map((folder) => (
                 <div
                   key={folder.slug}
-                  onClick={() => setSelectedPost(folder)}
+                  onClick={() => {
+                    setSelectedPost(folder);
+                    // On mobile, single tap redirects to editor
+                    if (window.innerWidth < 1024) {
+                      router.push(
+                        `/editor?slug=${encodeURIComponent(folder.slug)}`,
+                      );
+                    }
+                  }}
                   onDoubleClick={() =>
                     router.push(
                       `/editor?slug=${encodeURIComponent(folder.slug)}`,

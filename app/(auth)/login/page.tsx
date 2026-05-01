@@ -74,6 +74,12 @@ export default async function LoginPage() {
 
       {/* ── Right panel ── */}
       <section className="relative flex flex-col items-center justify-center px-6 py-14 sm:px-10">
+        <div className="mb-8 flex flex-col items-center gap-3 lg:hidden">
+          <LogoIcon className="size-12 text-[#1f3d39]" />
+          <h1 className="text-xl font-bold tracking-tight text-[#1f3d39]">
+            theStrengthsWriter
+          </h1>
+        </div>
         <AuthForm />
         <footer className="absolute bottom-8 text-center text-sm text-gray-500">
           <p>
