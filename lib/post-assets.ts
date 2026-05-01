@@ -74,6 +74,8 @@ export function resolvePostAssetUrl(
   return value;
 }
 
+export const resolveAssetPath = resolvePostAssetUrl;
+
 export function rewritePostAssetUrls(assetFolder: string, content: string) {
   if (!content) {
     return content;

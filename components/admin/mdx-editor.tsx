@@ -5,17 +5,20 @@ import {
   getBlogListAction,
   renameBlogSlugAction,
   saveBlogContentAction,
+  createDraftAction,
+  deleteStoryAction
 } from "@/app/actions/blog-actions";
-import { useSearchParams } from "next/navigation";
+import { compileMdxAction } from "@/app/actions/mdx-actions";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import EditorDialogs from "./editor/editor-dialogs";
 import EditorFooter from "./editor/editor-footer";
-import EditorInput from "./editor/editor-input";
+import CodeMirrorInput, { type CodeMirrorInputRef } from "./editor/codemirror-input";
 import EditorPreview from "./editor/editor-preview";
 import EditorSidebar from "./editor/editor-sidebar";
 import EditorToolbar from "./editor/editor-toolbar";
-import { renderMarkdownToHtml } from "./editor/markdown-renderer";
 import ResizeHandle from "./editor/resize-handle";
+import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 
 type BlogFolder = {
   slug: string;
@@ -34,25 +37,27 @@ export default function MdxEditor({
   initialBlogContents?: Record<string, string>;
 }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialActiveSlug = searchParams.get("slug");
+  
   const [content, setContent] = useState(initialContent);
   const [lastSavedContent, setLastSavedContent] = useState(initialContent);
-  const [activeSlug, setActiveSlug] = useState<string | null>(
-    initialActiveSlug || null,
-  );
-  const [blogFolders, setBlogFolders] =
-    useState<BlogFolder[]>(initialBlogFolders);
+  const [activeSlug, setActiveSlug] = useState<string | null>(initialActiveSlug || null);
+  const [blogFolders, setBlogFolders] = useState<BlogFolder[]>(initialBlogFolders);
   const [expandedSlugs, setExpandedSlugs] = useState<Set<string>>(
-    new Set(initialActiveSlug ? [initialActiveSlug] : []),
+    new Set(initialActiveSlug ? [initialActiveSlug] : [])
   );
-  const [previewHtml, setPreviewHtml] = useState<string>("");
+  const [previewSource, setPreviewSource] = useState<MDXRemoteSerializeResult | null>(null);
+  const [previewAsset, setPreviewAsset] = useState<{ slug: string, filename: string, dataUrl: string } | null>(null);
+
+  const editorRef = useRef<CodeMirrorInputRef>(null);
 
   const [isPending, startTransition] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [isSplit, setIsSplit] = useState(true);
 
-  const [sidebarWidth, setSidebarWidth] = useState(280);
+  const [sidebarWidth, setSidebarWidth] = useState(240);
   const [editorWidth, setEditorWidth] = useState(600);
   const isResizingSidebar = useRef(false);
   const isResizingEditor = useRef(false);
@@ -118,9 +123,16 @@ export default function MdxEditor({
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setPreviewHtml(renderMarkdownToHtml(content));
-    }, 300);
+    const timer = setTimeout(async () => {
+      if (!content.trim()) {
+        setPreviewSource(null);
+        return;
+      }
+      const res = await compileMdxAction(content);
+      if (res.success && res.source) {
+        setPreviewSource(res.source);
+      }
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [content]);
@@ -194,7 +206,7 @@ export default function MdxEditor({
     void save(activeSlug);
   }
 
-  function confirmNewPost() {
+  async function confirmNewPost() {
     if (!newPostSlug.trim()) {
       return;
     }
@@ -209,17 +221,25 @@ export default function MdxEditor({
       return;
     }
 
+    setIsDialogOpen(false);
+    setNewPostSlug("");
+    setIsSaving(true);
+
     const existing = blogFolders.find((folder) => folder.slug === slug);
 
     if (existing) {
       void handleLoadPost(slug);
+      setIsSaving(false);
     } else {
-      setActiveSlug(slug);
-      void save(slug);
+      const result = await createDraftAction(slug);
+      if (result.success && result.slug) {
+        await refreshList();
+        void handleLoadPost(result.slug);
+      } else {
+        alert(result.error || "Failed to create draft");
+      }
+      setIsSaving(false);
     }
-
-    setIsDialogOpen(false);
-    setNewPostSlug("");
   }
 
   async function confirmRenameSlug() {
@@ -253,6 +273,29 @@ export default function MdxEditor({
     setIsRenameDialogOpen(false);
   }
 
+  async function handleDeletePost(slug: string) {
+    if (!confirm(`Are you sure you want to delete ${slug}?`)) {
+      return;
+    }
+
+    setIsSaving(true);
+    const result = await deleteStoryAction(slug);
+    
+    if (result.success) {
+      if (activeSlug === slug) {
+        setActiveSlug(null);
+        setContent(initialContent);
+        setLastSavedContent(initialContent);
+        setPreviewSource(null);
+        router.push("/editor");
+      }
+      await refreshList();
+    } else {
+      alert(result.error || "Failed to delete story");
+    }
+    setIsSaving(false);
+  }
+
   function getLiveUrl() {
     if (!activeSlug) {
       return "#";
@@ -261,8 +304,14 @@ export default function MdxEditor({
     return `/${activeSlug}`;
   }
 
+  function insertAsset(filename: string) {
+    if (editorRef.current) {
+      editorRef.current.insertText(`\n![Image](${filename})\n`);
+    }
+  }
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden font-sans shadow-2xl ring-1 select-none">
+    <div className="flex min-h-0 max-h-[93vh] flex-1 flex-col overflow-hidden font-sans shadow-2xl ring-1 select-none">
       <EditorDialogs
         isNewPostOpen={isDialogOpen}
         onCloseNewPost={() => setIsDialogOpen(false)}
@@ -308,21 +357,22 @@ export default function MdxEditor({
           onToggleExpand={toggleExpand}
           onLoadPost={handleLoadPost}
           onNewDraft={() => {
-            setActiveSlug(null);
-            setContent(initialContent);
-            setLastSavedContent("");
-            setPreviewHtml(renderMarkdownToHtml(initialContent));
+            setNewPostSlug("");
+            setIsDialogOpen(true);
           }}
+          onDeletePost={handleDeletePost}
+          onPreviewAsset={setPreviewAsset}
+          onInsertAsset={insertAsset}
         />
 
         {showSidebar ? (
           <ResizeHandle onMouseDown={startResizingSidebar} />
         ) : null}
 
-        <EditorInput
+        <CodeMirrorInput
+          ref={editorRef}
           content={content}
           onChange={setContent}
-          isSplit={isSplit}
           editorWidth={editorWidth}
         />
 
@@ -330,10 +380,11 @@ export default function MdxEditor({
 
         {isSplit ? (
           <EditorPreview
-            previewHtml={previewHtml}
-            previewAsset={null}
+            previewSource={previewSource}
+            activeSlug={activeSlug}
+            previewAsset={previewAsset}
             isPending={isPending}
-            onClearPreviewAsset={() => {}}
+            onClearPreviewAsset={() => setPreviewAsset(null)}
           />
         ) : null}
       </div>
