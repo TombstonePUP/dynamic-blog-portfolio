@@ -85,6 +85,7 @@ The project uses **Tailwind CSS 4** with a strict design system defined in `glob
 
 ## Key Constraints and Gotchas
 - **Terminology**: Always use **Stories** in UI copy. Database/Code may use `post`.
+- **Database Schema**: The MDX content is stored in the `content_mdx` column in the `posts` table (do not use `content`).
 - **Data Fetching**: Never import `*.server.ts` files into Client Components.
 - **Assets**: Assets must be referenced via relative paths (e.g., `./assets/image.jpg`) in MDX.
 - **Admin Access**: Desktop-only restriction enforced via layout; mobile users see a blocker.

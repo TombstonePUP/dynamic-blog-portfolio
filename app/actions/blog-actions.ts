@@ -29,7 +29,7 @@ export async function getBlogContentAction(slug: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("posts")
-    .select("content")
+    .select("content_mdx")
     .eq("slug", slug)
     .single();
 
@@ -37,7 +37,7 @@ export async function getBlogContentAction(slug: string) {
     return { success: false, error: error.message };
   }
 
-  return { success: true, content: data.content };
+  return { success: true, content: data.content_mdx };
 }
 
 export async function saveBlogContentAction(slug: string, content: string) {
@@ -53,7 +53,7 @@ export async function saveBlogContentAction(slug: string, content: string) {
   const { error } = await supabase
     .from("posts")
     .update({
-      content,
+      content_mdx: content,
       title,
       updated_at: new Date().toISOString(),
     })
@@ -78,7 +78,7 @@ export async function createDraftAction(slug: string) {
       slug,
       title: slug,
       status: "draft",
-      content: "---\ntitle: " + slug + "\n---\n\nStart writing...",
+      content_mdx: "---\ntitle: " + slug + "\n---\n\nStart writing...",
     })
     .select()
     .single();
