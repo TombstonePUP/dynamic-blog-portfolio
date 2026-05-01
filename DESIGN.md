@@ -144,6 +144,27 @@
 </div>
 ```
 
+### CodeMirror Editor
+**Anatomy:**
+```text
++-----------------------------+
+| 1 | # Heading               |
+| 2 |                         |
+| 3 | **Bold Text**           |
++-----------------------------+
+```
+**Custom Theme Tokens:**
+| Element | Color | Style |
+| :--- | :--- | :--- |
+| **Gutter BG** | `#F7F2EA` | (Cream Accent) |
+| **Line Numbers**| `#3A332F50` | (Muted Brown) |
+| **Caret** | `#1F3D39` | (Evergreen) |
+| **Selection** | `#1F3D3920` | (Soft Evergreen) |
+| **Headings** | `#1F3D39` | Bold, Graduated Sizes |
+| **Keywords** | `#1F3D39` | Bold |
+| **Strings/URLs**| `#2B776A` | (Soft Teal) |
+| **Font** | `JetBrains Mono`| 13px |
+
 ### Modal / Overlay
 **Anatomy:**
 ```text

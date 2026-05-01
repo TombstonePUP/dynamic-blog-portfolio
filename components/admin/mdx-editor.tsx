@@ -59,6 +59,9 @@ export default function MdxEditor({
 
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const [editorWidth, setEditorWidth] = useState(600);
+  
+  const sidebarWidthRef = useRef(sidebarWidth);
+  const showSidebarRef = useRef(showSidebar);
   const isResizingSidebar = useRef(false);
   const isResizingEditor = useRef(false);
 
@@ -69,44 +72,46 @@ export default function MdxEditor({
 
   const isDirty = content !== lastSavedContent;
 
-  const handleMouseMove = useCallback(
-    (event: MouseEvent) => {
-      if (isResizingSidebar.current) {
-        setSidebarWidth(Math.max(200, Math.min(500, event.clientX)));
-      }
+  useEffect(() => {
+    sidebarWidthRef.current = sidebarWidth;
+  }, [sidebarWidth]);
 
-      if (isResizingEditor.current) {
-        const currentSidebarWidth = showSidebar ? sidebarWidth : 0;
-        setEditorWidth(Math.max(300, event.clientX - currentSidebarWidth));
-      }
-    },
-    [showSidebar, sidebarWidth],
-  );
+  useEffect(() => {
+    showSidebarRef.current = showSidebar;
+  }, [showSidebar]);
 
-  const stopResizing = useCallback(
-    function handleStopResizing() {
-      isResizingSidebar.current = false;
-      isResizingEditor.current = false;
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleStopResizing);
-      document.body.style.cursor = "default";
-      document.body.style.userSelect = "auto";
-    },
-    [handleMouseMove],
-  );
+  const handleMouseMove = useCallback((event: MouseEvent) => {
+    if (isResizingSidebar.current) {
+      setSidebarWidth(Math.max(200, Math.min(500, event.clientX)));
+    }
+
+    if (isResizingEditor.current) {
+      const currentSidebarWidth = showSidebarRef.current ? sidebarWidthRef.current : 0;
+      setEditorWidth(Math.max(300, event.clientX - currentSidebarWidth));
+    }
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    isResizingSidebar.current = false;
+    isResizingEditor.current = false;
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", stopResizing);
+    document.body.style.cursor = "default";
+    document.body.style.userSelect = "auto";
+  }, [handleMouseMove]);
 
   const startResizingSidebar = useCallback(() => {
     isResizingSidebar.current = true;
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", stopResizing);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", stopResizing);
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
   }, [handleMouseMove, stopResizing]);
 
   const startResizingEditor = useCallback(() => {
     isResizingEditor.current = true;
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", stopResizing);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", stopResizing);
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
   }, [handleMouseMove, stopResizing]);
@@ -373,7 +378,7 @@ export default function MdxEditor({
           ref={editorRef}
           content={content}
           onChange={setContent}
-          editorWidth={editorWidth}
+          editorWidth={isSplit ? editorWidth : undefined}
         />
 
         {isSplit ? <ResizeHandle onMouseDown={startResizingEditor} /> : null}
