@@ -22,33 +22,28 @@ interface CodeMirrorInputProps {
 const adminTheme = createTheme({
   theme: "light",
   settings: {
-    background: "#ffffff",
-    foreground: "#3a332f",
-    caret: "#1f3d39",
-    selection: "#1f3d3920",
-    selectionMatch: "#1f3d3930",
-    lineHighlight: "#f7f2ea50",
-    gutterBackground: "#f7f2ea",
-    gutterForeground: "#3a332f50",
+    background: "transparent",
+    foreground: "var(--color-admin-text)",
+    caret: "var(--color-admin-accent)",
+    selection: "var(--color-admin-accent)",
+    selectionMatch: "var(--color-admin-muted)",
+    lineHighlight: "transparent",
+    gutterBackground: "transparent",
+    gutterForeground: "var(--color-admin-muted)",
   },
   styles: [
-    { tag: t.heading1, fontSize: "1.6em", fontWeight: "bold", color: "#1f3d39" },
-    { tag: t.heading2, fontSize: "1.4em", fontWeight: "bold", color: "#1f3d39" },
-    { tag: t.heading3, fontSize: "1.2em", fontWeight: "bold", color: "#1f3d39" },
-    { tag: t.keyword, color: "#1f3d39", fontWeight: "bold" },
-    { tag: t.comment, color: "#7b6f64", fontStyle: "italic" },
-    { tag: t.url, color: "#2b776a", textDecoration: "underline" },
-    { tag: t.strong, fontWeight: "bold" },
-    { tag: t.emphasis, fontStyle: "italic" },
-    { tag: t.link, color: "#1f3d39", textDecoration: "underline" },
-    { tag: t.strikethrough, textDecoration: "line-through" },
-    { tag: t.meta, color: "#7b6f64" },
-    { tag: t.link, color: "#1f3d39" },
-    { tag: t.atom, color: "#b4534a" },
-    { tag: t.bool, color: "#b4534a" },
-    { tag: t.number, color: "#b4534a" },
-    { tag: t.string, color: "#2b776a" },
-    { tag: t.variableName, color: "#3a332f" },
+    { tag: t.heading1, fontSize: "1.6em", fontWeight: "bold", color: "var(--color-admin-heading)" },
+    { tag: t.heading2, fontSize: "1.4em", fontWeight: "bold", color: "var(--color-admin-heading)" },
+    { tag: t.heading3, fontSize: "1.2em", fontWeight: "bold", color: "var(--color-admin-heading)" },
+    { tag: t.keyword, color: "var(--color-admin-accent)", fontWeight: "bold" },
+    { tag: t.comment, color: "var(--color-admin-muted)", fontStyle: "italic" },
+    { tag: t.url, color: "var(--color-admin-info)", textDecoration: "underline" },
+    { tag: t.link, color: "var(--color-admin-info)", textDecoration: "underline" },
+    { tag: t.strong, fontWeight: "bold", color: "var(--color-admin-heading)" },
+    { tag: t.emphasis, fontStyle: "italic", color: "var(--color-admin-text)" },
+    { tag: t.strikethrough, textDecoration: "line-through", color: "var(--color-admin-muted)" },
+    { tag: t.list, color: "var(--color-admin-text)" },
+    { tag: t.meta, color: "var(--color-admin-muted)" },
   ],
 });
 
@@ -77,7 +72,7 @@ const CodeMirrorInput = forwardRef<CodeMirrorInputRef, CodeMirrorInputProps>(
 
     return (
       <div 
-        className={`overflow-hidden border-r bg-white font-mono ${editorWidth ? "md:shrink-0 flex-1 md:flex-none" : "flex-1"}`}
+        className={`overflow-hidden border-r bg-admin-surface font-mono ${editorWidth ? "md:shrink-0 flex-1 md:flex-none" : "flex-1"}`}
         style={editorWidth ? { flexBasis: editorWidth, width: "100%" } : {}}
       >
         <CodeMirror

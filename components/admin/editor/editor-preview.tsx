@@ -32,7 +32,7 @@ export default function EditorPreview({
         </button>
         
         <div className="flex flex-col items-center justify-center h-full max-w-2xl mx-auto">
-          <div className="w-full bg-white shadow-xl ring-1 ring-black/5 p-4 mb-6">
+          <div className="w-full bg-admin-surface shadow-xl ring-1 ring-black/5 p-4 mb-6">
             <img 
               src={previewAsset.dataUrl} 
               alt={previewAsset.filename}
@@ -54,7 +54,7 @@ export default function EditorPreview({
               onInsertAsset(previewAsset.filename);
               onClearPreviewAsset();
             }}
-            className="w-full py-2 bg-admin-primary text-white font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-admin-primary/90 transition-colors"
+            className="w-full py-2 bg-admin-primary text-admin-contrast font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-admin-primary/90 transition-colors"
           >
             Insert Image
           </button>
