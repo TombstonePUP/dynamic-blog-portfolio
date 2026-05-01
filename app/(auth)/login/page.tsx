@@ -21,7 +21,7 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen lg:grid-cols-[1.1fr_0.9fr]">
+    <main className="grid min-h-screen max-h-screen overflow-hidden lg:grid-cols-[1.1fr_0.9fr]">
       {/* ── Left panel ── */}
       <section className="relative flex flex-col overflow-hidden bg-[#1f3d39] px-8 text-[#f7f2ea] sm:px-12 lg:px-16">
         {/* Diagonal overlay */}
@@ -62,7 +62,7 @@ export default async function LoginPage() {
         <div className="absolute z-20 bottom-16">
           <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl">
             Write, refine, and <br />
-            <span className="text-white/40">publish from one place.</span>
+            <span className="text-gray-400">publish from one place.</span>
           </h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-white/60">
             Your editor now runs on Supabase-backed authentication and post

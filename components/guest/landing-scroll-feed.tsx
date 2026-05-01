@@ -153,7 +153,7 @@ export default function LandingScrollFeed({
     <div className="relative font-sans">
       <section
         id="featured"
-        className="relative z-10 mx-auto w-full max-w-[1440px] -mt-20 scroll-mt-24 px-4 sm:px-8 lg:-mt-75"
+        className="relative z-10 mx-auto w-full max-w-[1440px] mt-[-17vh] scroll-mt-24 px-4 sm:px-8 lg:mt-[-19vh]"
       >
         <div className="mx-auto max-w-7xl bg-[#f3f2f0] shadow-[0_-12px_40px_-20px_rgba(0,0,0,0.12)]">
           <div className="border-t-[10px] border-[#72dbcc] px-4 py-10 text-center sm:px-6 sm:py-12">
@@ -193,7 +193,7 @@ export default function LandingScrollFeed({
                 </p>
               </div>
               <span className="text-xs font-semibold uppercase tracking-wider text-[#72dbcc]">
-                Infinite-style feed
+                Latest feed
               </span>
             </div>
 
