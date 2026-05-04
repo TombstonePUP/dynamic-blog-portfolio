@@ -1,31 +1,16 @@
 "use client";
 
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/db/supabase/client";
+import { authSchema, type AuthFormValues } from "@/validators/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 type AuthMode = "sign-in" | "sign-up";
 
 const supabase = createClient();
-
-const authSchema = z
-  .object({
-    email: z.string().email("Please enter a valid email address."),
-    password: z.string().min(6, "Password must be at least 6 characters."),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-  })
-  .refine((data) => {
-    // If we wanted to enforce firstName/lastName here, we'd need the mode.
-    // But we can also do it in the handleSubmit or with a dynamic schema.
-    return true;
-  }, {});
-
-type AuthFormValues = z.infer<typeof authSchema>;
 
 export default function AuthForm() {
   const router = useRouter();

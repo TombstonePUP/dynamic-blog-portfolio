@@ -1,9 +1,8 @@
 import BackButton from "@/components/guest/back-button";
 import { slugToTag } from "@/data/blog";
-import { getBlogs } from "@/lib/blogs.server";
-
-import { getThemeColor } from "@/lib/theme";
-import type { Blog, Tag } from "@/types/blog";
+import { getThemeColor } from "@/features/posts/lib/tag-theme";
+import type { Blog, Tag } from "@/features/posts/types";
+import { getBlogs } from "@/services/posts";
 import { ArrowRight } from "lucide-react";
 import { Metadata } from "next";
 import Image from "next/image";

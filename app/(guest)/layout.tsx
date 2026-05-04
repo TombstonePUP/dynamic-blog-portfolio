@@ -6,7 +6,7 @@ import ScrollToTop from "@/components/scroll-to-top";
 import { Metadata } from "next";
 import { Hanken_Grotesk } from "next/font/google";
 
-import { getBlogs } from "@/lib/blogs.server";
+import { getBlogs } from "@/services/posts";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],

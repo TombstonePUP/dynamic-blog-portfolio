@@ -1,6 +1,6 @@
 "use client";
 
-import type { Blog } from "@/types/blog";
+import type { Blog } from "@/features/posts/types";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

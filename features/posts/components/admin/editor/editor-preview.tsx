@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { ClientMDXRemote } from "@/components/mdx/client-mdx-remote";
+import { ClientMDXRemote } from "@/features/posts/components/mdx/client-mdx-remote";
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 
 interface EditorPreviewProps {

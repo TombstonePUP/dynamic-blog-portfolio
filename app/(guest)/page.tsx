@@ -1,6 +1,6 @@
 import LandingHero from "@/components/guest/landing-hero";
 import LandingScrollFeed from "@/components/guest/landing-scroll-feed";
-import { getBlogs } from "@/lib/blogs.server";
+import { getBlogs } from "@/services/posts";
 
 export default async function LandingPage() {
   const blogs = await getBlogs();

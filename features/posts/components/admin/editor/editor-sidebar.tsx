@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useTransition, useRef } from "react";
 import { getBlogAssetsAction } from "@/app/actions/blog-actions";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/db/supabase/client";
 
 type BlogFolder = {
   slug: string;

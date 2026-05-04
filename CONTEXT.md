@@ -25,69 +25,66 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 | **Storage** | Supabase Storage (Bucket: `post-assets`) |
 | **Content** | MDX via `next-mdx-remote` |
 | **Runtime** | Node.js / Edge Runtime |
-| **Package Manager**| npm |
+| **Package Manager** | npm |
 
 ## Project Structure
 ```text
 /
-├── app/                     # Next.js App Router root
-│   ├── (admin)/             # Authenticated CMS/dashboard routes
-│   │   ├── dashboard/       # Main admin overview
-│   │   ├── editor/          # Custom Story editor (CodeMirror + Preview)
-│   │   ├── layout.tsx       # Admin shell with header and auth checks
-│   │   └── login/           # Admin authentication page
-│   ├── actions/             # Server Actions for mutations (blog-actions.ts, mdx-actions.ts)
-│   ├── api/                 # API Routes for search and admin utilities
-│   ├── globals.css          # Global styles and Tailwind 4 theme tokens
-│   └── layout.tsx           # Global root layout
-├── components/              # Shared UI components
-│   ├── admin/               # Admin-specific components (editor, dashboard)
-│   │   ├── editor/          # Specialized editor sub-components
-│   │   └── ui/              # Low-level admin design system components (Button, Modal)
-│   ├── guest/               # Guest-facing components (search, mobile menu)
-│   ├── mdx/                 # MDX rendering components
-│   └── ui/                  # General UI components
-├── lib/                     # Core business logic and data fetching
-│   ├── admin-data.server.ts # Server-only admin data utilities
-│   ├── blogs.server.ts      # Server-only guest data utilities
-│   └── post-assets.ts       # Asset path resolution logic
-├── scripts/                 # Migration and seeding utilities
-├── services/                # External service integrations (auth.ts)
-├── supabase/                # Local database schema and migrations
-├── types/                   # TypeScript definitions
-└── utils/                   # Shared utility functions (supabase client/server creators)
+|-- app/                     # Next.js App Router root with route groups, route handlers, and thin actions
+|   |-- (admin)/             # Authenticated CMS and dashboard routes
+|   |-- (auth)/              # Authentication routes and approval flow
+|   |-- (guest)/             # Public reader and marketing routes
+|   |-- actions/             # Thin Server Actions delegating to services
+|   `-- api/                 # API routes and admin asset handlers
+|-- components/              # Shared layout, branding, guest UI, and compatibility entrypoints
+|-- db/                      # Supabase clients plus query and persistence modules
+|   |-- queries/             # Database and storage query modules for posts and profiles
+|   `-- supabase/            # Browser, server, and proxy Supabase client factories
+|-- features/                # Feature-owned UI and feature-local helpers
+|   |-- auth/                # Authentication components and server context
+|   |-- posts/               # Story editor UI, MDX rendering, and post-specific helpers
+|   `-- users/               # Profile forms and user-management helpers
+|-- services/                # Route-facing business logic entrypoints
+|-- validators/              # Shared Zod schemas for auth, users, and post actions
+|-- lib/                     # Backward-compatible shims for older shared imports
+|-- scripts/                 # Migration and seeding utilities
+|-- supabase/                # Local database schema and migrations
+|-- types/                   # Backward-compatible type re-exports
+`-- utils/                   # Backward-compatible Supabase import shims
 ```
 
 ## Layout System
 | Layout | File | Used By | Styling Approach |
 | :--- | :--- | :--- | :--- |
 | **Root** | `app/layout.tsx` | All pages | Minimal; manages fonts and global context. |
-| **Guest** | `app/(guest)/layout.tsx` | `/`, `/about`, `/topics`, etc. | Uses `Hanken Grotesk` font; includes `GuestHeader` and `GuestFooter`. |
-| **Admin** | `app/(admin)/layout.tsx` | `/dashboard`, `/editor` | Uses `Inter` font; includes `AdminHeader`; implements mobile blocker. |
+| **Guest** | `app/(guest)/layout.tsx` | `/`, `/about`, `/topics`, and story routes | Uses `Hanken Grotesk`; includes `GuestHeader` and `GuestFooter`. |
+| **Admin** | `app/(admin)/layout.tsx` | `/dashboard`, `/editor`, `/posts`, `/users`, `/profile` | Uses `Inter`; includes `AdminHeader`; enforces approved desktop access. |
+| **Auth** | `app/(auth)/layout.tsx` | `/login`, `/pending`, `/auth-error` | Lightweight auth shell for sign-in and approval flows. |
 
 ## Routing Conventions
 | Pattern | Layout | Note |
 | :--- | :--- | :--- |
 | `/` | Guest | Portfolio landing page with featured stories. |
 | `/topics` | Guest | Filterable list of story categories. |
-| `/login` | Admin | Access point for story authors. |
-| `/dashboard`| Admin | Overview of stories and draft status. |
+| `/login` | Auth | Access point for story authors. |
+| `/dashboard` | Admin | Overview of stories and draft status. |
 | `/editor` | Admin | Specialized workspace for MDX editing. |
 | `/[slug]` | Guest | Dynamic story rendering via MDX. |
 
 ## Render Mode
-- **Hybrid Rendering**: The app uses Server-Side Rendering (SSR) for data fetching in `page.tsx` files and Client-Side Rendering (CSR) for interactive elements (Editor, Search, Modals).
-- **Static Generation**: Designed for static export compatibility where possible, but currently relies on SSR for dynamic story retrieval from Supabase.
-- **Gotchas**: Always use `createClient` from `@/utils/supabase/server` in Server Components and `@/utils/supabase/client` in Client Components.
+- **Hybrid Rendering**: The app uses Server-Side Rendering (SSR) for data fetching in `page.tsx` files and Client-Side Rendering (CSR) for interactive elements such as the editor, search modal, and comments.
+- **Dynamic Data Source**: Guest and admin content now resolve through services backed by Supabase data and storage.
+- **Gotchas**: Prefer `@/db/supabase/server` in Server Components and `@/db/supabase/client` in Client Components; `@/utils/supabase/*` now exists only as a compatibility shim layer.
 
 ## Styling Approach
 The project uses **Tailwind CSS 4** with a strict design system defined in `globals.css`. We use CSS variables for theme tokens and avoid ad-hoc color values in JSX. Layouts use CSS Grid and Flexbox for responsiveness. Refer to **DESIGN.md** for the full specification of tokens and components.
 
 ## Key Constraints and Gotchas
-- **Terminology**: Always use **Stories** in UI copy. Database/Code may use `post`.
+- **Terminology**: Always use **Stories** in UI copy. Database and code may still use `post`.
+- **Architecture**: Route files should stay thin and delegate business logic to `services/`, feature UI to `features/`, and persistence to `db/queries/`.
 - **Database Schema**: The MDX content is stored in the `content_mdx` column in the `posts` table (do not use `content`).
-- **Data Fetching**: Never import `*.server.ts` files into Client Components.
-- **Assets**: Assets must be referenced via relative paths (e.g., `./assets/image.jpg`) in MDX.
-- **Admin Access**: Desktop-only restriction enforced via layout; mobile users see a blocker.
-- **Mutations**: All database updates must go through **Server Actions** in `app/actions/`.
+- **Data Fetching**: Never import server-only modules into Client Components.
+- **Assets**: Assets must be referenced via relative paths such as `./assets/image.jpg` in MDX.
+- **Admin Access**: Desktop-only restriction is enforced via layout; mobile users see a blocker.
+- **Mutations**: All database updates must go through Server Actions in `app/actions/`.
 - **MDX**: Use `ClientMDXRemote` for previewing to avoid hostname whitelist issues with `next/image`.

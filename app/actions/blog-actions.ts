@@ -1,155 +1,109 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import {
+  createEditorDraft,
+  deleteEditorStory,
+  getEditorBlogAssets,
+  getEditorBlogContent,
+  getEditorBlogList,
+  renameEditorStorySlug,
+  saveEditorBlogContent,
+} from "@/services/posts";
 
 export async function getBlogListAction() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("slug, title, status, updated_at")
-    .order("updated_at", { ascending: false });
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    return {
+      success: true as const,
+      list: await getEditorBlogList(),
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to load stories.",
+    };
   }
-
-  return {
-    success: true,
-    list: data.map((item) => ({
-      slug: item.slug,
-      title: item.title,
-      status: item.status,
-      updatedAt: item.updated_at,
-    })),
-  };
 }
 
 export async function getBlogContentAction(slug: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("posts")
-    .select("content_mdx")
-    .eq("slug", slug)
-    .single();
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    return {
+      success: true as const,
+      content: await getEditorBlogContent(slug),
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to load story content.",
+    };
   }
-
-  return { success: true, content: data.content_mdx };
 }
 
 export async function saveBlogContentAction(slug: string, content: string) {
-  const supabase = await createClient();
+  try {
+    const result = await saveEditorBlogContent(slug, content);
 
-  // Basic title extraction from frontmatter or content
-  let title = slug;
-  const titleMatch = content.match(/title:\s*(.*)/);
-  if (titleMatch?.[1]) {
-    title = titleMatch[1].trim().replace(/^["']|["']$/g, "");
+    revalidatePath("/editor");
+    revalidatePath(`/${result.slug}`);
+
+    return { success: true as const, ...result };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to save story.",
+    };
   }
-
-  const { error } = await supabase
-    .from("posts")
-    .update({
-      content_mdx: content,
-      title,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("slug", slug);
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  revalidatePath("/editor");
-  revalidatePath(`/${slug}`);
-  
-  return { success: true, content, slug };
 }
 
 export async function createDraftAction(slug: string) {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from("posts")
-    .insert({
-      slug,
-      title: slug,
-      status: "draft",
-      content_mdx: "---\ntitle: " + slug + "\n---\n\nStart writing...",
-    })
-    .select()
-    .single();
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    const result = await createEditorDraft(slug);
+    revalidatePath("/editor");
+    return { success: true as const, slug: result.slug };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to create draft.",
+    };
   }
-
-  revalidatePath("/editor");
-  return { success: true, slug: data.slug };
 }
 
 export async function deleteStoryAction(slug: string) {
-  const supabase = await createClient();
-  
-  // 1. Delete assets from storage
-  const { data: files } = await supabase.storage
-    .from("post-assets")
-    .list(slug);
-
-  if (files && files.length > 0) {
-    await supabase.storage
-      .from("post-assets")
-      .remove(files.map(f => `${slug}/${f.name}`));
+  try {
+    await deleteEditorStory(slug);
+    revalidatePath("/editor");
+    return { success: true as const };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to delete story.",
+    };
   }
-
-  // 2. Delete the database row
-  const { error } = await supabase
-    .from("posts")
-    .delete()
-    .eq("slug", slug);
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  revalidatePath("/editor");
-  return { success: true };
 }
 
 export async function renameBlogSlugAction(oldSlug: string, newSlug: string) {
-  const supabase = await createClient();
-  
-  // This is complex because we'd need to move storage objects too.
-  // For now, let's just update the DB row.
-  const { error } = await supabase
-    .from("posts")
-    .update({ slug: newSlug })
-    .eq("slug", oldSlug);
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    const result = await renameEditorStorySlug(oldSlug, newSlug);
+    revalidatePath("/editor");
+    return { success: true as const, slug: result.slug };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to rename story slug.",
+    };
   }
-
-  revalidatePath("/editor");
-  return { success: true, slug: newSlug };
 }
 
 export async function getBlogAssetsAction(slug: string) {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase.storage
-    .from("post-assets")
-    .list(slug);
-
-  if (error) {
-    return { success: false, error: error.message };
+  try {
+    return {
+      success: true as const,
+      assets: await getEditorBlogAssets(slug),
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to load story assets.",
+    };
   }
-
-  return { 
-    success: true, 
-    assets: data.map(f => ({ name: f.name, id: f.id })) 
-  };
 }

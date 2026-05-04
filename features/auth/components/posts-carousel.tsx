@@ -1,6 +1,6 @@
 "use client";
 
-import type { Blog } from "@/types/blog";
+import type { Blog } from "@/features/posts/types";
 import { User } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";

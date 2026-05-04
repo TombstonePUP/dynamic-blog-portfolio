@@ -1,12 +1,9 @@
 import { LogoIcon } from "@/components/app-logo";
-import {
-  getAuthenticatedContext,
-  isApprovedProfile,
-} from "@/lib/admin-data.server";
+import AuthForm from "@/features/auth/components/auth-form";
+import DashboardPreview from "@/features/auth/components/dashboard-preview";
+import { getAuthenticatedContext, isApprovedProfile } from "@/services/auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import AuthForm from "./auth-form";
-import DashboardPreview from "./dashboard-preview";
 
 export const metadata = {
   title: "Login | The Strengths Writer",
@@ -52,7 +49,7 @@ export default async function LoginPage() {
         </nav>
 
         {/* 3D perspective container */}
-        <div className="pointer-events-none relative z-20 h-full mt-14  shrink-0 overflow-hidden [mask-image:radial-gradient(white_30%,transparent_90%)] [perspective:4000px] [perspective-origin:center]">
+        <div className="pointer-events-none relative z-20 mt-14 h-full shrink-0 overflow-hidden [mask-image:radial-gradient(white_30%,transparent_90%)] [perspective:4000px] [perspective-origin:center]">
           <div className="[-translate-y-10] [-translate-z-10] [transform:rotateX(10deg)_rotateY(20deg)_rotateZ(-10deg)] [transform-style:preserve-3d]">
             <DashboardPreview />
           </div>

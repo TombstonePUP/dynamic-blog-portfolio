@@ -1,6 +1,6 @@
 "use client";
 
-import StoryCard from "@/components/admin/story-card";
+import StoryCard from "./story-card";
 import {
   Calendar,
   FileEdit,

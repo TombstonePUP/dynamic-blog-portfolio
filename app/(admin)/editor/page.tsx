@@ -1,7 +1,7 @@
-import MdxEditor from "@/components/admin/mdx-editor";
-import { buildEditorContentFromPost, getOwnedPosts } from "@/lib/admin-data.server";
-import { Suspense } from "react";
+import MdxEditor from "@/features/posts/components/admin/mdx-editor";
+import { buildEditorContentFromPost, getOwnedPosts } from "@/services/posts";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Writer | The Strengths Writer",

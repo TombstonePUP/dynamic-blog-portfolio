@@ -1,7 +1,7 @@
 "use client";
 
-import { getThemeColor } from "@/lib/theme";
-import type { Blog } from "@/types/blog";
+import { getThemeColor } from "@/features/posts/lib/tag-theme";
+import type { Blog } from "@/features/posts/types";
 import { ArrowRight, Search, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
