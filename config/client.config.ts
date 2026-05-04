@@ -24,7 +24,7 @@ export const CLIENT_CONFIG = {
 
   // Authentication Settings
   auth: {
-    primaryAdminEmail: "sanjuanregie@gmail.com",
+    primaryAdminEmail: "superadmin@strengthwriter.com",
     oauth: {
       enableGithub: true,
       enableGoogle: true,

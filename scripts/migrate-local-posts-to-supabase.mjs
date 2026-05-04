@@ -4,7 +4,7 @@ import matter from "gray-matter";
 import { createClient } from "@supabase/supabase-js";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
-const PRIMARY_ADMIN_EMAIL = "sanjuanregie@gmail.com";
+const PRIMARY_ADMIN_EMAIL = "superadmin@strengthwriter.com";
 const DRY_RUN = process.argv.includes("--dry-run");
 const MIME_TYPES = {
   ".avif": "image/avif",

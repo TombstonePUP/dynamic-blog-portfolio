@@ -11,7 +11,7 @@ import { redirect } from "next/navigation";
 
 export type { ApprovalStatus, ProfileRecord, UserRole };
 
-export const PRIMARY_ADMIN_EMAIL = "sanjuanregie@gmail.com";
+export const PRIMARY_ADMIN_EMAIL = "superadmin@strengthwriter.com";
 
 export type AuthContext = {
   supabase: Awaited<ReturnType<typeof createClient>>;

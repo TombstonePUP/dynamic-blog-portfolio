@@ -2,9 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 
-const PRIMARY_ADMIN_EMAIL = "sanjuanregie@gmail.com";
-const DEFAULT_FIRST_NAME = "Regie";
-const DEFAULT_LAST_NAME = "San Juan";
+const PRIMARY_ADMIN_EMAIL = "superadmin@strengthwriter.com";
+const DEFAULT_FIRST_NAME = "Super";
+const DEFAULT_LAST_NAME = "Admin";
 
 function loadEnvFile(filePath) {
   if (!fs.existsSync(filePath)) {
