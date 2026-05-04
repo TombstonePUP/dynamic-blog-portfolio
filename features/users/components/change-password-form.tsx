@@ -2,27 +2,10 @@
 
 import { updateUserProfile } from "@/app/actions/user-management-actions";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { passwordSchema, type PasswordFormValues } from "@/validators/users";
 import { Loader2, LockKeyhole } from "lucide-react";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import * as z from "zod";
-
-const passwordSchema = z
-  .object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  })
-  .refine((data) => data.newPassword !== data.currentPassword, {
-    message: "New password must be different from current password",
-    path: ["newPassword"],
-  });
-
-type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function ChangePasswordForm() {
   const [submitting, setSubmitting] = useState(false);

@@ -1,6 +1,8 @@
-import DashboardStats from "@/components/admin/dashboard-stats";
-import StoryCard from "@/components/admin/story-card";
-import { getOwnedPosts, isAdminProfile } from "@/lib/admin-data.server";
+import DashboardStats from "@/features/posts/components/admin/dashboard-stats";
+import StoryCard from "@/features/posts/components/admin/story-card";
+import { isAdminProfile } from "@/services/auth";
+import { getOwnedPosts } from "@/services/posts";
+import { countPendingApprovals } from "@/services/users";
 import { Eye, FileEdit, Layout, Users } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -11,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardHome() {
-  const { posts, profile, supabase } = await getOwnedPosts();
+  const { posts, profile } = await getOwnedPosts();
   const recentStories = posts.slice(0, 6);
   const publishedCount = posts.filter(
     (post) => post.status === "published",
@@ -21,16 +23,7 @@ export default async function DashboardHome() {
     (post) => post.status === "archived",
   ).length;
   const isAdmin = isAdminProfile(profile);
-  let pendingApprovals = 0;
-
-  if (isAdmin) {
-    const { count } = await supabase
-      .from("profiles")
-      .select("id", { count: "exact", head: true })
-      .eq("approval_status", "pending");
-
-    pendingApprovals = count || 0;
-  }
+  const pendingApprovals = isAdmin ? await countPendingApprovals() : 0;
 
   const stats = [
     { label: "Total Stories", value: String(posts.length), icon: Layout },

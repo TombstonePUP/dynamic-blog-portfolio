@@ -1,4 +1,4 @@
-import StaticMdxEditor from "@/components/admin/static-mdx-editor";
+import StaticMdxEditor from "@/features/posts/components/admin/static-mdx-editor";
 
 export default function StaticEditorPage() {
   return (

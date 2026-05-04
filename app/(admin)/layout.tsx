@@ -1,8 +1,5 @@
 import "@/app/globals.css";
-import {
-  isAdminProfile,
-  requireApprovedContext,
-} from "@/lib/admin-data.server";
+import { isAdminProfile, requireApprovedContext } from "@/services/auth";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
@@ -17,7 +14,6 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "600"],
 });
-
 import AdminHeader from "@/components/admin/header";
 
 export default async function RootLayout({

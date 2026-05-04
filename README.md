@@ -17,17 +17,21 @@ The **Dynamic Blog Portfolio** (The Strengths Writer) is a professional CMS and 
 - **Unified Media Explorer**: Manage story content and image assets directly within the sidebar.
 - **Supabase Powered**: Dynamic story storage, authentication, and asset management via Supabase.
 - **Responsive Layouts**: Desktop-optimized admin dashboard and mobile-friendly reader site.
-- **Static Export Compatible**: Built to be performant and deployable to modern edge platforms like Cloudflare Pages.
+- **Server Runtime Ready**: Structured for Node-compatible deployment targets such as Vercel.
 
 ## Project Structure
 ```text
 /
-├── app/               # Core routing and application logic
-├── components/        # Reusable UI components (Admin & Guest)
-├── lib/               # Server-side utilities and data fetching
-├── scripts/           # Migration and admin seeding tools
-├── supabase/          # Database migrations and schema
-└── utils/             # Supabase client and server factories
+|-- app/               # App Router routes, layouts, route handlers, and thin server actions
+|-- components/        # Shared layout, branding, guest UI, and compatibility entrypoints
+|-- features/          # Feature-owned UI and feature-local helpers for auth, posts, and users
+|-- services/          # Business logic entrypoints consumed by routes and actions
+|-- db/                # Supabase clients plus persistence/query modules
+|-- validators/        # Centralized Zod schemas for auth, users, and post actions
+|-- lib/               # Compatibility shims for older shared import paths
+|-- scripts/           # Migration and admin seeding tools
+|-- supabase/          # Database migrations and schema
+`-- utils/             # Compatibility shims for legacy Supabase imports
 ```
 
 ## Getting Started
@@ -54,7 +58,7 @@ The **Dynamic Blog Portfolio** (The Strengths Writer) is a professional CMS and 
 | `npm run build` | Compiles the production application. |
 | `npm run supabase:push` | Pushes pending database migrations to Supabase. |
 | `npm run supabase:seed-admin` | Seeds or repairs the primary admin account. |
-| `npm run supabase:import-posts`| Migrates legacy local MDX posts to Supabase. |
+| `npm run supabase:import-posts` | Migrates legacy local MDX posts to Supabase. |
 
 ## Environment Variables
 | Variable | Purpose | Required |
@@ -63,7 +67,7 @@ The **Dynamic Blog Portfolio** (The Strengths Writer) is a professional CMS and 
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public API key (Anon key). | Yes |
 | `SUPABASE_SERVICE_ROLE_KEY` | Admin API key for migrations/seeding. | Yes (Dev only) |
 | `SUPABASE_DB_URL` | Postgres connection string for migrations. | Yes (Dev only) |
-| `NEXT_PUBLIC_SUPABASE_POST_ASSETS_BUCKET`| Name of the storage bucket for images. | Optional (Default: `post-assets`) |
+| `NEXT_PUBLIC_SUPABASE_POST_ASSETS_BUCKET` | Name of the storage bucket for images. | Optional (Default: `post-assets`) |
 
 ## Contributing
 Please follow the standard branching strategy:
@@ -72,6 +76,6 @@ Please follow the standard branching strategy:
 - Feature branches should be branched from `staging`.
 
 ## License
-MIT © 2026 The Strengths Writer
+MIT (c) 2026 The Strengths Writer
 
-<!-- last updated: 2026-05-01 -->
+<!-- last updated: 2026-05-04 -->

@@ -1,6 +1,6 @@
 "use client";
 
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/db/supabase/client";
 import { MessageCircle, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 

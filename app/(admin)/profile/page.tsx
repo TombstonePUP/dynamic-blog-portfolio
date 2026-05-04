@@ -1,7 +1,7 @@
-import { getAuthenticatedContext } from "@/lib/admin-data.server";
+import ChangePasswordForm from "@/features/users/components/change-password-form";
+import ProfileForm from "@/features/users/components/profile-form";
+import { getAuthenticatedContext } from "@/services/auth";
 import { redirect } from "next/navigation";
-import ChangePasswordForm from "./change-password-form";
-import ProfileForm from "./profile-form";
 
 export const metadata = {
   title: "Profile | The Strengths Writer",

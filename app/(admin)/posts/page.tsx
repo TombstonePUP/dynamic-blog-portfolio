@@ -1,5 +1,5 @@
-import { getOwnedPosts } from "@/lib/admin-data.server";
-import ExplorerGrid from "./explorer-grid";
+import ExplorerGrid from "@/features/posts/components/admin/explorer-grid";
+import { getOwnedPosts } from "@/services/posts";
 
 export const metadata = {
   title: "Explorer | Writer Dashboard",

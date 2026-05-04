@@ -2,23 +2,10 @@
 
 import { updateUserProfile } from "@/app/actions/user-management-actions";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { profileSchema, type ProfileFormValues } from "@/validators/users";
 import { Loader2, Mail, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-
-const profileSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, "First name is required")
-    .min(2, "First name must be at least 2 characters"),
-  lastName: z
-    .string()
-    .min(1, "Last name is required")
-    .min(2, "Last name must be at least 2 characters"),
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileForm({
   profile,

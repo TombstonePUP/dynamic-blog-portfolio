@@ -2,29 +2,11 @@ import { updateUserAccessAction } from "@/app/actions/user-management-actions";
 import { Button } from "@/components/admin/ui/button";
 import {
   PRIMARY_ADMIN_EMAIL,
-  requireAdminContext,
   type ApprovalStatus,
   type UserRole,
-} from "@/lib/admin-data.server";
+} from "@/services/auth";
+import { listManagedProfiles } from "@/services/users";
 import { Metadata } from "next";
-
-type ManagedProfile = {
-  id: string;
-  email: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  display_name: string | null;
-  role: UserRole | null;
-  approval_status: ApprovalStatus | null;
-  created_at: string;
-  approved_at: string | null;
-};
-
-const statusOrder: Record<ApprovalStatus, number> = {
-  pending: 0,
-  approved: 1,
-  rejected: 2,
-};
 
 function formatDateLabel(value: string | null) {
   if (!value) {
@@ -104,28 +86,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UsersPage() {
-  const { profile, supabase } = await requireAdminContext();
-  const { data } = await supabase
-    .from("profiles")
-    .select(
-      "id, email, first_name, last_name, display_name, role, approval_status, created_at, approved_at",
-    );
-
-  const profiles = ((data as ManagedProfile[] | null) || []).sort(
-    (left, right) => {
-      const leftStatus = left.approval_status || "pending";
-      const rightStatus = right.approval_status || "pending";
-
-      if (statusOrder[leftStatus] !== statusOrder[rightStatus]) {
-        return statusOrder[leftStatus] - statusOrder[rightStatus];
-      }
-
-      return (
-        new Date(right.created_at).getTime() -
-        new Date(left.created_at).getTime()
-      );
-    },
-  );
+  const { currentProfile, profiles } = await listManagedProfiles();
 
   const pendingCount = profiles.filter(
     (entry) => entry.approval_status === "pending",
@@ -193,7 +154,7 @@ export default async function UsersPage() {
             "Unnamed user";
           const isPrimaryAdmin =
             (entry.email || "").trim().toLowerCase() === PRIMARY_ADMIN_EMAIL;
-          const isCurrentUser = entry.id === profile?.id;
+          const isCurrentUser = entry.id === currentProfile?.id;
 
           return (
             <article

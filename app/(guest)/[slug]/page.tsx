@@ -1,16 +1,16 @@
 import BackButton from "@/components/guest/back-button";
 import CommentsSection from "@/components/guest/comments-section";
 import ScrollArrow from "@/components/guest/scroll-arrow";
-import { CustomMDX } from "@/components/mdx/mdx-remote";
+import { CustomMDX } from "@/features/posts/components/mdx/mdx-remote";
+import { getThemeColor } from "@/features/posts/lib/tag-theme";
+import type { Blog } from "@/features/posts/types";
 import SmoothScrollLink from "@/components/smooth-scroll-link";
 import {
   MAIN_CATEGORIES,
   readingMinutesFromContent,
   tagToSlug,
 } from "@/data/blog";
-import { getBlogBySlug, getBlogs, getRelatedBlogs } from "@/lib/blogs.server";
-import { getThemeColor } from "@/lib/theme";
-import type { Blog } from "@/types/blog";
+import { getBlogBySlug, getBlogs, getRelatedBlogs } from "@/services/posts";
 import {
   ArrowRight,
   Calendar,

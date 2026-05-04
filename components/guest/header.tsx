@@ -1,7 +1,7 @@
 "use client";
 
 import SearchModal from "@/components/guest/search-modal";
-import type { Blog } from "@/types/blog";
+import type { Blog } from "@/features/posts/types";
 import { Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

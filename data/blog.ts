@@ -1,4 +1,4 @@
-import type { Author, Tag } from "@/types/blog";
+import type { Author, Tag } from "@/features/posts/types";
 
 // ─── Authors ────────────────────────────────────────────────────────────────
 
