@@ -10,8 +10,23 @@ export const metadata = {
   description: "Sign in to manage your stories.",
 };
 
-export default async function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<{
+    reset?: string | string[] | undefined;
+  }>;
+};
+
+function readSearchParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
   const context = await getAuthenticatedContext();
+  const initialNotice =
+    readSearchParam(params.reset) === "success"
+      ? "Your password has been reset. Sign in with your new password."
+      : null;
 
   if (context) {
     redirect(isApprovedProfile(context.profile) ? "/dashboard" : "/pending");
@@ -77,7 +92,7 @@ export default async function LoginPage() {
             theStrengthsWriter
           </h1>
         </div>
-        <AuthForm />
+        <AuthForm initialNotice={initialNotice} />
         <footer className="absolute bottom-8 text-center text-sm text-gray-500">
           <p>
             &copy; {new Date().getFullYear()} theStrengthsWriter. All rights

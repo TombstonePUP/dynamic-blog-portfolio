@@ -1,6 +1,7 @@
 import {
   countProfilesByApprovalStatus,
   getProfileEmailById,
+  isUsernameTaken,
   listManagedProfiles as listManagedProfilesQuery,
   updateProfileAccess,
   updateProfileNames,
@@ -8,6 +9,7 @@ import {
   type ManagedProfile,
   type UserRole,
 } from "@/db/queries/profiles";
+import { createAdminClient } from "@/db/supabase/admin";
 import {
   getAuthenticatedContext,
   PRIMARY_ADMIN_EMAIL,
@@ -99,6 +101,7 @@ export async function applyUserAccessChange(options: {
 export async function updateSignedInUserProfile(options: {
   firstName?: string;
   lastName?: string;
+  username?: string;
   currentPassword?: string;
   newPassword?: string;
 }): Promise<{ success: boolean; error?: string }> {
@@ -109,11 +112,29 @@ export async function updateSignedInUserProfile(options: {
   }
 
   try {
-    if (options.firstName !== undefined || options.lastName !== undefined) {
+    if (
+      options.firstName !== undefined ||
+      options.lastName !== undefined ||
+      options.username !== undefined
+    ) {
+      const username = options.username?.trim().toLowerCase() || "";
+
+      if (
+        username &&
+        (await isUsernameTaken(
+          createAdminClient(),
+          username,
+          context.profile.id,
+        ))
+      ) {
+        return { success: false, error: "That username is already in use." };
+      }
+
       await updateProfileNames(context.supabase, {
         userId: context.profile.id,
         firstName: options.firstName,
         lastName: options.lastName,
+        username: options.username,
       });
     }
 

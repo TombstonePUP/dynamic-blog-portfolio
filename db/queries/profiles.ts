@@ -6,6 +6,7 @@ export type ApprovalStatus = "pending" | "approved" | "rejected";
 export type ProfileRecord = {
   id: string;
   email: string;
+  username: string | null;
   first_name: string;
   last_name: string;
   display_name: string | null;
@@ -29,6 +30,7 @@ export type PublicProfileRecord = {
 export type ManagedProfile = {
   id: string;
   email: string | null;
+  username?: string | null;
   first_name: string | null;
   last_name: string | null;
   display_name: string | null;
@@ -39,7 +41,7 @@ export type ManagedProfile = {
 };
 
 const PROFILE_SELECT =
-  "id, email, first_name, last_name, display_name, slug, bio, avatar_url, role, approval_status, approved_at, approved_by";
+  "id, email, username, first_name, last_name, display_name, slug, bio, avatar_url, role, approval_status, approved_at, approved_by";
 
 const PUBLIC_PROFILE_SELECT = "id, display_name, slug, role, avatar_url";
 
@@ -63,9 +65,16 @@ export function buildFallbackProfile(user: User): ProfileRecord {
     [firstName, lastName].filter(Boolean).join(" ") ||
     emailName;
 
+  const username =
+    typeof user.user_metadata.username === "string" &&
+    user.user_metadata.username.trim()
+      ? user.user_metadata.username.trim().toLowerCase()
+      : null;
+
   return {
     id: user.id,
     email: user.email || "",
+    username,
     first_name: firstName,
     last_name: lastName,
     display_name: displayName,
@@ -80,6 +89,15 @@ export function buildFallbackProfile(user: User): ProfileRecord {
     approved_by: null,
   };
 }
+
+export type AuthIdentityProfile = {
+  id: string;
+  email: string | null;
+  username: string | null;
+  approval_status: ApprovalStatus | null;
+};
+
+const AUTH_IDENTITY_SELECT = "id, email, username, approval_status";
 
 export async function getProfileById(
   supabase: SupabaseClient,
@@ -96,6 +114,78 @@ export async function getProfileById(
   }
 
   return (data as ProfileRecord | null) || null;
+}
+
+export async function getAuthIdentityByIdentifier(
+  supabase: SupabaseClient,
+  identifier: string,
+): Promise<AuthIdentityProfile | null> {
+  const normalizedIdentifier = identifier.trim().toLowerCase();
+
+  if (!normalizedIdentifier) {
+    return null;
+  }
+
+  const lookupField = normalizedIdentifier.includes("@") ? "email" : "username";
+  const query = supabase
+    .from("profiles")
+    .select(AUTH_IDENTITY_SELECT)
+    .eq(lookupField, normalizedIdentifier)
+    .maybeSingle();
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data as AuthIdentityProfile | null) || null;
+}
+
+export async function isEmailTaken(
+  supabase: SupabaseClient,
+  email: string,
+  excludeUserId?: string,
+): Promise<boolean> {
+  let query = supabase
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("email", email.trim().toLowerCase());
+
+  if (excludeUserId) {
+    query = query.neq("id", excludeUserId);
+  }
+
+  const { count, error } = await query;
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return Boolean(count);
+}
+
+export async function isUsernameTaken(
+  supabase: SupabaseClient,
+  username: string,
+  excludeUserId?: string,
+): Promise<boolean> {
+  let query = supabase
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("username", username.trim().toLowerCase());
+
+  if (excludeUserId) {
+    query = query.neq("id", excludeUserId);
+  }
+
+  const { count, error } = await query;
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return Boolean(count);
 }
 
 export async function listPublicProfilesByIds(
@@ -197,19 +287,35 @@ export async function updateProfileNames(
     userId: string;
     firstName?: string;
     lastName?: string;
+    username?: string;
   },
 ) {
-  const firstName = options.firstName?.trim() || "";
-  const lastName = options.lastName?.trim() || "";
+  const updates: {
+    first_name?: string | null;
+    last_name?: string | null;
+    display_name?: string | null;
+    username?: string | null;
+    updated_at: string;
+  } = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (options.firstName !== undefined || options.lastName !== undefined) {
+    const firstName = options.firstName?.trim() || "";
+    const lastName = options.lastName?.trim() || "";
+
+    updates.first_name = firstName || null;
+    updates.last_name = lastName || null;
+    updates.display_name = [firstName, lastName].filter(Boolean).join(" ") || null;
+  }
+
+  if (options.username !== undefined) {
+    updates.username = options.username.trim().toLowerCase() || null;
+  }
 
   const { error } = await supabase
     .from("profiles")
-    .update({
-      first_name: firstName || null,
-      last_name: lastName || null,
-      display_name: [firstName, lastName].filter(Boolean).join(" ") || null,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updates)
     .eq("id", options.userId);
 
   if (error) {
