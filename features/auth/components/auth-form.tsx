@@ -1,293 +1,441 @@
 "use client";
 
-import { createClient } from "@/db/supabase/client";
-import { authSchema, type AuthFormValues } from "@/validators/auth";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  forgotPasswordAction,
+  signInAction,
+  signUpAction,
+} from "@/app/actions/auth-actions";
+import {
+  INITIAL_AUTH_ACTION_STATE,
+  type AuthActionState,
+} from "@/features/auth/form-state";
 import { Loader2, LockKeyhole, Mail, UserRound } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useActionState, useState } from "react";
+import { useFormStatus } from "react-dom";
 
-type AuthMode = "sign-in" | "sign-up";
+type AuthMode = "sign-in" | "sign-up" | "forgot-password";
 
-const supabase = createClient();
+function getPasswordStrength(password: string) {
+  if (!password) {
+    return 0;
+  }
 
-export default function AuthForm() {
-  const router = useRouter();
-  const [mode, setMode] = useState<AuthMode>("sign-in");
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  let score = 0;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm<AuthFormValues>({
-    resolver: zodResolver(authSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      firstName: "",
-      lastName: "",
-    },
-  });
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
 
-  const password = watch("password");
+  return score;
+}
 
-  const getPasswordStrength = (pass: string) => {
-    if (!pass) return 0;
-    let score = 0;
-    if (pass.length > 8) score++;
-    if (/[A-Z]/.test(pass)) score++;
-    if (/[a-z]/.test(pass)) score++;
-    if (/[0-9]/.test(pass)) score++;
-    if (/[^A-Za-z0-9]/.test(pass)) score++;
-    return score;
-  };
+function getStrengthColor(score: number) {
+  if (score === 0) return "bg-gray-200";
+  if (score <= 2) return "bg-red-500";
+  if (score <= 3) return "bg-yellow-500";
+  if (score <= 4) return "bg-blue-500";
+  return "bg-green-500";
+}
 
-  const strength = getPasswordStrength(password);
+function getStrengthLabel(score: number) {
+  if (score === 0) return "";
+  if (score <= 2) return "Weak";
+  if (score <= 3) return "Fair";
+  if (score <= 4) return "Good";
+  return "Strong";
+}
 
-  const getStrengthColor = (score: number) => {
-    if (score === 0) return "bg-gray-200";
-    if (score <= 2) return "bg-red-500";
-    if (score <= 3) return "bg-yellow-500";
-    if (score <= 4) return "bg-blue-500";
-    return "bg-green-500";
-  };
+function FieldError({ message }: { message?: string }) {
+  if (!message) {
+    return null;
+  }
 
-  const getStrengthLabel = (score: number) => {
-    if (score === 0) return "";
-    if (score <= 2) return "Weak";
-    if (score <= 3) return "Fair";
-    if (score <= 4) return "Good";
-    return "Strong";
-  };
+  return <p className="mt-1 text-xs text-red-500">{message}</p>;
+}
 
-  // Reset form when switching modes
-  useEffect(() => {
-    reset();
-    setErrorMessage(null);
-    setNotice(null);
-  }, [mode, reset]);
+function FormMessage({
+  state,
+  fallbackMessage,
+}: {
+  state: AuthActionState;
+  fallbackMessage?: string | null;
+}) {
+  const message = state.message || fallbackMessage;
 
-  async function onSubmit(values: AuthFormValues) {
-    setSubmitting(true);
-    setErrorMessage(null);
-    setNotice(null);
+  if (!message) {
+    return null;
+  }
 
-    const normalizedEmail = values.email.trim().toLowerCase();
+  const className =
+    state.status === "error"
+      ? "text-sm text-red-600"
+      : "text-sm text-[#2b776a]";
 
-    if (mode === "sign-up") {
-      const firstName = values.firstName?.trim();
-      const lastName = values.lastName?.trim();
+  return <p className={className}>{message}</p>;
+}
 
-      if (!firstName || !lastName) {
-        setErrorMessage("Please enter your first and last name.");
-        setSubmitting(false);
-        return;
-      }
+function SubmitButton({
+  label,
+}: {
+  label: string;
+}) {
+  const { pending } = useFormStatus();
 
-      const { data, error } = await supabase.auth.signUp({
-        email: normalizedEmail,
-        password: values.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm?next=/pending`,
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            display_name: `${firstName} ${lastName}`,
-          },
-        },
-      });
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="flex w-full items-center justify-center gap-2 bg-[#111111] px-5 py-3 text-sm font-semibold text-white transition hover:bg-black/85 disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      {label}
+      {pending ? <Loader2 className="size-4 animate-spin" /> : null}
+    </button>
+  );
+}
 
-      if (error) {
-        setErrorMessage(error.message);
-        setSubmitting(false);
-        return;
-      }
+function PasswordStrengthMeter({ password }: { password: string }) {
+  const score = getPasswordStrength(password);
 
-      if (data.session) {
-        router.replace("/pending");
-        router.refresh();
-        return;
-      }
-
-      setNotice(
-        "Check your email to confirm your account. After that, an admin will review your access.",
-      );
-      setSubmitting(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
-      password: values.password,
-    });
-
-    if (error) {
-      setErrorMessage(error.message);
-      setSubmitting(false);
-      return;
-    }
-
-    router.replace("/dashboard");
-    router.refresh();
+  if (!password) {
+    return null;
   }
 
   return (
-    <div className="w-full max-w-md bg-white/90 p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.35)] ring-1 ring-black/5 backdrop-blur">
-      <div className="mb-8 flex gap-2 bg-[#f2efe7] p-1">
+    <div className="mt-3 space-y-1.5">
+      <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
+        <span className="text-foreground/40">Strength</span>
+        <span
+          style={{
+            color:
+              score <= 2
+                ? "#ef4444"
+                : score <= 3
+                  ? "#eab308"
+                  : score <= 4
+                    ? "#3b82f6"
+                    : "#22c55e",
+          }}
+        >
+          {getStrengthLabel(score)}
+        </span>
+      </div>
+      <div className="h-1 w-full overflow-hidden bg-black/5">
+        <div
+          className={`h-full transition-all duration-500 ease-out ${getStrengthColor(score)}`}
+          style={{ width: `${(score / 5) * 100}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function SignInForm({
+  initialNotice,
+  onForgotPassword,
+}: {
+  initialNotice?: string | null;
+  onForgotPassword: () => void;
+}) {
+  const [state, action] = useActionState(
+    signInAction,
+    INITIAL_AUTH_ACTION_STATE,
+  );
+
+  return (
+    <form action={action} className="space-y-4">
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+          Email or username
+        </span>
+        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <Mail className="size-4 text-foreground/35" />
+          <input
+            name="identifier"
+            placeholder="you@example.com or writer_name"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        </div>
+        <FieldError message={state.fieldErrors?.identifier?.[0]} />
+      </label>
+
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+          Password
+        </span>
+        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <LockKeyhole className="size-4 text-foreground/35" />
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            autoComplete="current-password"
+          />
+        </div>
+        <FieldError message={state.fieldErrors?.password?.[0]} />
+      </label>
+
+      <div className="flex items-center justify-between gap-4 text-sm">
         <button
           type="button"
-          onClick={() => setMode("sign-in")}
-          className={`flex-1 px-4 py-2 text-sm font-semibold transition ${
-            mode === "sign-in"
-              ? "bg-white text-foreground shadow-sm"
-              : "text-foreground/55"
-          }`}
+          onClick={onForgotPassword}
+          className="font-medium text-[#2b776a] transition hover:text-[#1f5b52]"
         >
-          Sign in
+          Forgot password?
         </button>
-        <button
-          type="button"
-          onClick={() => setMode("sign-up")}
-          className={`flex-1 px-4 py-2 text-sm font-semibold transition ${
-            mode === "sign-up"
-              ? "bg-white text-foreground shadow-sm"
-              : "text-foreground/55"
-          }`}
-        >
-          Create account
-        </button>
+        <p className="text-right text-foreground/45">
+          Protected with email verification and temporary lockouts.
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {mode === "sign-up" ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
-                First name
-              </span>
-              <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
-                <UserRound className="size-4 text-foreground/35" />
-                <input
-                  {...register("firstName")}
-                  placeholder="Regie"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
-                />
-              </div>
-              {errors.firstName && (
-                <p className="mt-1 text-xs text-red-500">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </label>
+      <FormMessage state={state} fallbackMessage={initialNotice} />
+      <SubmitButton label="Sign in" />
+    </form>
+  );
+}
 
-            <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
-                Last name
-              </span>
-              <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
-                <UserRound className="size-4 text-foreground/35" />
-                <input
-                  {...register("lastName")}
-                  placeholder="San Juan"
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
-                />
-              </div>
-              {errors.lastName && (
-                <p className="mt-1 text-xs text-red-500">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </label>
-          </div>
-        ) : null}
+function SignUpForm() {
+  const [state, action] = useActionState(
+    signUpAction,
+    INITIAL_AUTH_ACTION_STATE,
+  );
+  const [password, setPassword] = useState("");
 
+  return (
+    <form action={action} className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
-            Email
+            First name
           </span>
           <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
-            <Mail className="size-4 text-foreground/35" />
+            <UserRound className="size-4 text-foreground/35" />
             <input
-              type="email"
-              {...register("email")}
-              placeholder="you@example.com"
+              name="firstName"
+              placeholder="Regie"
               className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+              autoComplete="given-name"
             />
           </div>
-          {errors.email && (
-            <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
-          )}
+          <FieldError message={state.fieldErrors?.firstName?.[0]} />
         </label>
 
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
-            Password
+            Last name
           </span>
           <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
-            <LockKeyhole className="size-4 text-foreground/35" />
+            <UserRound className="size-4 text-foreground/35" />
             <input
-              type="password"
-              {...register("password")}
-              placeholder="At least 6 characters"
+              name="lastName"
+              placeholder="San Juan"
               className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+              autoComplete="family-name"
             />
           </div>
-          {errors.password && (
-            <p className="mt-1 text-xs text-red-500">
-              {errors.password.message}
-            </p>
-          )}
-
-          {mode === "sign-up" && password && (
-            <div className="mt-3 space-y-1.5">
-              <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
-                <span className="text-foreground/40">Strength</span>
-                <span
-                  style={{
-                    color:
-                      strength <= 2
-                        ? "#ef4444"
-                        : strength <= 3
-                          ? "#eab308"
-                          : strength <= 4
-                            ? "#3b82f6"
-                            : "#22c55e",
-                  }}
-                >
-                  {getStrengthLabel(strength)}
-                </span>
-              </div>
-              <div className="h-1 w-full overflow-hidden bg-black/5">
-                <div
-                  className={`h-full transition-all duration-500 ease-out ${getStrengthColor(strength)}`}
-                  style={{ width: `${(strength / 5) * 100}%` }}
-                />
-              </div>
-            </div>
-          )}
+          <FieldError message={state.fieldErrors?.lastName?.[0]} />
         </label>
+      </div>
 
-        {errorMessage ? (
-          <p className="text-sm text-red-600">{errorMessage}</p>
-        ) : null}
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+          Username
+        </span>
+        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <UserRound className="size-4 text-foreground/35" />
+          <input
+            name="username"
+            placeholder="Optional unique username"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        </div>
+        <FieldError message={state.fieldErrors?.username?.[0]} />
+        <p className="mt-1 text-xs text-foreground/50">
+          Letters, numbers, and underscores only. You can also leave this blank.
+        </p>
+      </label>
 
-        {notice ? <p className="text-sm text-[#2b776a]">{notice}</p> : null}
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+          Email
+        </span>
+        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <Mail className="size-4 text-foreground/35" />
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        </div>
+        <FieldError message={state.fieldErrors?.email?.[0]} />
+      </label>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 bg-[#111111] px-5 py-3 text-sm font-semibold text-white transition hover:bg-black/85 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {mode === "sign-in" ? "Sign in" : "Sign up"}
-          {submitting && <Loader2 className="size-4 animate-spin" />}
-        </button>
-      </form>
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+          Password
+        </span>
+        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <LockKeyhole className="size-4 text-foreground/35" />
+          <input
+            type="password"
+            name="password"
+            placeholder="8+ chars, uppercase, number, symbol"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            autoComplete="new-password"
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </div>
+        <FieldError message={state.fieldErrors?.password?.[0]} />
+        <PasswordStrengthMeter password={password} />
+      </label>
+
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+          Confirm password
+        </span>
+        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <LockKeyhole className="size-4 text-foreground/35" />
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Re-enter your password"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            autoComplete="new-password"
+          />
+        </div>
+        <FieldError message={state.fieldErrors?.confirmPassword?.[0]} />
+      </label>
+
+      <FormMessage state={state} />
+      <SubmitButton label="Create account" />
+    </form>
+  );
+}
+
+function ForgotPasswordForm({
+  onBack,
+}: {
+  onBack: () => void;
+}) {
+  const [state, action] = useActionState(
+    forgotPasswordAction,
+    INITIAL_AUTH_ACTION_STATE,
+  );
+
+  return (
+    <form action={action} className="space-y-4">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#2b776a]/70">
+          Password recovery
+        </p>
+        <h2 className="text-2xl font-bold text-foreground">
+          Reset your password
+        </h2>
+        <p className="text-sm leading-6 text-foreground/60">
+          Enter the email tied to your account and we&apos;ll send a secure reset
+          link.
+        </p>
+      </div>
+
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+          Email
+        </span>
+        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <Mail className="size-4 text-foreground/35" />
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        </div>
+        <FieldError message={state.fieldErrors?.email?.[0]} />
+      </label>
+
+      <FormMessage state={state} />
+      <SubmitButton label="Send reset link" />
+
+      <button
+        type="button"
+        onClick={onBack}
+        className="w-full text-sm font-medium text-[#2b776a] transition hover:text-[#1f5b52]"
+      >
+        Back to sign in
+      </button>
+    </form>
+  );
+}
+
+export default function AuthForm({
+  initialNotice,
+}: {
+  initialNotice?: string | null;
+}) {
+  const [mode, setMode] = useState<AuthMode>("sign-in");
+
+  return (
+    <div className="w-full max-w-md bg-white/90 p-8 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.35)] ring-1 ring-black/5 backdrop-blur">
+      {mode !== "forgot-password" ? (
+        <div className="mb-8 flex gap-2 bg-[#f2efe7] p-1">
+          <button
+            type="button"
+            onClick={() => setMode("sign-in")}
+            className={`flex-1 px-4 py-2 text-sm font-semibold transition ${
+              mode === "sign-in"
+                ? "bg-white text-foreground shadow-sm"
+                : "text-foreground/55"
+            }`}
+          >
+            Sign in
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("sign-up")}
+            className={`flex-1 px-4 py-2 text-sm font-semibold transition ${
+              mode === "sign-up"
+                ? "bg-white text-foreground shadow-sm"
+                : "text-foreground/55"
+            }`}
+          >
+            Create account
+          </button>
+        </div>
+      ) : null}
+
+      {mode === "sign-in" ? (
+        <SignInForm
+          key="sign-in"
+          initialNotice={initialNotice}
+          onForgotPassword={() => setMode("forgot-password")}
+        />
+      ) : null}
+
+      {mode === "sign-up" ? <SignUpForm key="sign-up" /> : null}
+
+      {mode === "forgot-password" ? (
+        <ForgotPasswordForm
+          key="forgot-password"
+          onBack={() => setMode("sign-in")}
+        />
+      ) : null}
     </div>
   );
 }

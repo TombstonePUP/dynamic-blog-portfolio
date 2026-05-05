@@ -68,6 +68,7 @@ export default function ChangePasswordForm() {
       const result = await updateUserProfile({
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
+        confirmPassword: values.confirmPassword,
       });
 
       if (result.success) {
@@ -77,7 +78,7 @@ export default function ChangePasswordForm() {
       } else {
         setErrorMessage(result.error || "Failed to change password");
       }
-    } catch (error) {
+    } catch {
       setErrorMessage("An error occurred while changing your password");
     } finally {
       setSubmitting(false);
@@ -125,7 +126,7 @@ export default function ChangePasswordForm() {
           <input
             type="password"
             {...register("newPassword")}
-            placeholder="At least 6 characters"
+            placeholder="8+ chars, uppercase, number, symbol"
             className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
           />
         </div>

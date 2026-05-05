@@ -13,6 +13,7 @@ export default function ProfileForm({
   profile: {
     first_name?: string | null;
     last_name?: string | null;
+    username?: string | null;
     email?: string | null;
   } | null;
 }) {
@@ -22,6 +23,7 @@ export default function ProfileForm({
 
   const firstName = profile?.first_name || "";
   const lastName = profile?.last_name || "";
+  const username = profile?.username || "";
   const userEmail = profile?.email || "";
 
   const {
@@ -34,13 +36,14 @@ export default function ProfileForm({
     defaultValues: {
       firstName,
       lastName,
+      username,
     },
     mode: "onChange",
   });
 
   useEffect(() => {
-    reset({ firstName, lastName });
-  }, [firstName, lastName, reset]);
+    reset({ firstName, lastName, username });
+  }, [firstName, lastName, username, reset]);
 
   async function onSubmit(values: ProfileFormValues) {
     setSubmitting(true);
@@ -51,6 +54,7 @@ export default function ProfileForm({
       const result = await updateUserProfile({
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
+        username: values.username?.trim(),
       });
 
       if (result.success) {
@@ -59,7 +63,7 @@ export default function ProfileForm({
       } else {
         setErrorMessage(result.error || "Failed to update profile");
       }
-    } catch (error) {
+    } catch {
       setErrorMessage("An error occurred while updating your profile");
     } finally {
       setSubmitting(false);
@@ -77,7 +81,7 @@ export default function ProfileForm({
       ) : null}
 
       {/* First Name Field */}
-      <div className="flex items-center gap-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
             First Name
@@ -96,8 +100,6 @@ export default function ProfileForm({
             </p>
           )}
         </label>
-
-        {/* Last Name Field */}
         <label className="block">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
             Last Name
@@ -117,6 +119,30 @@ export default function ProfileForm({
           )}
         </label>
       </div>
+      <label className="block">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
+          Username
+        </span>
+        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <UserRound className="size-4 text-foreground/35" />
+          <input
+            {...register("username")}
+            placeholder="your_username"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/30"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        </div>
+        {errors.username && (
+          <p className="mt-1 text-xs text-red-500">
+            {errors.username.message}
+          </p>
+        )}
+        <p className="mt-1 text-xs text-foreground/50">
+          Optional. You can use this instead of your email when signing in.
+        </p>
+      </label>
       {/* Email Field (Read-only) */}
       <label className="block">
         <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
