@@ -61,7 +61,7 @@ Use the editor on the left to write your content, and see the preview update liv
     : {};
 
   return (
-    <main className="px-8 pb-8 pt-6 flex-1 flex flex-col">
+    <main className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-4 pt-4 md:px-6 md:pb-6 md:pt-5">
       <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading editor...</div>}>
         <MdxEditor 
           initialContent={initialContent} 

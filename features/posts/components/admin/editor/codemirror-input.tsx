@@ -72,7 +72,7 @@ const CodeMirrorInput = forwardRef<CodeMirrorInputRef, CodeMirrorInputProps>(
 
     return (
       <div 
-        className={`overflow-hidden border-r bg-admin-surface font-mono ${editorWidth ? "md:shrink-0 flex-1 md:flex-none" : "flex-1"}`}
+        className={`flex min-h-0 flex-1 flex-col overflow-hidden bg-transparent font-mono ${editorWidth ? "md:shrink-0 md:flex-none" : ""}`}
         style={editorWidth ? { flexBasis: editorWidth, width: "100%" } : {}}
       >
         <CodeMirror
@@ -92,7 +92,7 @@ const CodeMirrorInput = forwardRef<CodeMirrorInputRef, CodeMirrorInputProps>(
             allowMultipleSelections: true,
             indentOnInput: true,
           }}
-          className="h-full text-[13px]"
+          className="h-full min-h-0 text-[13px] [&_.cm-editor]:h-full [&_.cm-focused]:outline-none [&_.cm-gutters]:h-full [&_.cm-scroller]:overflow-auto [&_.cm-content]:py-5 [&_.cm-line]:px-2"
         />
       </div>
     );
