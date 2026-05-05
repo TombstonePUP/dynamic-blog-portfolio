@@ -1,5 +1,6 @@
 export { default as EditorDialogs } from "./editor-dialogs";
 export { default as EditorFooter } from "./editor-footer";
+export { default as EditorMetadata } from "./editor-metadata";
 export { default as EditorInput } from "./editor-input";
 export { default as EditorPreview } from "./editor-preview";
 export { default as EditorSidebar } from "./editor-sidebar";

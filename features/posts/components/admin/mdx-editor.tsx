@@ -17,8 +17,10 @@ import CodeMirrorInput, { type CodeMirrorInputRef } from "./editor/codemirror-in
 import EditorPreview from "./editor/editor-preview";
 import EditorSidebar from "./editor/editor-sidebar";
 import EditorToolbar from "./editor/editor-toolbar";
+import EditorMetadata, { type PostMetadata } from "./editor/editor-metadata";
 import ResizeHandle from "./editor/resize-handle";
-import { Eye, FileEdit, FolderOpen } from "lucide-react";
+import { Eye, FileEdit, FolderOpen, Code, FormInput } from "lucide-react";
+import { parseEditorDocument, buildEditorDocument } from "@/features/posts/lib/post-documents";
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 
 type BlogFolder = {
@@ -27,6 +29,48 @@ type BlogFolder = {
   status: "draft" | "published" | "archived";
   updatedAt: string;
 };
+
+type EditorMode = "form" | "raw";
+
+function extractMetadataAndBody(content: string): { metadata: PostMetadata; body: string } {
+  try {
+    const doc = parseEditorDocument(content);
+    return {
+      metadata: {
+        title: doc.title,
+        date: doc.date,
+        author: doc.author,
+        image: doc.image,
+        thumbnail: doc.thumbnail,
+        excerpt: doc.excerpt,
+        tags: doc.tags,
+        status: doc.status,
+      },
+      body: doc.body,
+    };
+  } catch {
+    return {
+      metadata: {
+        title: "Untitled story",
+        date: new Date().toISOString().slice(0, 10),
+        author: "writer",
+        image: "",
+        thumbnail: "",
+        excerpt: "",
+        tags: [],
+        status: "draft",
+      },
+      body: content,
+    };
+  }
+}
+
+function rebuildContent(metadata: PostMetadata, body: string): string {
+  return buildEditorDocument({
+    ...metadata,
+    body,
+  });
+}
 
 export default function MdxEditor({
   initialContent = "",
@@ -55,10 +99,18 @@ export default function MdxEditor({
   const [previewSource, setPreviewSource] = useState<MDXRemoteSerializeResult | null>(null);
   const [previewAsset, setPreviewAsset] = useState<{ slug: string, filename: string, dataUrl: string } | null>(null);
 
+  // Editor mode: "form" (structured inputs) or "raw" (full MDX)
+  const [editorMode, setEditorMode] = useState<EditorMode>("form");
+  
+  // Structured metadata state — derived from content
+  const [metadata, setMetadata] = useState<PostMetadata>(() => extractMetadataAndBody(defaultContent).metadata);
+  const [bodyContent, setBodyContent] = useState<string>(() => extractMetadataAndBody(defaultContent).body);
+
   const editorRef = useRef<CodeMirrorInputRef>(null);
 
   const [isPending, startTransition] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
+  const [isCompiling, setIsCompiling] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [isSplit, setIsSplit] = useState(true);
   const [activeTab, setActiveTab] = useState<"explorer" | "editor" | "preview">("editor");
@@ -77,6 +129,9 @@ export default function MdxEditor({
   const [renameValue, setRenameValue] = useState("");
 
   const isDirty = content !== lastSavedContent;
+
+  // Ref to track whether we're doing a mode-switch sync, to avoid infinite loops
+  const isSyncing = useRef(false);
 
   useEffect(() => {
     sidebarWidthRef.current = sidebarWidth;
@@ -97,11 +152,11 @@ export default function MdxEditor({
     }
   }, []);
 
-  const stopResizing = useCallback(() => {
+  const stopResizing = useCallback(function handleStopResizing() {
     isResizingSidebar.current = false;
     isResizingEditor.current = false;
     window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("mouseup", stopResizing);
+    window.removeEventListener("mouseup", handleStopResizing);
     document.body.style.cursor = "default";
     document.body.style.userSelect = "auto";
   }, [handleMouseMove]);
@@ -133,20 +188,81 @@ export default function MdxEditor({
     void refreshList();
   }, []);
 
+  // Preview compilation
   useEffect(() => {
+    let isCancelled = false;
     const timer = setTimeout(async () => {
       if (!content.trim()) {
+        setIsCompiling(false);
         setPreviewSource(null);
         return;
       }
+      setIsCompiling(true);
       const res = await compileMdxAction(content);
+      if (isCancelled) {
+        return;
+      }
       if (res.success && res.source) {
         setPreviewSource(res.source);
+      } else {
+        setPreviewSource(null);
       }
+      setIsCompiling(false);
     }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
   }, [content]);
+
+  // Sync: when content changes externally (e.g. loading a post), update metadata + body
+  useEffect(() => {
+    if (isSyncing.current) return;
+    const { metadata: m, body: b } = extractMetadataAndBody(content);
+    setMetadata(m);
+    setBodyContent(b);
+  }, [content]);
+
+  // Handle metadata changes in form mode → rebuild content
+  const handleMetadataChange = useCallback((newMetadata: PostMetadata) => {
+    setMetadata(newMetadata);
+    isSyncing.current = true;
+    const rebuilt = rebuildContent(newMetadata, bodyContent);
+    setContent(rebuilt);
+    requestAnimationFrame(() => { isSyncing.current = false; });
+  }, [bodyContent]);
+
+  // Handle body changes in form mode → rebuild content
+  const handleBodyChange = useCallback((newBody: string) => {
+    setBodyContent(newBody);
+    isSyncing.current = true;
+    const rebuilt = rebuildContent(metadata, newBody);
+    setContent(rebuilt);
+    requestAnimationFrame(() => { isSyncing.current = false; });
+  }, [metadata]);
+
+  // Handle raw content changes → update content + let the effect sync metadata
+  const handleRawContentChange = useCallback((value: string) => {
+    setContent(value);
+  }, []);
+
+  // Switch mode: sync state when switching
+  const switchEditorMode = useCallback((mode: EditorMode) => {
+    if (mode === editorMode) return;
+    
+    if (mode === "form") {
+      // Switching from raw → form: parse the raw content
+      const { metadata: m, body: b } = extractMetadataAndBody(content);
+      setMetadata(m);
+      setBodyContent(b);
+    } else {
+      // Switching from form → raw: rebuild from metadata + body
+      const rebuilt = rebuildContent(metadata, bodyContent);
+      setContent(rebuilt);
+    }
+    setEditorMode(mode);
+  }, [editorMode, content, metadata, bodyContent]);
 
   const handleLoadPost = useCallback(
     async (slug: string) => {
@@ -180,7 +296,7 @@ export default function MdxEditor({
         }
       });
     },
-    [initialBlogContents],
+    [initialBlogContents, router],
   );
 
   useEffect(() => {
@@ -344,7 +460,7 @@ export default function MdxEditor({
   }
 
   return (
-    <div className="flex h-[100dvh] md:h-auto md:min-h-0 md:max-h-[93vh] flex-1 flex-col overflow-hidden font-sans shadow-2xl ring-1 select-none">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[32px] border border-admin-text/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(247,242,234,0.92))] font-sans shadow-[0_30px_120px_rgba(31,61,57,0.14)] select-none">
       <EditorDialogs
         isNewPostOpen={isDialogOpen}
         onCloseNewPost={() => setIsDialogOpen(false)}
@@ -371,7 +487,7 @@ export default function MdxEditor({
         isDirty={isDirty}
         isSaving={isSaving}
         isUploading={false}
-        isPending={isPending}
+        isPending={isPending || isCompiling}
         onSave={handleSave}
         onRename={() => {
           setRenameValue(activeSlug || "");
@@ -380,61 +496,119 @@ export default function MdxEditor({
         getLiveUrl={getLiveUrl}
       />
 
-      {/* Mobile Tabs */}
-      <div className="flex border-b border-admin-surface-hover bg-admin-surface md:hidden shrink-0">
-        <button
-          onClick={() => setActiveTab("explorer")}
-          className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold transition-colors ${
-            activeTab === "explorer"
-              ? "bg-admin-bg text-admin-accent border-b-2 border-admin-accent"
-              : "text-admin-muted hover:text-admin-heading"
-          }`}
-        >
-          <FolderOpen size={14} />
-          Explorer
-        </button>
-        <button
-          onClick={() => setActiveTab("editor")}
-          className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold transition-colors ${
-            activeTab === "editor"
-              ? "bg-admin-bg text-admin-accent border-b-2 border-admin-accent"
-              : "text-admin-muted hover:text-admin-heading"
-          }`}
-        >
-          <FileEdit size={14} />
-          Editor
-        </button>
-        <button
-          onClick={() => setActiveTab("preview")}
-          className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold transition-colors ${
-            activeTab === "preview"
-              ? "bg-admin-bg text-admin-accent border-b-2 border-admin-accent"
-              : "text-admin-muted hover:text-admin-heading"
-          }`}
-        >
-          <Eye size={14} />
-          Preview
-        </button>
+      <div className="shrink-0 border-b border-admin-text/8 bg-white/50">
+        <div className="flex flex-col gap-4 px-4 py-4 md:px-6">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-admin-text/45">
+                Writing workspace
+              </p>
+              <h2 className="mt-1 text-lg font-semibold text-admin-heading md:text-xl">
+                Draft on the left, preview the published reading experience on the right.
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-admin-text/60">
+                The form panel keeps metadata close at hand, while raw mode gives you the full MDX document when you want to edit like code.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2 text-[11px] text-admin-text/55">
+              <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-admin-text/8">
+                {metadata.status.charAt(0).toUpperCase() + metadata.status.slice(1)}
+              </span>
+              <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-admin-text/8">
+                {metadata.tags.length > 0 ? `${metadata.tags.length} tags` : "No tags yet"}
+              </span>
+              <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-admin-text/8">
+                {activeSlug ? "Live slug connected" : "Create a draft to lock the slug"}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <div className="inline-flex rounded-full border border-admin-text/10 bg-admin-contrast/65 p-1">
+              <button
+                onClick={() => switchEditorMode("form")}
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${
+                  editorMode === "form"
+                    ? "bg-white text-admin-primary shadow-sm"
+                    : "text-admin-muted hover:bg-white/60 hover:text-admin-text"
+                }`}
+              >
+                <FormInput size={13} strokeWidth={2.5} />
+                Structured
+              </button>
+              <button
+                onClick={() => switchEditorMode("raw")}
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${
+                  editorMode === "raw"
+                    ? "bg-white text-admin-primary shadow-sm"
+                    : "text-admin-muted hover:bg-white/60 hover:text-admin-text"
+                }`}
+              >
+                <Code size={13} strokeWidth={2.5} />
+                Raw MDX
+              </button>
+            </div>
+
+            <div className="hidden items-center gap-2 rounded-full bg-admin-contrast/70 px-3 py-1.5 text-[11px] text-admin-text/55 ring-1 ring-admin-text/8 md:flex">
+              <span className={`size-2 rounded-full ${isCompiling ? "animate-pulse bg-amber-500" : "bg-emerald-500"}`} />
+              {isCompiling ? "Refreshing preview" : "Preview ready"}
+            </div>
+
+            <div className="flex rounded-full border border-admin-text/10 bg-admin-contrast/65 p-1 md:hidden">
+              <button
+                onClick={() => setActiveTab("explorer")}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${
+                  activeTab === "explorer"
+                    ? "bg-white text-admin-accent shadow-sm"
+                    : "text-admin-muted hover:text-admin-heading"
+                }`}
+              >
+                <FolderOpen size={13} />
+              </button>
+              <button
+                onClick={() => setActiveTab("editor")}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${
+                  activeTab === "editor"
+                    ? "bg-white text-admin-accent shadow-sm"
+                    : "text-admin-muted hover:text-admin-heading"
+                }`}
+              >
+                <FileEdit size={13} />
+              </button>
+              <button
+                onClick={() => setActiveTab("preview")}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${
+                  activeTab === "preview"
+                    ? "bg-white text-admin-accent shadow-sm"
+                    : "text-admin-muted hover:text-admin-heading"
+                }`}
+              >
+                <Eye size={13} />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="relative flex flex-col md:flex-row flex-1 overflow-x-hidden overflow-y-auto md:overflow-hidden">
-        <div className={`w-full md:w-auto shrink-0 md:h-full ${activeTab === "explorer" ? "block" : "hidden md:block"}`}>
+      <div className="relative flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-3 md:flex-row md:p-4">
+        <div className={`min-h-0 w-full md:w-auto shrink-0 md:h-full ${activeTab === "explorer" ? "block" : "hidden md:block"}`}>
           <EditorSidebar
-          width={sidebarWidth}
-          showSidebar={showSidebar}
-          blogFolders={blogFolders}
-          activeSlug={activeSlug}
-          expandedSlugs={expandedSlugs}
-          onToggleExpand={toggleExpand}
-          onLoadPost={handleLoadPost}
-          onNewDraft={() => {
-            setNewPostSlug("");
-            setIsDialogOpen(true);
-          }}
-          onDeletePost={handleDeletePost}
-          onPreviewAsset={setPreviewAsset}
-          onInsertAsset={insertAsset}
-        />
+            width={sidebarWidth}
+            showSidebar={showSidebar}
+            blogFolders={blogFolders}
+            activeSlug={activeSlug}
+            expandedSlugs={expandedSlugs}
+            onToggleExpand={toggleExpand}
+            onLoadPost={handleLoadPost}
+            onNewDraft={() => {
+              setNewPostSlug("");
+              setIsDialogOpen(true);
+            }}
+            onDeletePost={handleDeletePost}
+            onPreviewAsset={setPreviewAsset}
+            onInsertAsset={insertAsset}
+          />
         </div>
 
         {showSidebar ? (
@@ -444,15 +618,69 @@ export default function MdxEditor({
         ) : null}
 
         <div 
-          className={`w-full md:w-auto shrink-0 md:h-full min-h-[50vh] ${isSplit ? "md:flex-none" : "flex-1"} ${activeTab === "editor" ? "block" : "hidden md:block"}`}
+          className={`min-h-0 w-full shrink-0 md:h-full md:w-auto ${isSplit ? "md:flex-none" : "flex-1"} ${activeTab === "editor" ? "flex" : "hidden md:flex"}`}
           style={isSplit ? { flexBasis: editorWidth, width: editorWidth } : {}}
         >
-          <CodeMirrorInput
-            ref={editorRef}
-            content={content}
-            onChange={setContent}
-            editorWidth={isSplit ? editorWidth : undefined}
-          />
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/8 bg-admin-surface/90 shadow-[0_24px_60px_rgba(31,61,57,0.08)]">
+          {editorMode === "form" ? (
+            /* Structured Form Mode: Metadata panel on top + Body editor below */
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {/* Metadata Panel — scrollable */}
+              <div className="shrink-0 border-b border-admin-text/8 bg-white/75 px-4 py-3 backdrop-blur">
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-text/45">
+                  Structured editor
+                </p>
+                <p className="text-sm font-semibold text-admin-heading">
+                  Metadata on top, narrative body below
+                </p>
+              </div>
+              <div className="shrink-0 max-h-[42%] overflow-y-auto border-b border-admin-text/5">
+                <EditorMetadata
+                  metadata={metadata}
+                  onChange={handleMetadataChange}
+                  activeSlug={activeSlug}
+                />
+              </div>
+
+              {/* Body Content Editor */}
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <div className="sticky top-0 z-10 border-b border-admin-text/5 bg-white/80 px-4 py-2 backdrop-blur">
+                  <span className="sr-only text-[10px] font-black uppercase tracking-[0.15em] text-admin-text/50">
+                    ✎ Body Content (MDX)
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-admin-text/50">
+                    Body content (MDX)
+                  </span>
+                </div>
+                <div className="min-h-0 flex-1 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,242,234,0.7))]">
+                  <CodeMirrorInput
+                    ref={editorRef}
+                    content={bodyContent}
+                    onChange={handleBodyChange}
+                  />
+                </div>
+              </div>
+            </div>
+            ) : (
+              <>
+                <div className="shrink-0 border-b border-admin-text/8 bg-white/75 px-4 py-3 backdrop-blur">
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-text/45">
+                    Raw MDX
+                  </p>
+                  <p className="text-sm font-semibold text-admin-heading">
+                    Full document editing with frontmatter included
+                  </p>
+                </div>
+                <div className="min-h-0 flex-1 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,242,234,0.7))]">
+                  <CodeMirrorInput
+                    ref={editorRef}
+                    content={content}
+                    onChange={handleRawContentChange}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {isSplit ? (
@@ -462,12 +690,14 @@ export default function MdxEditor({
         ) : null}
 
         {isSplit || activeTab === "preview" ? (
-          <div className={`w-full md:w-auto flex-1 shrink-0 md:h-full min-h-[50vh] border-t md:border-t-0 ${activeTab === "preview" ? "flex" : "hidden md:flex"}`}>
+          <div className={`min-h-0 w-full flex-1 shrink-0 md:h-full md:w-auto ${activeTab === "preview" ? "flex" : "hidden md:flex"}`}>
             <EditorPreview
               previewSource={previewSource}
               activeSlug={activeSlug}
               previewAsset={previewAsset}
-              isPending={isPending}
+              metadata={metadata}
+              previewContent={content}
+              isPending={isCompiling}
               onClearPreviewAsset={() => setPreviewAsset(null)}
               onInsertAsset={insertAsset}
             />

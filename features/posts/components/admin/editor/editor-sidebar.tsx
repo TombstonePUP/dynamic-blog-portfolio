@@ -15,7 +15,7 @@ import {
   UploadCloud,
   FileText
 } from "lucide-react";
-import { useEffect, useState, useTransition, useRef } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { getBlogAssetsAction } from "@/app/actions/blog-actions";
 import { createClient } from "@/db/supabase/client";
 
@@ -55,12 +55,12 @@ export default function EditorSidebar({
 }: EditorSidebarProps) {
   return (
     <div
-      className={`min-h-full overflow-x-hidden overflow-y-auto border-r shadow-[inset_-10px_0_15px_-15px_rgba(0,0,0,0.1)] transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0"}`}
+      className={`flex min-h-0 flex-col overflow-hidden rounded-[24px] border border-admin-text/8 bg-admin-surface/90 shadow-[0_24px_60px_rgba(31,61,57,0.08)] transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent shadow-none"}`}
       style={showSidebar ? { flexBasis: `var(--sidebar-width, ${width}px)` } : { width: 0 }}
     >
       <style>{`@media (max-width: 768px) { .responsive-sidebar-inner { width: 100% !important; } }`}</style>
       <div
-        className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4 responsive-sidebar-inner"
+        className="responsive-sidebar-inner flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4 md:p-5"
         style={{ width: `var(--sidebar-width, ${width}px)` }}
       >
         <div className="flex items-center justify-between px-1 text-[11px] font-black uppercase tracking-[0.2em] text-admin-text/60">
@@ -168,7 +168,7 @@ function FolderItem({
 
   const supabase = createClient();
 
-  const fetchAssets = () => {
+  const fetchAssets = useCallback(() => {
     startTransition(async () => {
       const res = await getBlogAssetsAction(folder.slug);
       if (res.success && res.assets) {
@@ -176,13 +176,13 @@ function FolderItem({
       }
       setHasFetched(true);
     });
-  };
+  }, [folder.slug, startTransition]);
 
   useEffect(() => {
     if (isExpanded && !hasFetched) {
       fetchAssets();
     }
-  }, [isExpanded, folder.slug, hasFetched]);
+  }, [fetchAssets, hasFetched, isExpanded]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
