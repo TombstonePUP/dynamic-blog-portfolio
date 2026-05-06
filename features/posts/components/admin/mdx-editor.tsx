@@ -10,7 +10,7 @@ import {
 } from "@/app/actions/blog-actions";
 import { compileMdxAction } from "@/app/actions/mdx-actions";
 import { buildEditorDocument, parseEditorDocument } from "@/features/posts/lib/post-documents";
-import { ChevronDown, ChevronRight, Code, Eye, FileEdit, FolderOpen, FormInput } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, FileEdit, FolderOpen } from "lucide-react";
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
@@ -462,7 +462,7 @@ export default function MdxEditor({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-admin-bg font-sans shadow-xl select-none">
+    <div className="flex h-screen flex-col overflow-hidden bg-admin-bg font-sans shadow-xl select-none">
       <EditorDialogs
         isNewPostOpen={isDialogOpen}
         onCloseNewPost={() => setIsDialogOpen(false)}
@@ -496,84 +496,44 @@ export default function MdxEditor({
           setIsRenameDialogOpen(true);
         }}
         getLiveUrl={getLiveUrl}
+        editorMode={editorMode}
+        onSwitchEditorMode={switchEditorMode}
       />
 
       <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/30">
-        <div className="flex flex-col gap-4 px-4 py-4 md:px-6">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div className="flex flex-wrap gap-2 text-[10px] uppercase font-black tracking-widest text-admin-text/40">
-              <span className="rounded-full bg-admin-surface/50 px-3 py-1.5 ring-1 ring-admin-text/5">
-                {metadata.status.charAt(0).toUpperCase() + metadata.status.slice(1)}
-              </span>
-              <span className="rounded-full bg-admin-surface/50 px-3 py-1.5 ring-1 ring-admin-text/5">
-                {metadata.tags.length > 0 ? `${metadata.tags.length} tags` : "No tags"}
-              </span>
-              <span className="rounded-full bg-admin-surface/50 px-3 py-1.5 ring-1 ring-admin-text/5">
-                {activeSlug ? "Locked" : "Drafting"}
-              </span>
-            </div>
-          </div>
+        <div className="flex items-center justify-end px-4 py-2 md:px-6">
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="inline-flex rounded-full border border-admin-text/10 bg-admin-surface/80 p-1 shadow-sm">
-              <button
-                onClick={() => switchEditorMode("form")}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${editorMode === "form"
-                    ? "bg-admin-accent text-admin-contrast shadow-sm"
-                    : "text-admin-muted hover:bg-admin-surface-hover hover:text-admin-heading"
-                  }`}
-              >
-                <FormInput size={13} strokeWidth={2.5} />
-                Structured
-              </button>
-              <button
-                onClick={() => switchEditorMode("raw")}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${editorMode === "raw"
-                    ? "bg-admin-accent text-admin-contrast shadow-sm"
-                    : "text-admin-muted hover:bg-admin-surface-hover hover:text-admin-heading"
-                  }`}
-              >
-                <Code size={13} strokeWidth={2.5} />
-                Raw MDX
-              </button>
-            </div>
-
-            <div className="hidden items-center gap-2 rounded-full bg-admin-contrast/70 px-3 py-1.5 text-[11px] text-admin-text/55 ring-1 ring-admin-text/8 md:flex">
-              <span className={`size-2 rounded-full ${isCompiling ? "animate-pulse bg-amber-500" : "bg-emerald-500"}`} />
-              {isCompiling ? "Refreshing preview" : "Preview ready"}
-            </div>
-
-            <div className="flex rounded-full border border-admin-text/10 bg-admin-contrast/65 p-1 md:hidden">
-              <button
-                onClick={() => setActiveTab("explorer")}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "explorer"
-                    ? "bg-white text-admin-accent shadow-sm"
-                    : "text-admin-muted hover:text-admin-heading"
-                  }`}
-              >
-                <FolderOpen size={13} />
-              </button>
-              <button
-                onClick={() => setActiveTab("editor")}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "editor"
-                    ? "bg-white text-admin-accent shadow-sm"
-                    : "text-admin-muted hover:text-admin-heading"
-                  }`}
-              >
-                <FileEdit size={13} />
-              </button>
-              <button
-                onClick={() => setActiveTab("preview")}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "preview"
-                    ? "bg-white text-admin-accent shadow-sm"
-                    : "text-admin-muted hover:text-admin-heading"
-                  }`}
-              >
-                <Eye size={13} />
-              </button>
-            </div>
+          <div className="flex rounded-full border border-admin-text/10 bg-admin-contrast/65 p-1 md:hidden">
+            <button
+              onClick={() => setActiveTab("explorer")}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "explorer"
+                ? "bg-white text-admin-accent shadow-sm"
+                : "text-admin-muted hover:text-admin-heading"
+                }`}
+            >
+              <FolderOpen size={13} />
+            </button>
+            <button
+              onClick={() => setActiveTab("editor")}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "editor"
+                ? "bg-white text-admin-accent shadow-sm"
+                : "text-admin-muted hover:text-admin-heading"
+                }`}
+            >
+              <FileEdit size={13} />
+            </button>
+            <button
+              onClick={() => setActiveTab("preview")}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "preview"
+                ? "bg-white text-admin-accent shadow-sm"
+                : "text-admin-muted hover:text-admin-heading"
+                }`}
+            >
+              <Eye size={13} />
+            </button>
           </div>
         </div>
+
       </div>
 
       <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
@@ -617,10 +577,7 @@ export default function MdxEditor({
                 >
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
-                      Post Details
-                    </p>
-                    <p className="text-sm font-bold text-admin-heading tracking-tight">
-                      Metadata
+                      Post Details (Metadata)
                     </p>
                   </div>
                   {isMetadataExpanded ? (
@@ -630,7 +587,7 @@ export default function MdxEditor({
                   )}
                 </button>
                 {isMetadataExpanded && (
-                  <div className="shrink-0 max-h-[42%] overflow-y-auto border-b border-admin-text/5">
+                  <div className="shrink-0 overflow-y-auto border-b border-admin-text/5">
                     <EditorMetadata
                       metadata={metadata}
                       onChange={handleMetadataChange}

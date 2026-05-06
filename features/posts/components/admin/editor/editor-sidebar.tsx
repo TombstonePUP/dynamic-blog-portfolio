@@ -1,23 +1,23 @@
 "use client";
 
+import { getBlogAssetsAction } from "@/app/actions/blog-actions";
+import { createClient } from "@/db/supabase/client";
 import {
   ChevronDown,
   ChevronRight,
   FileCode,
   FileEdit,
+  FileText,
+  Folder,
   FolderOpen,
+  Image as ImageIcon,
   Info,
+  Loader2,
   Plus,
   Trash2,
-  Image as ImageIcon,
-  Loader2,
-  Folder,
-  UploadCloud,
-  FileText
+  UploadCloud
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import { getBlogAssetsAction } from "@/app/actions/blog-actions";
-import { createClient } from "@/db/supabase/client";
 
 type BlogFolder = {
   slug: string;
@@ -55,7 +55,7 @@ export default function EditorSidebar({
 }: EditorSidebarProps) {
   return (
     <div
-      className={`flex min-h-0 flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/80 transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent"}`}
+      className={`flex h-screen flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/80 transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent"}`}
       style={showSidebar ? { flexBasis: `var(--sidebar-width, ${width}px)` } : { width: 0 }}
     >
       <style>{`@media (max-width: 768px) { .responsive-sidebar-inner { width: 100% !important; } }`}</style>
@@ -100,7 +100,7 @@ export default function EditorSidebar({
 function NewDraftPlaceholder() {
   return (
     <div className="mb-4 flex flex-col">
-      <div className="bg-admin-accent text-admin-contrast px-3 py-2.5 text-sm font-black shadow-sm ring-1 ring-admin-accent/10">
+      <div className="bg-admin-accent text-admin-contrast px-3 py-2.5 text-sm font-black border-b border-admin-accent/20">
         <div className="flex items-center gap-3">
           <FileEdit
             size={16}
@@ -218,9 +218,9 @@ function FolderItem({
   return (
     <div className="flex flex-col group/folder">
       <div
-        className={`min-w-0 transition-all flex items-center justify-between rounded-lg ${isActive
-            ? "bg-admin-accent text-admin-contrast shadow-sm"
-            : "hover:bg-admin-surface-hover text-admin-text/70 hover:text-admin-heading"
+        className={`min-w-0 transition-all flex items-center justify-between border-b border-admin-text/5 ${isActive
+          ? "bg-admin-accent text-admin-contrast"
+          : "hover:bg-admin-surface-hover text-admin-text/70 hover:text-admin-heading"
           }`}
       >
         <button
@@ -263,7 +263,7 @@ function FolderItem({
         <div className="ml-6 mt-1 flex flex-col gap-0.5 border-l border-admin-text/10 pl-2">
           <button
             onClick={() => onLoadPost(folder.slug)}
-            className={`flex min-w-0 items-center gap-2.5 px-4 py-2 text-left text-[12px] font-bold transition rounded-md ${isActive ? "bg-admin-accent/5 text-admin-primary shadow-sm ring-1 ring-admin-accent/10" : "text-admin-text/50 hover:bg-admin-surface-hover hover:text-admin-heading"}`}
+            className={`flex min-w-0 items-center gap-2.5 px-4 py-2 text-left text-[12px] font-bold transition border-b border-admin-text/5 ${isActive ? "bg-admin-accent/5 text-admin-primary" : "text-admin-text/50 hover:bg-admin-surface-hover hover:text-admin-heading"}`}
           >
             <FileText size={14} strokeWidth={2.5} className={isActive ? "text-admin-primary" : "opacity-40"} />
             <span className="truncate">index.mdx</span>

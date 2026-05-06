@@ -41,9 +41,9 @@ interface EditorMetadataProps {
 }
 
 const STATUS_OPTIONS: { value: BlogStatus; label: string; icon: typeof Clock; color: string }[] = [
-  { value: "draft", label: "Draft", icon: Clock, color: "text-amber-500 bg-amber-500/10 border-amber-500/20" },
-  { value: "published", label: "Published", icon: CheckCircle, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" },
-  { value: "archived", label: "Archived", icon: Archive, color: "text-admin-muted bg-admin-muted/10 border-admin-muted/20" },
+  { value: "draft", label: "Draft", icon: Clock, color: "text-admin-danger bg-admin-danger/5 border-admin-danger/10" },
+  { value: "published", label: "Published", icon: CheckCircle, color: "text-admin-success bg-admin-success/5 border-admin-success/10" },
+  { value: "archived", label: "Archived", icon: Archive, color: "text-admin-muted bg-admin-muted/5 border-admin-muted/10" },
 ];
 
 function FieldLabel({ icon: Icon, label, hint }: { icon: typeof Type; label: string; hint?: string }) {
@@ -288,7 +288,7 @@ function ImageUploadZone({
             <span className="text-[10px] text-admin-text/30 truncate max-w-[80%]">
               {imageUrl.split("/").pop() || "Image"}
             </span>
-            <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider">Uploaded</span>
+            <span className="text-[9px] text-admin-success font-bold uppercase tracking-wider">Uploaded</span>
           </div>
         </div>
       ) : (
@@ -345,17 +345,6 @@ export default function EditorMetadata({ metadata, onChange, activeSlug }: Edito
 
   return (
     <div className="flex flex-col h-full overflow-y-auto bg-admin-surface">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-admin-surface/95 backdrop-blur-sm border-b border-admin-text/5 px-5 py-3.5">
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center size-6 bg-admin-primary/10 text-admin-primary">
-            <FileText size={13} strokeWidth={2.5} />
-          </div>
-          <span className="text-[11px] font-black uppercase tracking-[0.15em] text-admin-text/60">
-            Post Details
-          </span>
-        </div>
-      </div>
 
       <div className="flex flex-col gap-5 p-5">
         {/* Title */}

@@ -14,13 +14,13 @@ export default function EditorFooter({ content, isDirty }: EditorFooterProps) {
       </div>
       <div className="flex items-center gap-2">
         {isDirty ? (
-          <div className="flex items-center gap-2 text-amber-600">
-            <div className="size-1.5 rounded-full bg-amber-600 animate-pulse" />
+          <div className="flex items-center gap-2 text-admin-danger/70">
+            <div className="size-1.5 rounded-full bg-admin-danger/70 animate-pulse" />
             Unsaved Changes
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-emerald-600">
-            <div className="size-1.5 rounded-full bg-emerald-600" />
+          <div className="flex items-center gap-2 text-admin-success">
+            <div className="size-1.5 rounded-full bg-admin-success" />
             All Changes Saved
           </div>
         )}

@@ -1,8 +1,8 @@
 "use client";
 
 import { AUTHORS, readingMinutesFromContent } from "@/data/blog";
-import { getThemeColor } from "@/features/posts/lib/tag-theme";
 import { ClientMDXRemote } from "@/features/posts/components/mdx/client-mdx-remote";
+import { getThemeColor } from "@/features/posts/lib/tag-theme";
 import { Calendar, Clock, UserCircle, WandSparkles, X } from "lucide-react";
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 import type { CSSProperties } from "react";
@@ -94,13 +94,13 @@ export default function EditorPreview({
         <div className="min-h-0 flex-1 overflow-y-auto bg-admin-bg/40 p-4 md:p-6">
           <div className="mx-auto flex max-w-2xl flex-col items-center justify-center gap-6 rounded-3xl bg-admin-surface p-4 shadow-2xl md:p-6">
             <div className="w-full overflow-hidden rounded-2xl bg-admin-surface shadow-xl ring-1 ring-black/5">
-            <img 
-              src={previewAsset.dataUrl} 
-              alt={previewAsset.filename}
-              className="w-full h-auto object-contain max-h-[60vh]"
-            />
-          </div>
-          
+              <img
+                src={previewAsset.dataUrl}
+                alt={previewAsset.filename}
+                className="w-full h-auto object-contain max-h-[60vh]"
+              />
+            </div>
+
             <div className="w-full rounded-[20px] border border-admin-primary/15 bg-admin-primary/8 px-4 py-3">
               <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary">
                 Relative Path
@@ -109,7 +109,7 @@ export default function EditorPreview({
                 ./assets/{previewAsset.filename}
               </code>
             </div>
-          
+
             <button
               onClick={() => {
                 onInsertAsset(previewAsset.filename);
