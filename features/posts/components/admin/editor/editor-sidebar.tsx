@@ -55,7 +55,7 @@ export default function EditorSidebar({
 }: EditorSidebarProps) {
   return (
     <div
-      className={`flex max-h-full flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/80 transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent"}`}
+      className={`flex h-full flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/80 transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent"}`}
       style={showSidebar ? { flexBasis: `var(--sidebar-width, ${width}px)` } : { width: 0 }}
     >
       <style>{`@media (max-width: 768px) { .responsive-sidebar-inner { width: 100% !important; } }`}</style>
