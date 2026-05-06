@@ -92,8 +92,8 @@ export default function EditorPreview({
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto bg-admin-bg/40 p-4 md:p-6">
-          <div className="mx-auto flex max-w-2xl flex-col items-center justify-center gap-6 rounded-[28px] bg-white p-4 shadow-[0_28px_80px_rgba(31,61,57,0.12)] md:p-6">
-            <div className="w-full overflow-hidden rounded-[22px] bg-admin-surface shadow-xl ring-1 ring-black/5">
+          <div className="mx-auto flex max-w-2xl flex-col items-center justify-center gap-6 rounded-3xl bg-admin-surface p-4 shadow-2xl md:p-6">
+            <div className="w-full overflow-hidden rounded-2xl bg-admin-surface shadow-xl ring-1 ring-black/5">
             <img 
               src={previewAsset.dataUrl} 
               alt={previewAsset.filename}
@@ -144,7 +144,7 @@ export default function EditorPreview({
 
       <div className="min-h-0 flex-1 overflow-y-auto bg-admin-bg/40 p-3 md:p-5">
         <div className="mx-auto max-w-[1040px]">
-          <article className="overflow-hidden rounded-[28px] bg-white shadow-[0_36px_100px_rgba(31,61,57,0.16)]">
+          <article className="overflow-hidden rounded-3xl bg-background shadow-2xl">
             <header className="relative min-h-[20rem] overflow-hidden bg-admin-heading sm:min-h-[24rem]">
               {heroImage ? (
                 <img
@@ -258,7 +258,7 @@ export default function EditorPreview({
               </div>
 
               <div
-                className="mt-14 bg-[#f3f2f0]/60 px-6 py-8 text-center md:px-10"
+                className="mt-14 bg-foreground/5 px-6 py-8 text-center md:px-10"
                 style={{ borderTop: `6px solid ${themeColor}` }}
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">

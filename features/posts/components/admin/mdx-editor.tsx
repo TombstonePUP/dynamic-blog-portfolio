@@ -1,27 +1,27 @@
 "use client";
 
 import {
+  createDraftAction,
+  deleteStoryAction,
   getBlogContentAction,
   getBlogListAction,
   renameBlogSlugAction,
-  saveBlogContentAction,
-  createDraftAction,
-  deleteStoryAction
+  saveBlogContentAction
 } from "@/app/actions/blog-actions";
 import { compileMdxAction } from "@/app/actions/mdx-actions";
-import { useSearchParams, useRouter } from "next/navigation";
+import { buildEditorDocument, parseEditorDocument } from "@/features/posts/lib/post-documents";
+import { Code, Eye, FileEdit, FolderOpen, FormInput } from "lucide-react";
+import type { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import CodeMirrorInput, { type CodeMirrorInputRef } from "./editor/codemirror-input";
 import EditorDialogs from "./editor/editor-dialogs";
 import EditorFooter from "./editor/editor-footer";
-import CodeMirrorInput, { type CodeMirrorInputRef } from "./editor/codemirror-input";
+import EditorMetadata, { type PostMetadata } from "./editor/editor-metadata";
 import EditorPreview from "./editor/editor-preview";
 import EditorSidebar from "./editor/editor-sidebar";
 import EditorToolbar from "./editor/editor-toolbar";
-import EditorMetadata, { type PostMetadata } from "./editor/editor-metadata";
 import ResizeHandle from "./editor/resize-handle";
-import { Eye, FileEdit, FolderOpen, Code, FormInput } from "lucide-react";
-import { parseEditorDocument, buildEditorDocument } from "@/features/posts/lib/post-documents";
-import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 
 type BlogFolder = {
   slug: string;
@@ -84,9 +84,9 @@ export default function MdxEditor({
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialActiveSlug = searchParams.get("slug");
-  
-  const defaultContent = initialActiveSlug && initialBlogContents[initialActiveSlug] 
-    ? initialBlogContents[initialActiveSlug] 
+
+  const defaultContent = initialActiveSlug && initialBlogContents[initialActiveSlug]
+    ? initialBlogContents[initialActiveSlug]
     : initialContent;
 
   const [content, setContent] = useState(defaultContent);
@@ -101,7 +101,7 @@ export default function MdxEditor({
 
   // Editor mode: "form" (structured inputs) or "raw" (full MDX)
   const [editorMode, setEditorMode] = useState<EditorMode>("form");
-  
+
   // Structured metadata state — derived from content
   const [metadata, setMetadata] = useState<PostMetadata>(() => extractMetadataAndBody(defaultContent).metadata);
   const [bodyContent, setBodyContent] = useState<string>(() => extractMetadataAndBody(defaultContent).body);
@@ -117,7 +117,7 @@ export default function MdxEditor({
 
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const [editorWidth, setEditorWidth] = useState(600);
-  
+
   const sidebarWidthRef = useRef(sidebarWidth);
   const showSidebarRef = useRef(showSidebar);
   const isResizingSidebar = useRef(false);
@@ -250,7 +250,7 @@ export default function MdxEditor({
   // Switch mode: sync state when switching
   const switchEditorMode = useCallback((mode: EditorMode) => {
     if (mode === editorMode) return;
-    
+
     if (mode === "form") {
       // Switching from raw → form: parse the raw content
       const { metadata: m, body: b } = extractMetadataAndBody(content);
@@ -272,7 +272,7 @@ export default function MdxEditor({
           router.push(`?slug=${slug}`, { scroll: false });
         }
       }
-      
+
       // Update synchronously to prevent infinite loops with useSearchParams effect
       setActiveSlug(slug);
 
@@ -425,7 +425,7 @@ export default function MdxEditor({
 
     setIsSaving(true);
     const result = await deleteStoryAction(slug);
-    
+
     if (result.success) {
       if (activeSlug === slug) {
         setActiveSlug(null);
@@ -454,13 +454,13 @@ export default function MdxEditor({
       let cleanName = filename;
       if (cleanName.startsWith("./assets/")) cleanName = cleanName.slice(9);
       else if (cleanName.startsWith("assets/")) cleanName = cleanName.slice(7);
-      
+
       editorRef.current.insertText(`\n![Image](./assets/${cleanName})\n`);
     }
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-admin-text/10 bg-admin-bg font-sans shadow-xl select-none">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-admin-bg font-sans shadow-xl select-none">
       <EditorDialogs
         isNewPostOpen={isDialogOpen}
         onCloseNewPost={() => setIsDialogOpen(false)}
@@ -474,8 +474,8 @@ export default function MdxEditor({
         onConfirmRename={confirmRenameSlug}
         activeSlug={activeSlug}
         deleteTarget={null}
-        onCloseDelete={() => {}}
-        onConfirmDelete={() => {}}
+        onCloseDelete={() => { }}
+        onConfirmDelete={() => { }}
       />
 
       <EditorToolbar
@@ -499,18 +499,6 @@ export default function MdxEditor({
       <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/30">
         <div className="flex flex-col gap-4 px-4 py-4 md:px-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-admin-primary/60">
-                Writing workspace
-              </p>
-              <h2 className="mt-1 text-lg font-bold text-admin-heading md:text-xl tracking-tight">
-                Draft on the left, preview on the right.
-              </h2>
-              <p className="mt-1.5 text-sm leading-relaxed text-admin-text/60">
-                The form panel keeps metadata close at hand, while raw mode gives you the full MDX document.
-              </p>
-            </div>
-
             <div className="flex flex-wrap gap-2 text-[10px] uppercase font-black tracking-widest text-admin-text/40">
               <span className="rounded-full bg-admin-surface/50 px-3 py-1.5 ring-1 ring-admin-text/5">
                 {metadata.status.charAt(0).toUpperCase() + metadata.status.slice(1)}
@@ -528,22 +516,20 @@ export default function MdxEditor({
             <div className="inline-flex rounded-full border border-admin-text/10 bg-admin-surface/80 p-1 shadow-sm">
               <button
                 onClick={() => switchEditorMode("form")}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${
-                  editorMode === "form"
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${editorMode === "form"
                     ? "bg-admin-accent text-admin-contrast shadow-sm"
                     : "text-admin-muted hover:bg-admin-surface-hover hover:text-admin-heading"
-                }`}
+                  }`}
               >
                 <FormInput size={13} strokeWidth={2.5} />
                 Structured
               </button>
               <button
                 onClick={() => switchEditorMode("raw")}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${
-                  editorMode === "raw"
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${editorMode === "raw"
                     ? "bg-admin-accent text-admin-contrast shadow-sm"
                     : "text-admin-muted hover:bg-admin-surface-hover hover:text-admin-heading"
-                }`}
+                  }`}
               >
                 <Code size={13} strokeWidth={2.5} />
                 Raw MDX
@@ -558,31 +544,28 @@ export default function MdxEditor({
             <div className="flex rounded-full border border-admin-text/10 bg-admin-contrast/65 p-1 md:hidden">
               <button
                 onClick={() => setActiveTab("explorer")}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${
-                  activeTab === "explorer"
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "explorer"
                     ? "bg-white text-admin-accent shadow-sm"
                     : "text-admin-muted hover:text-admin-heading"
-                }`}
+                  }`}
               >
                 <FolderOpen size={13} />
               </button>
               <button
                 onClick={() => setActiveTab("editor")}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${
-                  activeTab === "editor"
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "editor"
                     ? "bg-white text-admin-accent shadow-sm"
                     : "text-admin-muted hover:text-admin-heading"
-                }`}
+                  }`}
               >
                 <FileEdit size={13} />
               </button>
               <button
                 onClick={() => setActiveTab("preview")}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${
-                  activeTab === "preview"
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[10px] font-bold transition-colors ${activeTab === "preview"
                     ? "bg-white text-admin-accent shadow-sm"
                     : "text-admin-muted hover:text-admin-heading"
-                }`}
+                  }`}
               >
                 <Eye size={13} />
               </button>
@@ -617,47 +600,47 @@ export default function MdxEditor({
           </div>
         ) : null}
 
-        <div 
+        <div
           className={`min-h-0 w-full shrink-0 md:h-full md:w-auto ${isSplit ? "md:flex-none" : "flex-1"} ${activeTab === "editor" ? "flex" : "hidden md:flex"}`}
           style={isSplit ? { flexBasis: editorWidth, width: editorWidth } : {}}
         >
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/8 bg-admin-surface/90 shadow-[0_24px_60px_rgba(31,61,57,0.08)]">
-          {editorMode === "form" ? (
-            /* Structured Form Mode: Metadata panel on top + Body editor below */
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {/* Metadata Panel — scrollable */}
-              <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
-                  Structured editor
-                </p>
-                <p className="text-sm font-bold text-admin-heading tracking-tight">
-                  Metadata & Content
-                </p>
-              </div>
-              <div className="shrink-0 max-h-[42%] overflow-y-auto border-b border-admin-text/5">
-                <EditorMetadata
-                  metadata={metadata}
-                  onChange={handleMetadataChange}
-                  activeSlug={activeSlug}
-                />
-              </div>
-
-              {/* Body Content Editor */}
+            {editorMode === "form" ? (
+              /* Structured Form Mode: Metadata panel on top + Body editor below */
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <div className="sticky top-0 z-10 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-2 backdrop-blur">
-                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-admin-primary/60">
-                    Story content (MDX)
-                  </span>
+                {/* Metadata Panel — scrollable */}
+                <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
+                    Structured editor
+                  </p>
+                  <p className="text-sm font-bold text-admin-heading tracking-tight">
+                    Metadata & Content
+                  </p>
                 </div>
-                <div className="min-h-0 flex-1 bg-admin-surface">
-                  <CodeMirrorInput
-                    ref={editorRef}
-                    content={bodyContent}
-                    onChange={handleBodyChange}
+                <div className="shrink-0 max-h-[42%] overflow-y-auto border-b border-admin-text/5">
+                  <EditorMetadata
+                    metadata={metadata}
+                    onChange={handleMetadataChange}
+                    activeSlug={activeSlug}
                   />
                 </div>
+
+                {/* Body Content Editor */}
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                  <div className="sticky top-0 z-10 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-2 backdrop-blur">
+                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-admin-primary/60">
+                      Story content (MDX)
+                    </span>
+                  </div>
+                  <div className="min-h-0 flex-1 bg-admin-surface">
+                    <CodeMirrorInput
+                      ref={editorRef}
+                      content={bodyContent}
+                      onChange={handleBodyChange}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
             ) : (
               <>
                 <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
