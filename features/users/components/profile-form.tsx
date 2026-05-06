@@ -86,7 +86,7 @@ export default function ProfileForm({
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
             First Name
           </span>
-          <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <div className="flex items-center gap-3 border border-admin-text/10 bg-admin-bg/50 px-4 py-3">
             <UserRound className="size-4 text-foreground/35" />
             <input
               {...register("firstName")}
@@ -104,7 +104,7 @@ export default function ProfileForm({
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
             Last Name
           </span>
-          <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+          <div className="flex items-center gap-3 border border-admin-text/10 bg-admin-bg/50 px-4 py-3">
             <UserRound className="size-4 text-foreground/35" />
             <input
               {...register("lastName")}
@@ -123,7 +123,7 @@ export default function ProfileForm({
         <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
           Username
         </span>
-        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+        <div className="flex items-center gap-3 border border-admin-text/10 bg-admin-bg/50 px-4 py-3">
           <UserRound className="size-4 text-foreground/35" />
           <input
             {...register("username")}
@@ -148,7 +148,7 @@ export default function ProfileForm({
         <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
           Email Address
         </span>
-        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3 opacity-60 cursor-not-allowed">
+        <div className="flex items-center gap-3 border border-admin-text/10 bg-admin-bg/50 px-4 py-3 opacity-60 cursor-not-allowed">
           <Mail className="size-4 text-foreground/35" />
           <input
             type="email"

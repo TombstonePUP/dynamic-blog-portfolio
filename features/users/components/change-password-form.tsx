@@ -100,7 +100,7 @@ export default function ChangePasswordForm() {
         <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
           Current Password
         </span>
-        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+        <div className="flex items-center gap-3 border border-admin-text/10 bg-admin-bg/50 px-4 py-3">
           <LockKeyhole className="size-4 text-foreground/35" />
           <input
             type="password"
@@ -121,7 +121,7 @@ export default function ChangePasswordForm() {
         <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
           New Password
         </span>
-        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+        <div className="flex items-center gap-3 border border-admin-text/10 bg-admin-bg/50 px-4 py-3">
           <LockKeyhole className="size-4 text-foreground/35" />
           <input
             type="password"
@@ -170,7 +170,7 @@ export default function ChangePasswordForm() {
         <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-foreground/50">
           Confirm New Password
         </span>
-        <div className="flex items-center gap-3 border border-black/10 bg-[#fbfaf6] px-4 py-3">
+        <div className="flex items-center gap-3 border border-admin-text/10 bg-admin-bg/50 px-4 py-3">
           <LockKeyhole className="size-4 text-foreground/35" />
           <input
             type="password"
