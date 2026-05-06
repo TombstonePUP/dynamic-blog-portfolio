@@ -73,7 +73,7 @@ export default function EditorPreview({
 
   if (previewAsset) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/5 bg-admin-surface/80 shadow-xl">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-admin-surface/80">
         <div className="flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
@@ -126,7 +126,7 @@ export default function EditorPreview({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/5 bg-admin-surface/80 shadow-xl">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-admin-surface/80">
       <div className="flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">

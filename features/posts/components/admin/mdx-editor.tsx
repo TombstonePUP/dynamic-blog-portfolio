@@ -10,7 +10,7 @@ import {
 } from "@/app/actions/blog-actions";
 import { compileMdxAction } from "@/app/actions/mdx-actions";
 import { buildEditorDocument, parseEditorDocument } from "@/features/posts/lib/post-documents";
-import { Code, Eye, FileEdit, FolderOpen, FormInput } from "lucide-react";
+import { ChevronDown, ChevronRight, Code, Eye, FileEdit, FolderOpen, FormInput } from "lucide-react";
 import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
@@ -101,6 +101,8 @@ export default function MdxEditor({
 
   // Editor mode: "form" (structured inputs) or "raw" (full MDX)
   const [editorMode, setEditorMode] = useState<EditorMode>("form");
+  const [isMetadataExpanded, setIsMetadataExpanded] = useState(true);
+  const [isContentExpanded, setIsContentExpanded] = useState(true);
 
   // Structured metadata state — derived from content
   const [metadata, setMetadata] = useState<PostMetadata>(() => extractMetadataAndBody(defaultContent).metadata);
@@ -574,7 +576,7 @@ export default function MdxEditor({
         </div>
       </div>
 
-      <div className="relative flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-3 md:flex-row md:p-4">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
         <div className={`min-h-0 w-full md:w-auto shrink-0 md:h-full ${activeTab === "explorer" ? "block" : "hidden md:block"}`}>
           <EditorSidebar
             width={sidebarWidth}
@@ -604,41 +606,63 @@ export default function MdxEditor({
           className={`min-h-0 w-full shrink-0 md:h-full md:w-auto ${isSplit ? "md:flex-none" : "flex-1"} ${activeTab === "editor" ? "flex" : "hidden md:flex"}`}
           style={isSplit ? { flexBasis: editorWidth, width: editorWidth } : {}}
         >
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/8 bg-admin-surface/90 shadow-[0_24px_60px_rgba(31,61,57,0.08)]">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/90">
             {editorMode === "form" ? (
               /* Structured Form Mode: Metadata panel on top + Body editor below */
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
                 {/* Metadata Panel — scrollable */}
-                <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
-                    Structured editor
-                  </p>
-                  <p className="text-sm font-bold text-admin-heading tracking-tight">
-                    Metadata & Content
-                  </p>
-                </div>
-                <div className="shrink-0 max-h-[42%] overflow-y-auto border-b border-admin-text/5">
-                  <EditorMetadata
-                    metadata={metadata}
-                    onChange={handleMetadataChange}
-                    activeSlug={activeSlug}
-                  />
-                </div>
+                <button
+                  onClick={() => setIsMetadataExpanded(!isMetadataExpanded)}
+                  className="shrink-0 flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur hover:bg-admin-surface-hover transition-colors text-left"
+                >
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
+                      Post Details
+                    </p>
+                    <p className="text-sm font-bold text-admin-heading tracking-tight">
+                      Metadata
+                    </p>
+                  </div>
+                  {isMetadataExpanded ? (
+                    <ChevronDown size={18} className="text-admin-text/40" />
+                  ) : (
+                    <ChevronRight size={18} className="text-admin-text/40" />
+                  )}
+                </button>
+                {isMetadataExpanded && (
+                  <div className="shrink-0 max-h-[42%] overflow-y-auto border-b border-admin-text/5">
+                    <EditorMetadata
+                      metadata={metadata}
+                      onChange={handleMetadataChange}
+                      activeSlug={activeSlug}
+                    />
+                  </div>
+                )}
 
                 {/* Body Content Editor */}
                 <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                  <div className="sticky top-0 z-10 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-2 backdrop-blur">
+                  <button
+                    onClick={() => setIsContentExpanded(!isContentExpanded)}
+                    className="sticky top-0 z-10 flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-2 backdrop-blur hover:bg-admin-surface-hover transition-colors text-left"
+                  >
                     <span className="text-[10px] font-black uppercase tracking-[0.15em] text-admin-primary/60">
                       Story content (MDX)
                     </span>
-                  </div>
-                  <div className="min-h-0 flex-1 bg-admin-surface">
-                    <CodeMirrorInput
-                      ref={editorRef}
-                      content={bodyContent}
-                      onChange={handleBodyChange}
-                    />
-                  </div>
+                    {isContentExpanded ? (
+                      <ChevronDown size={16} className="text-admin-text/40" />
+                    ) : (
+                      <ChevronRight size={16} className="text-admin-text/40" />
+                    )}
+                  </button>
+                  {isContentExpanded && (
+                    <div className="min-h-0 flex-1 bg-admin-surface">
+                      <CodeMirrorInput
+                        ref={editorRef}
+                        content={bodyContent}
+                        onChange={handleBodyChange}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
