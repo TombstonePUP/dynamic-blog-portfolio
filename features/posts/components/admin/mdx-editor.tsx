@@ -188,7 +188,7 @@ export default function MdxEditor({
       const serverList = result.list || [];
       const serverSlugs = new Set(serverList.map(f => f.slug));
       const extraFolders = initialBlogFolders.filter(f => !serverSlugs.has(f.slug));
-      
+
       setBlogFolders([...serverList, ...extraFolders]);
     }
   }
@@ -594,7 +594,7 @@ export default function MdxEditor({
                   )}
                 </button>
                 {isMetadataExpanded && (
-                  <div className="shrink-0 overflow-y-auto border-b border-admin-text/5">
+                  <div className="shrink-0 max-h-[40%] overflow-y-auto border-b border-admin-text/5">
                     <EditorMetadata
                       metadata={metadata}
                       onChange={handleMetadataChange}
@@ -619,7 +619,7 @@ export default function MdxEditor({
                     )}
                   </button>
                   {isContentExpanded && (
-                    <div className="min-h-0 flex-1 bg-admin-surface">
+                    <div className="min-h-0 flex-1 bg-admin-surface overflow-y-scroll">
                       <CodeMirrorInput
                         ref={editorRef}
                         content={bodyContent}
