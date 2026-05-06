@@ -411,14 +411,6 @@ export default function EditorMetadata({ metadata, onChange, activeSlug }: Edito
           <div className="flex-1 border-t border-admin-text/5" />
         </div>
 
-        {/* Cover Image Upload */}
-        <ImageUploadZone
-          label="Cover Image"
-          imageUrl={metadata.image}
-          onUrlChange={(url) => update("image", url)}
-          activeSlug={activeSlug}
-        />
-
         {/* Thumbnail Upload */}
         <ImageUploadZone
           label="Thumbnail"
