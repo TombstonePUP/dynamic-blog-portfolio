@@ -65,6 +65,18 @@
 +---------------------------------------------------------+
 ```
 
+### Auth Layout Shell
+```text
++---------------------------------------------------------+
+|                                                         |
+|                                                         |
+|                [Auth Card / Children]                   |
+|           .max-w-md .bg-white/90 .backdrop-blur         |
+|                                                         |
+|                                                         |
++---------------------------------------------------------+
+```
+
 ## Components
 
 ### Button
@@ -185,6 +197,33 @@
   <div class="w-full max-w-md bg-admin-surface p-8 shadow-2xl ring-1 ring-black/10">
     <!-- Header, Body, Footer -->
   </div>
+</div>
+```
+
+### Auth Form
+**Anatomy:**
+```text
++-----------------------------------------+
+| [ Sign in ] [ Create account ]          |
+| --------------------------------------- |
+| (Icon) Email or username                |
+| (Icon) Password         [Forgot?]       |
+|                                         |
+| [ Sign in Button ]                      |
++-----------------------------------------+
+```
+**Code Structure:**
+```html
+<div class="w-full max-w-md bg-white/90 p-8 shadow-2xl backdrop-blur">
+  <div class="mb-8 flex gap-2 bg-admin-bg p-1">
+    <button class="flex-1 bg-white px-4 py-2 text-sm font-semibold shadow-sm">
+      Sign in
+    </button>
+    <button class="flex-1 text-admin-text/55 px-4 py-2 text-sm font-semibold">
+      Create account
+    </button>
+  </div>
+  <!-- Form Fields -->
 </div>
 ```
 

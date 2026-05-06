@@ -184,13 +184,10 @@ function SignInForm({
         <button
           type="button"
           onClick={onForgotPassword}
-          className="font-medium text-[#2b776a] transition hover:text-[#1f5b52]"
+          className="ml-auto font-medium text-[#2b776a] transition hover:text-[#1f5b52]"
         >
           Forgot password?
         </button>
-        <p className="text-right text-foreground/45">
-          Protected with email verification and temporary lockouts.
-        </p>
       </div>
 
       <FormMessage state={state} fallbackMessage={initialNotice} />
@@ -398,22 +395,20 @@ export default function AuthForm({
           <button
             type="button"
             onClick={() => setMode("sign-in")}
-            className={`flex-1 px-4 py-2 text-sm font-semibold transition ${
-              mode === "sign-in"
-                ? "bg-white text-foreground shadow-sm"
-                : "text-foreground/55"
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-semibold transition ${mode === "sign-in"
+              ? "bg-white text-foreground shadow-sm"
+              : "text-foreground/55"
+              }`}
           >
             Sign in
           </button>
           <button
             type="button"
             onClick={() => setMode("sign-up")}
-            className={`flex-1 px-4 py-2 text-sm font-semibold transition ${
-              mode === "sign-up"
-                ? "bg-white text-foreground shadow-sm"
-                : "text-foreground/55"
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-semibold transition ${mode === "sign-up"
+              ? "bg-white text-foreground shadow-sm"
+              : "text-foreground/55"
+              }`}
           >
             Create account
           </button>

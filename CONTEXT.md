@@ -34,20 +34,21 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 |   |-- (admin)/             # Authenticated CMS and dashboard routes
 |   |-- (auth)/              # Authentication routes and approval flow
 |   |-- (guest)/             # Public reader and marketing routes
-|   |-- actions/             # Thin Server Actions delegating to services
-|   `-- api/                 # API routes and admin asset handlers
+|   |-- actions/             # Thin Server Actions delegating to services (Auth, Posts, etc.)
+|   |-- api/                 # API routes and admin asset handlers
+|   `-- auth/                # Supabase Auth callback handlers (confirm, signout)
 |-- components/              # Shared layout, branding, guest UI, and compatibility entrypoints
 |-- db/                      # Supabase clients plus query and persistence modules
-|   |-- queries/             # Database and storage query modules for posts and profiles
+|   |-- queries/             # Database and storage query modules (posts, profiles, auth-security)
 |   `-- supabase/            # Browser, server, and proxy Supabase client factories
 |-- features/                # Feature-owned UI and feature-local helpers
-|   |-- auth/                # Authentication components and server context
+|   |-- auth/                # Authentication components, server context, and security
 |   |-- posts/               # Story editor UI, MDX rendering, and post-specific helpers
 |   `-- users/               # Profile forms and user-management helpers
 |-- services/                # Route-facing business logic entrypoints
 |-- validators/              # Shared Zod schemas for auth, users, and post actions
 |-- lib/                     # Backward-compatible shims for older shared imports
-|-- scripts/                 # Migration and seeding utilities
+|-- scripts/                 # Migration, seeding, and management utilities
 |-- supabase/                # Local database schema and migrations
 |-- types/                   # Backward-compatible type re-exports
 `-- utils/                   # Backward-compatible Supabase import shims
@@ -56,10 +57,9 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 ## Layout System
 | Layout | File | Used By | Styling Approach |
 | :--- | :--- | :--- | :--- |
-| **Root** | `app/layout.tsx` | All pages | Minimal; manages fonts and global context. |
-| **Guest** | `app/(guest)/layout.tsx` | `/`, `/about`, `/topics`, and story routes | Uses `Hanken Grotesk`; includes `GuestHeader` and `GuestFooter`. |
-| **Admin** | `app/(admin)/layout.tsx` | `/dashboard`, `/editor`, `/posts`, `/users`, `/profile` | Uses `Inter`; includes `AdminHeader`; enforces approved desktop access. |
-| **Auth** | `app/(auth)/layout.tsx` | `/login`, `/pending`, `/auth-error` | Lightweight auth shell for sign-in and approval flows. |
+| **Guest (Root)** | `app/(guest)/layout.tsx` | `/`, `/about`, `/topics`, and story routes | Uses `Hanken Grotesk`; includes `GuestHeader` and `GuestFooter`. Acts as a root layout. |
+| **Admin (Root)** | `app/(admin)/layout.tsx` | `/dashboard`, `/editor`, `/posts`, `/users`, `/profile` | Uses `Inter`; includes `AdminHeader`; enforces approved desktop access. Acts as a root layout. |
+| **Auth (Root)** | `app/(auth)/layout.tsx` | `/login`, `/pending`, `/auth-error`, `/reset-password` | Lightweight auth shell for sign-in and approval flows. Acts as a root layout. |
 
 ## Routing Conventions
 | Pattern | Layout | Note |
@@ -67,8 +67,10 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 | `/` | Guest | Portfolio landing page with featured stories. |
 | `/topics` | Guest | Filterable list of story categories. |
 | `/login` | Auth | Access point for story authors. |
+| `/reset-password` | Auth | Secure password recovery flow. |
 | `/dashboard` | Admin | Overview of stories and draft status. |
 | `/editor` | Admin | Specialized workspace for MDX editing. |
+| `/editor-static` | Admin | Alternative static editor for legacy support. |
 | `/[slug]` | Guest | Dynamic story rendering via MDX. |
 
 ## Render Mode
@@ -88,3 +90,5 @@ The project uses **Tailwind CSS 4** with a strict design system defined in `glob
 - **Admin Access**: Desktop-only restriction is enforced via layout; mobile users see a blocker.
 - **Mutations**: All database updates must go through Server Actions in `app/actions/`.
 - **MDX**: Use `ClientMDXRemote` for previewing to avoid hostname whitelist issues with `next/image`.
+- **Auth Security**: All sign-in attempts are tracked in `auth_security_events` and rate-limited via `login_attempts` table.
+
