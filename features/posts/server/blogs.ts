@@ -27,8 +27,25 @@ function resolveAuthor(
     name: row.author_name || profile?.display_name || "Author",
     slug: row.author_slug || profile?.slug || "author",
     role: row.author_role || profile?.role || "Writer",
-    image: row.author_avatar_url || profile?.avatar_url || undefined,
+    image:
+      sanitizeDisplayImageUrl(row.author_avatar_url) ||
+      sanitizeDisplayImageUrl(profile?.avatar_url) ||
+      undefined,
   };
+}
+
+function sanitizeDisplayImageUrl(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+
+  if (!trimmed || trimmed.startsWith("./") || trimmed.startsWith("/images/")) {
+    return null;
+  }
+
+  return trimmed;
 }
 
 function mapSupabasePost(
@@ -38,6 +55,9 @@ function mapSupabasePost(
   const date = row.published_on || row.created_at.slice(0, 10);
   const assetFolder = row.asset_folder || row.slug;
   const contentMdx = rewritePostAssetUrls(assetFolder, row.content_mdx);
+  const imageUrl = sanitizeDisplayImageUrl(
+    resolvePostAssetUrl(assetFolder, row.image_url),
+  );
 
   return {
     id: row.id,
@@ -46,12 +66,8 @@ function mapSupabasePost(
     slug: row.slug,
     title: row.title,
     href: `/${row.slug}`,
-    image:
-      resolvePostAssetUrl(assetFolder, row.image_url) ||
-      "/images/blog/unsplash-1499750310107-5fef28a66643.jpg",
-    thumbnail:
-      resolvePostAssetUrl(assetFolder, row.image_url) ||
-      "/images/blog/unsplash-1499750310107-5fef28a66643.jpg",
+    image: imageUrl,
+    thumbnail: imageUrl,
     author: resolveAuthor(row, profile),
     date,
     dateLabel: formatDateLabel(date),

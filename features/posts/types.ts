@@ -52,7 +52,7 @@ export interface Author {
   name: string;
   slug: string;
   role?: string;
-  image?: string;
+  image?: string | null;
   link?: string;
   social?: {
     x?: string;
@@ -75,9 +75,9 @@ export interface Blog {
   title: string;
   href: string;
   /** Canonical post image URL reused for cover and thumbnail layouts */
-  image: string;
+  image: string | null;
   /** Derived thumbnail presentation URL, currently the same asset as image */
-  thumbnail: string;
+  thumbnail: string | null;
   author: Author;
   /** ISO 8601 date string e.g. "2025-08-13" */
   date: string;

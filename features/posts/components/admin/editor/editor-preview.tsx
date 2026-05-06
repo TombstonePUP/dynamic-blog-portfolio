@@ -1,6 +1,6 @@
 "use client";
 
-import { AUTHORS, readingMinutesFromContent } from "@/data/blog";
+import { readingMinutesFromContent } from "@/data/blog";
 import { ClientMDXRemote } from "@/features/posts/components/mdx/client-mdx-remote";
 import { getThemeColor } from "@/features/posts/lib/tag-theme";
 import { Calendar, Clock, UserCircle, WandSparkles, X } from "lucide-react";
@@ -37,6 +37,19 @@ function formatPreviewDate(value: string): string {
   }).format(parsed);
 }
 
+function formatAuthorName(value: string | null | undefined) {
+  const normalized = value?.trim();
+
+  if (!normalized) {
+    return "Writer";
+  }
+
+  return normalized
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 interface EditorPreviewProps {
   previewSource: MDXRemoteSerializeResult | null;
   activeSlug: string | null;
@@ -60,14 +73,7 @@ export default function EditorPreview({
 }: EditorPreviewProps) {
   const themeColor = getThemeColor(metadata.tags);
   const label = seriesLabel(metadata.tags);
-  const authorProfile =
-    metadata.author && metadata.author in AUTHORS
-      ? AUTHORS[metadata.author as keyof typeof AUTHORS]
-      : null;
-  const authorName =
-    authorProfile?.name ??
-    metadata.author?.replace(/-/g, " ") ??
-    "Writer";
+  const authorName = formatAuthorName(metadata.author);
   const readingMinutes = readingMinutesFromContent(previewContent);
   const heroImage = metadata.image;
 

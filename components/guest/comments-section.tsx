@@ -51,6 +51,11 @@ function getLoadErrorMessage(message: string) {
   return "Comments are unavailable right now.";
 }
 
+function toDisplayInitial(name: string) {
+  const trimmed = name.trim();
+  return trimmed ? trimmed.charAt(0).toUpperCase() : "?";
+}
+
 export default function CommentsSection({
   postSlug,
   themeColor,
@@ -67,6 +72,7 @@ export default function CommentsSection({
   const displayComments = enabled ? comments : [];
   const displayLoading = enabled ? loading : false;
   const displayErrorMessage = enabled ? errorMessage : null;
+  const resolvedThemeColor = themeColor || "#72dbcc";
 
   useEffect(() => {
     if (!enabled) {
@@ -175,11 +181,11 @@ export default function CommentsSection({
               style={{ borderLeft: `4px solid ${themeColor}` }}
             >
               <div className="mb-3 flex items-center gap-3">
-                <div
-                  className="flex size-8 items-center justify-center text-xs font-bold text-foreground/70"
-                  style={{ backgroundColor: `${themeColor}30` }}
-                >
-                  {comment.name.charAt(0).toUpperCase()}
+              <div
+                className="flex size-8 items-center justify-center text-xs font-bold text-foreground/70"
+                style={{ backgroundColor: `${resolvedThemeColor}30` }}
+              >
+                  {toDisplayInitial(comment.name)}
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground">
@@ -217,7 +223,9 @@ export default function CommentsSection({
               placeholder="Your name"
               required
               className="w-full border border-foreground/15 bg-white px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 transition focus:outline-none focus:ring-2 focus:ring-offset-1"
-              style={{ "--tw-ring-color": themeColor } as React.CSSProperties}
+              style={
+                { "--tw-ring-color": resolvedThemeColor } as React.CSSProperties
+              }
             />
             <textarea
               value={body}
@@ -226,14 +234,16 @@ export default function CommentsSection({
               required
               rows={4}
               className="w-full resize-none border border-foreground/15 bg-white px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 transition focus:outline-none focus:ring-2 focus:ring-offset-1"
-              style={{ "--tw-ring-color": themeColor } as React.CSSProperties}
+              style={
+                { "--tw-ring-color": resolvedThemeColor } as React.CSSProperties
+              }
             />
             <div className="flex items-center justify-end gap-4">
               <button
                 type="submit"
                 disabled={submitting}
                 className="inline-flex cursor-pointer items-center gap-2 px-6 py-3 text-sm font-bold text-black transition hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
-                style={{ backgroundColor: themeColor }}
+                style={{ backgroundColor: resolvedThemeColor }}
               >
                 <Send className="size-4" strokeWidth={2} />
                 {submitting ? "Posting..." : "Post comment"}

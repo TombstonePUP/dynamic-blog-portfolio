@@ -1,45 +1,4 @@
-import type { Author, Tag } from "@/features/posts/types";
-
-// ─── Authors ────────────────────────────────────────────────────────────────
-
-export const AUTHORS: Record<string, Author> = {
-  ian: {
-    name: "Ian Llenares",
-    slug: "ian",
-    role: "Founder & Lead Writer",
-    image: "/images/blog/Ian-L-1024x1024.jpg",
-    social: {
-      x: "https://x.com/ianllenares",
-      linkedin: "https://linkedin.com/in/ianllenares",
-      instagram: "https://instagram.com/ianllenares",
-      github: "https://github.com/ianllenares",
-      youtube: "https://youtube.com/ianllenares",
-      tiktok: "https://tiktok.com/ianllenares",
-    },
-  },
-  johndoe: {
-    name: "John Doe",
-    slug: "johndoe",
-    role: "Guest Contributor",
-    image: "/images/blog/unsplash-1472099645785-5658abf4ff4e.jpg",
-    social: {
-      x: "https://x.com/johndoe",
-      linkedin: "https://linkedin.com/in/johndoe",
-    },
-  },
-  janedoe: {
-    name: "Jane Doe",
-    slug: "janedoe",
-    role: "Editorial Assistant",
-    image: "/images/blog/unsplash-1438761681033-6461ffad8d80.jpg",
-    social: {
-      instagram: "https://instagram.com/janedoe",
-      tiktok: "https://tiktok.com/janedoe",
-    },
-  },
-} as const;
-
-// ─── Tags ────────────────────────────────────────────────────────────────────
+import type { Tag } from "@/features/posts/types";
 
 export const MAIN_CATEGORIES: Tag[] = [
   "movie Review",
@@ -50,14 +9,12 @@ export const MAIN_CATEGORIES: Tag[] = [
 ];
 
 export const ALL_TAGS: Tag[] = [
-  // Categories
   "featured",
   "movie Review",
   "personal blog",
   "what's your worry?",
   "why positive psychology?",
   "advice",
-  // SubTags
   "career search",
   "character strengths",
   "coping this new normal",
@@ -97,7 +54,6 @@ export const ALL_TAGS: Tag[] = [
   "workplace",
 ];
 
-/** Convert a tag label into a URL-safe slug (spaces → hyphens, lowercase) */
 export function tagToSlug(tag: string): string {
   return tag
     .toLowerCase()
@@ -106,15 +62,12 @@ export function tagToSlug(tag: string): string {
     .replace(/^-|-$/g, "");
 }
 
-/** Reverse a slug back to the original Tag, or undefined if not found */
 export function slugToTag(slug: string): Tag | undefined {
-  return ALL_TAGS.find((t) => tagToSlug(t) === slug);
+  return ALL_TAGS.find((tag) => tagToSlug(tag) === slug);
 }
 
-export function readingMinutesFromContent(paragraphs: string[] | string): number {
+export function readingMinutesFromContent(paragraphs: string[] | string) {
   const text = Array.isArray(paragraphs) ? paragraphs.join(" ") : paragraphs;
   const words = text.split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }
-
-

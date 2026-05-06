@@ -43,7 +43,7 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 |   `-- supabase/            # Browser, server, and proxy Supabase client factories
 |-- features/                # Feature-owned UI and feature-local helpers
 |   |-- auth/                # Authentication components, server context, and security
-|   |-- posts/               # Story editor UI, MDX rendering, and post-specific helpers
+|   |-- posts/               # Guest story views, story editor UI, MDX rendering, and post-specific helpers
 |   `-- users/               # Profile forms and user-management helpers
 |-- services/                # Route-facing business logic entrypoints
 |-- validators/              # Shared Zod schemas for auth, users, and post actions
@@ -57,7 +57,7 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 ## Layout System
 | Layout | File | Used By | Styling Approach |
 | :--- | :--- | :--- | :--- |
-| **Guest (Root)** | `app/(guest)/layout.tsx` | `/`, `/about`, `/topics`, and story routes | Uses `Hanken Grotesk`; includes `GuestHeader` and `GuestFooter`. Acts as a root layout. |
+| **Guest (Root)** | `app/(guest)/layout.tsx` | `/`, `/topics`, and story routes | Uses `Hanken Grotesk`; includes `GuestHeader` with dynamic search and no static footer. Acts as a root layout. |
 | **Admin (Root)** | `app/(admin)/layout.tsx` | `/dashboard`, `/editor`, `/posts`, `/users`, `/profile` | Uses `Inter`; includes `AdminHeader`; enforces approved desktop access. Acts as a root layout. |
 | **Auth (Root)** | `app/(auth)/layout.tsx` | `/login`, `/pending`, `/auth-error`, `/reset-password` | Lightweight auth shell for sign-in and approval flows. Acts as a root layout. |
 
@@ -70,12 +70,11 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 | `/reset-password` | Auth | Secure password recovery flow. |
 | `/dashboard` | Admin | Overview of stories and draft status. |
 | `/editor` | Admin | Specialized workspace for MDX editing. |
-| `/editor-static` | Admin | Alternative static editor for legacy support. |
 | `/[slug]` | Guest | Dynamic story rendering via MDX. |
 
 ## Render Mode
-- **Hybrid Rendering**: The app uses Server-Side Rendering (SSR) for data fetching in `page.tsx` files and Client-Side Rendering (CSR) for interactive elements such as the editor, search modal, and comments.
-- **Dynamic Data Source**: Guest and admin content now resolve through services backed by Supabase data and storage.
+- **Hybrid Rendering**: The app uses Server-Side Rendering (SSR) for thin route data loading and Client-Side Rendering (CSR) for interactive elements such as the editor, search modal, comments, and carousel motion.
+- **Dynamic Data Source**: Guest and admin content resolve through services backed by Supabase data and storage, with static marketing pages removed from the public flow.
 - **Gotchas**: Prefer `@/db/supabase/server` in Server Components and `@/db/supabase/client` in Client Components; `@/utils/supabase/*` now exists only as a compatibility shim layer.
 
 ## Styling Approach
@@ -84,8 +83,9 @@ The project uses **Tailwind CSS 4** with a strict design system defined in `glob
 ## Key Constraints and Gotchas
 - **Terminology**: Always use **Stories** in UI copy. Database and code may still use `post`.
 - **Architecture**: Route files should stay thin and delegate business logic to `services/`, feature UI to `features/`, and persistence to `db/queries/`.
+- **Guest UI**: Public routes should use the feature-owned guest post components under `features/posts/components/guest` instead of standalone static marketing sections.
 - **Database Schema**: The MDX content is stored in the `content_mdx` column in the `posts` table (do not use `content`).
-- **Data Fetching**: Never import server-only modules into Client Components.
+- **Data Fetching**: Never import server-only modules into Client Components. Missing post images or empty Supabase result sets must render placeholders instead of crashing.
 - **Assets**: Assets must be referenced via relative paths such as `./assets/image.jpg` in MDX.
 - **Admin Access**: Desktop-only restriction is enforced via layout; mobile users see a blocker.
 - **Mutations**: All database updates must go through Server Actions in `app/actions/`.

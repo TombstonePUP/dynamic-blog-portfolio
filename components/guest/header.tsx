@@ -14,7 +14,7 @@ const leftNav = [
 ];
 
 const rightNav = [
-  { label: "About", href: "/about" },
+  { label: "Home", href: "/" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -43,11 +43,13 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
 
       <header className="sticky top-0 z-50 w-full bg-[#FAF9F6]">
         <div
-          className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 transition-all duration-300 ease-in-out md:px-24 pt-7 ${isCompact ? "h-20 " : "md:h-40 md:pt-10"}`}
+          className={`relative mx-auto flex w-full max-w-7xl items-start justify-between px-5 pt-7 transition-all duration-300 ease-in-out md:px-24 ${
+            isCompact ? "h-20 " : "md:h-40 md:pt-10"
+          }`}
         >
           <LogoIcon className="size-8 md:hidden" />
-          {/* LEFT NAV */}
-          <nav className="hidden md:flex flex-1 gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80">
+
+          <nav className="hidden flex-1 gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80 md:flex">
             {leftNav.map((link) => {
               const isHome = pathname === "/";
               const targetHref =
@@ -65,10 +67,11 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
             })}
           </nav>
 
-          {/* CENTER LOGO */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pt-1">
+          <div className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center pt-1">
             <div
-              className={`transition-all duration-300 ease-in-out overflow-hidden max-h-0 opacity-0 mb-0 ${isCompact ? "max-h-0 opacity-0 mb-0" : "md:max-h-20 md:opacity-100"}`}
+              className={`mb-0 max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out ${
+                isCompact ? "max-h-0 opacity-0 mb-0" : "md:max-h-20 md:opacity-100"
+              }`}
             >
               <LogoIcon className="hidden md:block md:size-20" />
             </div>
@@ -76,8 +79,7 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
             <LogoText className="text-lg leading-none" />
           </div>
 
-          {/* RIGHT NAV (DESKTOP) */}
-          <nav className="hidden md:flex flex-1 justify-end items-center gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80">
+          <nav className="hidden flex-1 items-center justify-end gap-12 text-md transition-all duration-300 ease-in-out hover:text-foreground/80 md:flex">
             {rightNav.map((link) =>
               link.href.startsWith("#") ? (
                 <a key={link.href} href={link.href}>
@@ -91,25 +93,24 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
             )}
             <button
               onClick={() => setSearchOpen(true)}
-              className="h-fit hover:text-foreground/80 transition hover:bg-transparent focus:bg-transparent focus:outline-none cursor-pointer"
+              className="h-fit cursor-pointer transition hover:bg-transparent hover:text-foreground/80 focus:bg-transparent focus:outline-none"
               aria-label="Open search"
             >
               <Search className="size-6" strokeWidth={2.3} />
             </button>
           </nav>
 
-          {/* MOBILE CONTROLS */}
-          <div className="flex flex-1 justify-end items-center gap-4 md:hidden z-50 relative">
+          <div className="relative z-50 flex flex-1 items-center justify-end gap-4 md:hidden">
             <button
               onClick={() => setSearchOpen(true)}
-              className="h-fit hover:text-foreground/80 transition hover:bg-transparent focus:bg-transparent focus:outline-none cursor-pointer"
+              className="h-fit cursor-pointer transition hover:bg-transparent hover:text-foreground/80 focus:bg-transparent focus:outline-none"
               aria-label="Open search"
             >
               <Search className="size-6" strokeWidth={2.3} />
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="flex flex-col gap-1 cursor-pointer"
+              className="flex cursor-pointer flex-col gap-1"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
@@ -122,10 +123,10 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
         </div>
       </header>
 
-      {/* MOBILE MENU */}
       <div
-        className={`fixed inset-0 z-40 bg-[#FAF9F6] px-5 pt-32 transition-transform duration-300 ease-in-out md:hidden ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed inset-0 z-40 bg-[#FAF9F6] px-5 pt-32 transition-transform duration-300 ease-in-out md:hidden ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <nav className="flex flex-col gap-8 text-3xl font-bold">
           {[...leftNav, ...rightNav].map((link) => {
@@ -138,7 +139,7 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
                 key={link.href}
                 href={targetHref}
                 onClick={() => setMobileMenuOpen(false)}
-                className="hover:text-foreground/80 transition-colors"
+                className="transition-colors hover:text-foreground/80"
               >
                 {link.label}
               </a>
@@ -147,7 +148,7 @@ export default function GuestHeader({ blogs = [] }: { blogs?: Blog[] }) {
                 key={link.href}
                 href={targetHref}
                 onClick={() => setMobileMenuOpen(false)}
-                className="hover:text-foreground/80 transition-colors"
+                className="transition-colors hover:text-foreground/80"
               >
                 {link.label}
               </Link>

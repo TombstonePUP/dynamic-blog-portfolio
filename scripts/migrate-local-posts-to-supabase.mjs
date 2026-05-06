@@ -26,19 +26,19 @@ const AUTHOR_SNAPSHOTS = {
     author_name: "Ian Llenares",
     author_slug: "ian",
     author_role: "Founder & Lead Writer",
-    author_avatar_url: "/images/blog/Ian-L-1024x1024.jpg",
+    author_avatar_url: null,
   },
   johndoe: {
     author_name: "John Doe",
     author_slug: "johndoe",
     author_role: "Guest Contributor",
-    author_avatar_url: "/images/blog/unsplash-1472099645785-5658abf4ff4e.jpg",
+    author_avatar_url: null,
   },
   janedoe: {
     author_name: "Jane Doe",
     author_slug: "janedoe",
     author_role: "Editorial Assistant",
-    author_avatar_url: "/images/blog/unsplash-1438761681033-6461ffad8d80.jpg",
+    author_avatar_url: null,
   },
 };
 

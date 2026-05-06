@@ -1,12 +1,10 @@
 import "@/app/globals.css";
-import GuestFooter from "@/components/guest/footer";
 import GuestHeader from "@/components/guest/header";
 import LenisProvider from "@/components/lenis-provider";
 import ScrollToTop from "@/components/scroll-to-top";
+import { getBlogs } from "@/services/posts";
 import { Metadata } from "next";
 import { Hanken_Grotesk } from "next/font/google";
-
-import { getBlogs } from "@/services/posts";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -32,7 +30,6 @@ export default async function RootLayout({
         <LenisProvider />
         <GuestHeader blogs={blogs} />
         {children}
-        <GuestFooter />
         <ScrollToTop />
       </body>
     </html>
