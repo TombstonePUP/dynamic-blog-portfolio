@@ -38,10 +38,10 @@ export default async function ProfilePage() {
             </p>
           </section>
           <section className="flex gap-8">
-            <div className="rounded-lg border border-admin-surface-hover bg-admin-surface p-8 h-fit min-w-[520px]">
+            <div className=" border border-admin-surface-hover bg-admin-surface p-8 h-fit min-w-[520px]">
               <ProfileForm profile={profile} />
             </div>
-            <div className="rounded-lg border border-admin-surface-hover bg-admin-surface p-8 h-fit min-w-[520px]">
+            <div className=" border border-admin-surface-hover bg-admin-surface p-8 h-fit min-w-[520px]">
               <ChangePasswordForm />
             </div>
           </section>
