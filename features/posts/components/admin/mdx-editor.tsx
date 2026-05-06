@@ -460,7 +460,7 @@ export default function MdxEditor({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[32px] border border-admin-text/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(247,242,234,0.92))] font-sans shadow-[0_30px_120px_rgba(31,61,57,0.14)] select-none">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-admin-text/10 bg-admin-bg font-sans shadow-xl select-none">
       <EditorDialogs
         isNewPostOpen={isDialogOpen}
         onCloseNewPost={() => setIsDialogOpen(false)}
@@ -496,42 +496,42 @@ export default function MdxEditor({
         getLiveUrl={getLiveUrl}
       />
 
-      <div className="shrink-0 border-b border-admin-text/8 bg-white/50">
+      <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/30">
         <div className="flex flex-col gap-4 px-4 py-4 md:px-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-admin-text/45">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-admin-primary/60">
                 Writing workspace
               </p>
-              <h2 className="mt-1 text-lg font-semibold text-admin-heading md:text-xl">
-                Draft on the left, preview the published reading experience on the right.
+              <h2 className="mt-1 text-lg font-bold text-admin-heading md:text-xl tracking-tight">
+                Draft on the left, preview on the right.
               </h2>
-              <p className="mt-2 text-sm leading-relaxed text-admin-text/60">
-                The form panel keeps metadata close at hand, while raw mode gives you the full MDX document when you want to edit like code.
+              <p className="mt-1.5 text-sm leading-relaxed text-admin-text/60">
+                The form panel keeps metadata close at hand, while raw mode gives you the full MDX document.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2 text-[11px] text-admin-text/55">
-              <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-admin-text/8">
+            <div className="flex flex-wrap gap-2 text-[10px] uppercase font-black tracking-widest text-admin-text/40">
+              <span className="rounded-full bg-admin-surface/50 px-3 py-1.5 ring-1 ring-admin-text/5">
                 {metadata.status.charAt(0).toUpperCase() + metadata.status.slice(1)}
               </span>
-              <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-admin-text/8">
-                {metadata.tags.length > 0 ? `${metadata.tags.length} tags` : "No tags yet"}
+              <span className="rounded-full bg-admin-surface/50 px-3 py-1.5 ring-1 ring-admin-text/5">
+                {metadata.tags.length > 0 ? `${metadata.tags.length} tags` : "No tags"}
               </span>
-              <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-admin-text/8">
-                {activeSlug ? "Live slug connected" : "Create a draft to lock the slug"}
+              <span className="rounded-full bg-admin-surface/50 px-3 py-1.5 ring-1 ring-admin-text/5">
+                {activeSlug ? "Locked" : "Drafting"}
               </span>
             </div>
           </div>
 
           <div className="flex items-center justify-between gap-3">
-            <div className="inline-flex rounded-full border border-admin-text/10 bg-admin-contrast/65 p-1">
+            <div className="inline-flex rounded-full border border-admin-text/10 bg-admin-surface/80 p-1 shadow-sm">
               <button
                 onClick={() => switchEditorMode("form")}
                 className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${
                   editorMode === "form"
-                    ? "bg-white text-admin-primary shadow-sm"
-                    : "text-admin-muted hover:bg-white/60 hover:text-admin-text"
+                    ? "bg-admin-accent text-admin-contrast shadow-sm"
+                    : "text-admin-muted hover:bg-admin-surface-hover hover:text-admin-heading"
                 }`}
               >
                 <FormInput size={13} strokeWidth={2.5} />
@@ -541,8 +541,8 @@ export default function MdxEditor({
                 onClick={() => switchEditorMode("raw")}
                 className={`flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] transition-all ${
                   editorMode === "raw"
-                    ? "bg-white text-admin-primary shadow-sm"
-                    : "text-admin-muted hover:bg-white/60 hover:text-admin-text"
+                    ? "bg-admin-accent text-admin-contrast shadow-sm"
+                    : "text-admin-muted hover:bg-admin-surface-hover hover:text-admin-heading"
                 }`}
               >
                 <Code size={13} strokeWidth={2.5} />
@@ -626,12 +626,12 @@ export default function MdxEditor({
             /* Structured Form Mode: Metadata panel on top + Body editor below */
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {/* Metadata Panel — scrollable */}
-              <div className="shrink-0 border-b border-admin-text/8 bg-white/75 px-4 py-3 backdrop-blur">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-text/45">
+              <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
                   Structured editor
                 </p>
-                <p className="text-sm font-semibold text-admin-heading">
-                  Metadata on top, narrative body below
+                <p className="text-sm font-bold text-admin-heading tracking-tight">
+                  Metadata & Content
                 </p>
               </div>
               <div className="shrink-0 max-h-[42%] overflow-y-auto border-b border-admin-text/5">
@@ -644,15 +644,12 @@ export default function MdxEditor({
 
               {/* Body Content Editor */}
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <div className="sticky top-0 z-10 border-b border-admin-text/5 bg-white/80 px-4 py-2 backdrop-blur">
-                  <span className="sr-only text-[10px] font-black uppercase tracking-[0.15em] text-admin-text/50">
-                    ✎ Body Content (MDX)
-                  </span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-admin-text/50">
-                    Body content (MDX)
+                <div className="sticky top-0 z-10 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-2 backdrop-blur">
+                  <span className="text-[10px] font-black uppercase tracking-[0.15em] text-admin-primary/60">
+                    Story content (MDX)
                   </span>
                 </div>
-                <div className="min-h-0 flex-1 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,242,234,0.7))]">
+                <div className="min-h-0 flex-1 bg-admin-surface">
                   <CodeMirrorInput
                     ref={editorRef}
                     content={bodyContent}
@@ -663,15 +660,15 @@ export default function MdxEditor({
             </div>
             ) : (
               <>
-                <div className="shrink-0 border-b border-admin-text/8 bg-white/75 px-4 py-3 backdrop-blur">
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-text/45">
+                <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
                     Raw MDX
                   </p>
-                  <p className="text-sm font-semibold text-admin-heading">
-                    Full document editing with frontmatter included
+                  <p className="text-sm font-bold text-admin-heading tracking-tight">
+                    Full document editing
                   </p>
                 </div>
-                <div className="min-h-0 flex-1 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,242,234,0.7))]">
+                <div className="min-h-0 flex-1 bg-admin-surface">
                   <CodeMirrorInput
                     ref={editorRef}
                     content={content}

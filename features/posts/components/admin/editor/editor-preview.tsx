@@ -73,25 +73,25 @@ export default function EditorPreview({
 
   if (previewAsset) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/8 bg-admin-surface/90 shadow-[0_24px_60px_rgba(31,61,57,0.08)]">
-        <div className="flex items-center justify-between border-b border-admin-text/8 bg-white/75 px-4 py-3 backdrop-blur">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/5 bg-admin-surface/80 shadow-xl">
+        <div className="flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-text/45">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
               Asset preview
             </p>
-            <p className="text-sm font-semibold text-admin-heading">
-              Inspect media before inserting it
+            <p className="text-sm font-bold text-admin-heading tracking-tight">
+              Media Inspector
             </p>
           </div>
           <button
             onClick={onClearPreviewAsset}
-            className="rounded-full border border-admin-text/10 bg-white/80 p-2 transition hover:bg-admin-contrast/80"
+            className="rounded-full border border-admin-text/10 bg-admin-surface p-2 transition hover:bg-admin-surface-hover shadow-sm"
           >
             <X size={18} />
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto bg-[#efe8dd] p-4 md:p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto bg-admin-bg/40 p-4 md:p-6">
           <div className="mx-auto flex max-w-2xl flex-col items-center justify-center gap-6 rounded-[28px] bg-white p-4 shadow-[0_28px_80px_rgba(31,61,57,0.12)] md:p-6">
             <div className="w-full overflow-hidden rounded-[22px] bg-admin-surface shadow-xl ring-1 ring-black/5">
             <img 
@@ -126,23 +126,23 @@ export default function EditorPreview({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/8 bg-admin-surface/90 shadow-[0_24px_60px_rgba(31,61,57,0.08)]">
-      <div className="flex items-center justify-between border-b border-admin-text/8 bg-white/75 px-4 py-3 backdrop-blur">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-admin-text/5 bg-admin-surface/80 shadow-xl">
+      <div className="flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-text/45">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
             Live preview
           </p>
-          <p className="text-sm font-semibold text-admin-heading">
-            Public article experience
+          <p className="text-sm font-bold text-admin-heading tracking-tight">
+            Reader experience
           </p>
         </div>
-        <div className="hidden items-center gap-2 rounded-full bg-admin-contrast/70 px-3 py-1.5 text-[11px] text-admin-text/55 ring-1 ring-admin-text/8 md:flex">
-          <WandSparkles className="size-3.5 text-admin-primary" />
-          Mirrors the guest view
+        <div className="hidden items-center gap-2 rounded-full bg-admin-bg/80 px-3 py-1.5 text-[10px] uppercase font-black tracking-widest text-admin-primary/60 ring-1 ring-admin-text/5 md:flex">
+          <WandSparkles className="size-3.5" />
+          Guest View
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto bg-[#efe8dd] p-3 md:p-5">
+      <div className="min-h-0 flex-1 overflow-y-auto bg-admin-bg/40 p-3 md:p-5">
         <div className="mx-auto max-w-[1040px]">
           <article className="overflow-hidden rounded-[28px] bg-white shadow-[0_36px_100px_rgba(31,61,57,0.16)]">
             <header className="relative min-h-[20rem] overflow-hidden bg-admin-heading sm:min-h-[24rem]">

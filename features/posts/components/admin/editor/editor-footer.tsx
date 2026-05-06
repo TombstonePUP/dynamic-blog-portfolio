@@ -7,7 +7,7 @@ interface EditorFooterProps {
 
 export default function EditorFooter({ content, isDirty }: EditorFooterProps) {
   return (
-    <div className="px-6 py-2.5 border-t flex items-center justify-between text-[11px] font-black text-admin-text/60 uppercase tracking-[0.1em]">
+    <div className="px-6 py-3 border-t border-admin-text/5 flex items-center justify-between text-[10px] font-black text-admin-text/40 uppercase tracking-[0.15em] bg-admin-surface/50">
       <div className="flex gap-6">
         <span>Words: {content.split(/\s+/).filter(Boolean).length}</span>
         <span>Chars: {content.length}</span>

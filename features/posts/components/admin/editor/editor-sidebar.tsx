@@ -55,7 +55,7 @@ export default function EditorSidebar({
 }: EditorSidebarProps) {
   return (
     <div
-      className={`flex min-h-0 flex-col overflow-hidden rounded-[24px] border border-admin-text/8 bg-admin-surface/90 shadow-[0_24px_60px_rgba(31,61,57,0.08)] transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent shadow-none"}`}
+      className={`flex min-h-0 flex-col overflow-hidden rounded-[24px] border border-admin-text/5 bg-admin-surface/80 shadow-xl transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent shadow-none"}`}
       style={showSidebar ? { flexBasis: `var(--sidebar-width, ${width}px)` } : { width: 0 }}
     >
       <style>{`@media (max-width: 768px) { .responsive-sidebar-inner { width: 100% !important; } }`}</style>
@@ -63,8 +63,8 @@ export default function EditorSidebar({
         className="responsive-sidebar-inner flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4 md:p-5"
         style={{ width: `var(--sidebar-width, ${width}px)` }}
       >
-        <div className="flex items-center justify-between px-1 text-[11px] font-black uppercase tracking-[0.2em] text-admin-text/60">
-          <span>Story Explorer</span>
+        <div className="flex items-center justify-between px-1 text-[10px] font-black uppercase tracking-[0.2em] text-admin-primary/60">
+          <span>Explorer</span>
           <button
             onClick={onNewDraft}
             disabled={!activeSlug}
@@ -100,19 +100,19 @@ export default function EditorSidebar({
 function NewDraftPlaceholder() {
   return (
     <div className="mb-4 flex flex-col">
-      <div className="bg-admin-primary/20 px-3 py-2.5 text-sm font-black text-admin-text shadow-sm ring-1 ring-admin-primary/30">
+      <div className="bg-admin-accent text-admin-contrast px-3 py-2.5 text-sm font-black shadow-sm ring-1 ring-admin-accent/10">
         <div className="flex items-center gap-3">
           <FileEdit
             size={16}
             strokeWidth={2.5}
-            className="shrink-0 text-admin-primary"
+            className="shrink-0"
           />
           <span className="truncate">unsaved-draft</span>
         </div>
       </div>
 
-      <div className="mt-1 flex flex-col gap-1 border-l-2 border-admin-primary/20 pl-2">
-        <div className="bg-admin-primary/10 px-4 py-2 text-[12px] font-black text-admin-text shadow-sm">
+      <div className="mt-1 flex flex-col gap-1 border-l-2 border-admin-accent/20 pl-2">
+        <div className="bg-admin-surface px-4 py-2 text-[12px] font-black text-admin-heading shadow-sm border border-admin-text/5">
           <div className="flex items-center gap-2.5">
             <FileCode
               size={14}
@@ -123,11 +123,11 @@ function NewDraftPlaceholder() {
           </div>
         </div>
 
-        <div className="mr-2 mt-2 flex flex-col gap-4 bg-admin-primary/5 p-4">
-          <div className="flex items-start gap-2.5 text-[11px] font-bold leading-tight text-admin-text">
+        <div className="mr-2 mt-2 flex flex-col gap-4 bg-admin-bg/50 border border-admin-text/5 p-4">
+          <div className="flex items-start gap-2.5 text-[11px] font-bold leading-tight text-admin-text/60">
             <Info
               size={14}
-              className="mt-0.5 shrink-0 text-admin-primary opacity-60"
+              className="mt-0.5 shrink-0 text-admin-primary/40"
             />
             <span>
               Set title, excerpt, tags, status, and image URLs directly in the
@@ -218,14 +218,14 @@ function FolderItem({
   return (
     <div className="flex flex-col group/folder">
       <div
-        className={`min-w-0 transition flex items-center justify-between ${isActive
-            ? "bg-admin-primary/10 shadow-sm ring-1 ring-admin-primary/5"
-            : "hover:bg-admin-contrast/5"
+        className={`min-w-0 transition-all flex items-center justify-between rounded-lg ${isActive
+            ? "bg-admin-accent text-admin-contrast shadow-sm"
+            : "hover:bg-admin-surface-hover text-admin-text/70 hover:text-admin-heading"
           }`}
       >
         <button
           onClick={() => onToggleExpand(folder.slug)}
-          className="flex flex-1 min-w-0 items-center gap-3 px-3 py-2.5 text-left text-[13px] font-bold text-admin-text"
+          className="flex flex-1 min-w-0 items-center gap-3 px-3 py-2.5 text-left text-[13px] font-bold"
         >
           {isExpanded ? (
             <ChevronDown
@@ -243,7 +243,7 @@ function FolderItem({
           <FolderOpen
             size={16}
             strokeWidth={2.5}
-            className={`shrink-0 ${isActive ? "text-admin-primary" : ""}`}
+            className={`shrink-0 ${isActive ? "text-admin-contrast" : "text-admin-primary/60"}`}
           />
           <span className="truncate">{folder.title}</span>
         </button>
@@ -260,12 +260,12 @@ function FolderItem({
       </div>
 
       {isExpanded ? (
-        <div className="ml-6 mt-1 flex flex-col gap-0.5 border-l-2 pl-2">
+        <div className="ml-6 mt-1 flex flex-col gap-0.5 border-l border-admin-text/10 pl-2">
           <button
             onClick={() => onLoadPost(folder.slug)}
-            className={`flex min-w-0 items-center gap-2.5 px-4 py-2 text-left text-[12px] font-semibold transition ${isActive ? "bg-admin-primary/10 text-admin-primary" : "text-admin-text/60 hover:bg-admin-primary/5 hover:text-admin-text"}`}
+            className={`flex min-w-0 items-center gap-2.5 px-4 py-2 text-left text-[12px] font-bold transition rounded-md ${isActive ? "bg-admin-accent/5 text-admin-primary shadow-sm ring-1 ring-admin-accent/10" : "text-admin-text/50 hover:bg-admin-surface-hover hover:text-admin-heading"}`}
           >
-            <FileText size={14} strokeWidth={2.5} className={isActive ? "" : "opacity-60"} />
+            <FileText size={14} strokeWidth={2.5} className={isActive ? "text-admin-primary" : "opacity-40"} />
             <span className="truncate">index.mdx</span>
           </button>
 
