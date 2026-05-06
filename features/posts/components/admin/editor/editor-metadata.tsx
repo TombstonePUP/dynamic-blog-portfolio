@@ -405,11 +405,7 @@ export default function EditorMetadata({ metadata, onChange, activeSlug }: Edito
         </div>
 
         {/* Divider — Images */}
-        <div className="flex items-center gap-2 pt-1">
-          <div className="flex-1 border-t border-admin-text/5" />
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-admin-text/25">Images</span>
-          <div className="flex-1 border-t border-admin-text/5" />
-        </div>
+        <div className="border-t border-admin-text/5 pt-1" />
 
         {/* Thumbnail Upload */}
         <ImageUploadZone
@@ -421,11 +417,7 @@ export default function EditorMetadata({ metadata, onChange, activeSlug }: Edito
         />
 
         {/* Divider — Tags */}
-        <div className="flex items-center gap-2 pt-1">
-          <div className="flex-1 border-t border-admin-text/5" />
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-admin-text/25">Categorize</span>
-          <div className="flex-1 border-t border-admin-text/5" />
-        </div>
+        <div className="border-t border-admin-text/5 pt-1" />
 
         {/* Tags */}
         <div>

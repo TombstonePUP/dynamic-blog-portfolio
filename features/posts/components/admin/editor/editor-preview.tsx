@@ -75,14 +75,9 @@ export default function EditorPreview({
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-admin-surface/80">
         <div className="flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
-              Asset preview
-            </p>
-            <p className="text-sm font-bold text-admin-heading tracking-tight">
-              Media Inspector
-            </p>
-          </div>
+          <p className="text-sm font-bold text-admin-heading tracking-tight">
+            Media Inspector
+          </p>
           <button
             onClick={onClearPreviewAsset}
             className="rounded-full border border-admin-text/10 bg-admin-surface p-2 transition hover:bg-admin-surface-hover shadow-sm"
@@ -102,8 +97,8 @@ export default function EditorPreview({
             </div>
 
             <div className="w-full rounded-[20px] border border-admin-primary/15 bg-admin-primary/8 px-4 py-3">
-              <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary">
-                Relative Path
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-admin-primary/40">
+                Asset Path
               </p>
               <code className="text-sm font-bold text-admin-text">
                 ./assets/{previewAsset.filename}
@@ -128,17 +123,11 @@ export default function EditorPreview({
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-admin-surface/80">
       <div className="flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
-            Live preview
-          </p>
+        <div className="flex items-center gap-2">
+          <WandSparkles className="size-4 text-admin-primary/60" />
           <p className="text-sm font-bold text-admin-heading tracking-tight">
             Reader experience
           </p>
-        </div>
-        <div className="hidden items-center gap-2 rounded-full bg-admin-bg/80 px-3 py-1.5 text-[10px] uppercase font-black tracking-widest text-admin-primary/60 ring-1 ring-admin-text/5 md:flex">
-          <WandSparkles className="size-3.5" />
-          Guest View
         </div>
       </div>
 

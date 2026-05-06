@@ -71,11 +71,6 @@ export default function EditorToolbar({
               className={showSidebar ? "text-admin-primary" : "opacity-40"}
             />
           </button>
-          <div className="flex items-center gap-2 rounded-full border border-admin-text/5 bg-admin-bg/80 px-3 py-1.5 text-[10px] md:text-xs font-bold uppercase tracking-[0.16em] text-admin-primary/70 shrink-0">
-            <FileText className="size-3" />
-            <span className="hidden xs:inline">Live Editor</span>
-          </div>
-          <span className="hidden xs:inline text-xs text-admin-text/20 shrink-0">/</span>
           <span className="truncate text-[11px] md:text-sm font-bold text-admin-heading/70">
             {activeSlug ? activeSlug : "Unsaved draft"}
           </span>
