@@ -13,8 +13,7 @@ export type PublishedPostRow = {
   slug: string;
   excerpt: string | null;
   content_mdx: string;
-  cover_image_url: string | null;
-  thumbnail_url: string | null;
+  image_url: string | null;
   status: BlogStatus;
   tags: string[] | null;
   published_on: string | null;
@@ -33,8 +32,7 @@ export type OwnedPostRecord = {
   slug: string;
   excerpt: string | null;
   content_mdx: string;
-  cover_image_url: string | null;
-  thumbnail_url: string | null;
+  image_url: string | null;
   tags: string[] | null;
   status: BlogStatus;
   published_on: string | null;
@@ -52,10 +50,10 @@ export type EditorPostSummary = {
 };
 
 const PUBLISHED_POST_SELECT =
-  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, cover_image_url, thumbnail_url, status, tags, published_on, created_at";
+  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, image_url, status, tags, published_on, created_at";
 
 export const OWNED_POST_SELECT =
-  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, cover_image_url, thumbnail_url, tags, status, published_on, published_at, created_at, updated_at";
+  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, image_url, tags, status, published_on, published_at, created_at, updated_at";
 
 const EDITOR_POST_SELECT = "slug, title, status, updated_at";
 
@@ -164,13 +162,29 @@ export async function getPostContentBySlug(
 
 export async function updatePostContent(
   supabase: SupabaseClient,
-  options: { slug: string; title: string; content: string },
+  options: {
+    slug: string;
+    title: string;
+    content: string;
+    excerpt: string;
+    imageUrl: string | null;
+    tags: string[];
+    status: BlogStatus;
+    publishedOn: string | null;
+    publishedAt: string | null;
+  },
 ) {
   const { error } = await supabase
     .from("posts")
     .update({
       content_mdx: options.content,
       title: options.title,
+      excerpt: options.excerpt,
+      image_url: options.imageUrl,
+      tags: options.tags,
+      status: options.status,
+      published_on: options.publishedOn,
+      published_at: options.publishedAt,
       updated_at: new Date().toISOString(),
     })
     .eq("slug", options.slug);

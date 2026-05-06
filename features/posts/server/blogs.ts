@@ -47,11 +47,10 @@ function mapSupabasePost(
     title: row.title,
     href: `/${row.slug}`,
     image:
-      resolvePostAssetUrl(assetFolder, row.cover_image_url) ||
+      resolvePostAssetUrl(assetFolder, row.image_url) ||
       "/images/blog/unsplash-1499750310107-5fef28a66643.jpg",
     thumbnail:
-      resolvePostAssetUrl(assetFolder, row.thumbnail_url) ||
-      resolvePostAssetUrl(assetFolder, row.cover_image_url) ||
+      resolvePostAssetUrl(assetFolder, row.image_url) ||
       "/images/blog/unsplash-1499750310107-5fef28a66643.jpg",
     author: resolveAuthor(row, profile),
     date,

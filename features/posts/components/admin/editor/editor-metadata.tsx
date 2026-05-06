@@ -27,7 +27,6 @@ export type PostMetadata = {
   date: string;
   author: string;
   image: string;
-  thumbnail: string;
   excerpt: string;
   tags: string[];
   status: BlogStatus;
@@ -407,13 +406,13 @@ export default function EditorMetadata({ metadata, onChange, activeSlug }: Edito
         {/* Divider — Images */}
         <div className="border-t border-admin-text/5 pt-1" />
 
-        {/* Thumbnail Upload */}
+        {/* Featured Image Upload */}
         <ImageUploadZone
-          label="Thumbnail"
-          imageUrl={metadata.thumbnail}
-          onUrlChange={(url) => update("thumbnail", url)}
+          label="Featured image"
+          imageUrl={metadata.image}
+          onUrlChange={(url) => update("image", url)}
           activeSlug={activeSlug}
-          fieldHint="Defaults to cover image"
+          fieldHint="Used for both cover and thumbnail layouts"
         />
 
         {/* Divider — Tags */}

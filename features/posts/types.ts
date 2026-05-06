@@ -74,9 +74,9 @@ export interface Blog {
   slug: string;
   title: string;
   href: string;
-  /** Full-size image URL */
+  /** Canonical post image URL reused for cover and thumbnail layouts */
   image: string;
-  /** Thumbnail image URL (150x150) */
+  /** Derived thumbnail presentation URL, currently the same asset as image */
   thumbnail: string;
   author: Author;
   /** ISO 8601 date string e.g. "2025-08-13" */

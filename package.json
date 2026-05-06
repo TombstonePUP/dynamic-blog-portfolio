@@ -14,6 +14,7 @@
     "supabase:push": "node scripts/supabase-push.mjs",
     "supabase:push:dry": "node scripts/supabase-push.mjs --dry-run",
     "supabase:seed-admin": "node scripts/seed-admin.mjs",
+    "supabase:reset-users": "node scripts/reset-users-and-comments.mjs",
     "supabase:import-posts": "node scripts/migrate-local-posts-to-supabase.mjs",
     "supabase:import-posts:dry": "node scripts/migrate-local-posts-to-supabase.mjs --dry-run"
   },

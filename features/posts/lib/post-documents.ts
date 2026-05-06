@@ -6,7 +6,6 @@ export type EditorPostDocument = {
   date: string;
   author: string;
   image: string;
-  thumbnail: string;
   excerpt: string;
   tags: string[];
   status: BlogStatus;
@@ -61,13 +60,18 @@ export function toIsoDate(value: unknown, fallback = new Date()) {
 
 export function parseEditorDocument(rawDocument: string): EditorPostDocument {
   const { data, content } = matter(rawDocument);
+  const image =
+    typeof data.image === "string" && data.image.trim()
+      ? data.image.trim()
+      : typeof data.thumbnail === "string" && data.thumbnail.trim()
+        ? data.thumbnail.trim()
+        : "";
 
   return {
     title: typeof data.title === "string" && data.title.trim() ? data.title.trim() : "Untitled story",
     date: toIsoDate(data.date),
     author: typeof data.author === "string" && data.author.trim() ? data.author.trim() : "author",
-    image: typeof data.image === "string" ? data.image.trim() : "",
-    thumbnail: typeof data.thumbnail === "string" ? data.thumbnail.trim() : "",
+    image,
     excerpt: typeof data.excerpt === "string" ? data.excerpt.trim() : "",
     tags: normalizeTags(data.tags),
     status: normalizeStatus(data.status),
@@ -81,7 +85,6 @@ export function buildEditorDocument(document: EditorPostDocument) {
     date: document.date,
     author: document.author,
     image: document.image,
-    thumbnail: document.thumbnail || document.image,
     excerpt: document.excerpt,
     tags: document.tags,
     status: document.status,

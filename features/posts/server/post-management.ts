@@ -9,17 +9,8 @@ import {
   updatePostContent,
 } from "@/db/queries/posts";
 import { createClient } from "@/db/supabase/server";
+import { parseEditorDocument } from "@/features/posts/lib/post-documents";
 import { parsePostContent, parsePostSlug } from "@/validators/posts";
-
-function extractTitle(content: string, fallbackSlug: string) {
-  const titleMatch = content.match(/title:\s*(.*)/);
-
-  if (titleMatch?.[1]) {
-    return titleMatch[1].trim().replace(/^["']|["']$/g, "");
-  }
-
-  return fallbackSlug;
-}
 
 export async function getEditorBlogList() {
   const supabase = await createClient();
@@ -45,12 +36,21 @@ export async function saveEditorBlogContent(slug: string, content: string) {
   const supabase = await createClient();
   const normalizedSlug = parsePostSlug(slug);
   const nextContent = parsePostContent(content);
-  const title = extractTitle(nextContent, normalizedSlug);
+  const document = parseEditorDocument(nextContent);
 
   await updatePostContent(supabase, {
     slug: normalizedSlug,
-    title,
+    title: document.title || normalizedSlug,
     content: nextContent,
+    excerpt: document.excerpt,
+    imageUrl: document.image || null,
+    tags: document.tags,
+    status: document.status,
+    publishedOn: document.date || null,
+    publishedAt:
+      document.status === "published" && document.date
+        ? new Date(`${document.date}T00:00:00.000Z`).toISOString()
+        : null,
   });
 
   return {

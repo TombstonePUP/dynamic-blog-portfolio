@@ -34,7 +34,19 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  const { error } = await supabase.auth.getUser();
+
+  // If the refresh token is invalid/not found, force the user to log in again
+  // by explicitly clearing the session and redirecting to the login page.
+  if (error && error.code === 'refresh_token_not_found') {
+    // Explicitly sign out to clear local storage and ensure cookies are fully wiped
+    await supabase.auth.signOut();
+    
+    // Redirect the user to login page
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("notice", "Session expired. Please log in again.");
+    return NextResponse.redirect(loginUrl);
+  }
 
   return response;
 }

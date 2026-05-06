@@ -130,7 +130,7 @@ function NewDraftPlaceholder() {
               className="mt-0.5 shrink-0 text-admin-primary/40"
             />
             <span>
-              Set title, excerpt, tags, status, and image URLs directly in the
+              Set title, excerpt, tags, status, and the featured image directly in the
               frontmatter.
             </span>
           </div>

@@ -68,7 +68,7 @@ function RelatedCard({ post }: { post: Blog }) {
       <div className="relative h-44 overflow-hidden">
         <Image
           fill
-          src={post.image}
+          src={post.thumbnail}
           alt={post.title}
           className="object-cover transition duration-300 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, 33vw"

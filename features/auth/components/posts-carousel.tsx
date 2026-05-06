@@ -29,7 +29,7 @@ export default function PostsCarousel({ posts, className }: { posts: Blog[], cla
             }`}
         >
           <Image
-            src={post.image}
+            src={post.thumbnail}
             alt={post.title}
             fill
             className="object-cover"

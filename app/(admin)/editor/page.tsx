@@ -23,7 +23,6 @@ status: "draft"
 date: "${new Date().toISOString().split('T')[0]}"
 author: "${profile?.slug || "writer"}"
 image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=1400"
-thumbnail: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800"
 excerpt: "The beginning of a new chapter in positive psychology."
 tags: ["featured", "personal blog"]
 ---

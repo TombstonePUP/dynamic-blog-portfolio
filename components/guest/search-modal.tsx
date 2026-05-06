@@ -42,7 +42,7 @@ function SearchResult({
     >
       <div className="relative size-16 shrink-0 overflow-hidden">
         <Image
-          src={post.image}
+          src={post.thumbnail}
           alt={post.title}
           fill
           className="object-cover transition duration-300 group-hover:scale-105"

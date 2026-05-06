@@ -50,11 +50,7 @@ export function buildEditorContentFromPost(
     title: post.title,
     date: post.published_on || post.created_at.slice(0, 10),
     author: post.author_slug || authorSlug,
-    image: resolvePostAssetUrl(assetFolder, post.cover_image_url) || "",
-    thumbnail:
-      resolvePostAssetUrl(assetFolder, post.thumbnail_url) ||
-      resolvePostAssetUrl(assetFolder, post.cover_image_url) ||
-      "",
+    image: resolvePostAssetUrl(assetFolder, post.image_url) || "",
     excerpt: post.excerpt || "",
     tags: post.tags || [],
     status: post.status,

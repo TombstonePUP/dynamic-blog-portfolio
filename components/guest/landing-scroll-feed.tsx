@@ -23,7 +23,7 @@ function FeaturedCard({ post }: { post: Blog }) {
       <div className="relative h-44 overflow-hidden">
         <Image
           fill
-          src={post.image}
+          src={post.thumbnail}
           alt={post.title}
           className="object-cover transition duration-300 group-hover:scale-101"
           sizes="(max-width: 768px) 100vw, 33vw"
@@ -58,7 +58,7 @@ function RiverCard({ post, variant }: { post: Blog; variant: "a" | "b" }) {
       <div className="relative h-48 w-full shrink-0 sm:h-auto sm:min-h-[220px] sm:w-[42%]">
         <Image
           fill
-          src={post.image}
+          src={post.thumbnail}
           alt={post.title}
           className="object-cover transition duration-300 group-hover:scale-101"
           sizes="(max-width: 640px) 100vw, 280px"

@@ -429,7 +429,7 @@ async function findExistingPost(slug) {
   const { data, error } = await supabase
     .from("posts")
     .select(
-      "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, cover_image_url, thumbnail_url, tags, status, published_on, published_at",
+      "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, image_url, tags, status, published_on, published_at",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -457,22 +457,16 @@ async function migratePost(post) {
     ? rewritePostAssetUrls(assetFolder, existing.content_mdx)
     : null;
   const body = existingBody || localBody;
-  const coverImage =
+  const imageUrl =
     resolvePostAssetUrl(
       assetFolder,
-      existing?.cover_image_url ||
-        (typeof post.frontmatter.image === "string" ? post.frontmatter.image : ""),
-    ) || null;
-  const thumbnailImage =
-    resolvePostAssetUrl(
-      assetFolder,
-      existing?.thumbnail_url ||
-        (typeof post.frontmatter.thumbnail === "string"
-          ? post.frontmatter.thumbnail
-          : typeof post.frontmatter.image === "string"
-            ? post.frontmatter.image
+      existing?.image_url ||
+        (typeof post.frontmatter.image === "string"
+          ? post.frontmatter.image
+          : typeof post.frontmatter.thumbnail === "string"
+            ? post.frontmatter.thumbnail
             : ""),
-    ) || coverImage;
+    ) || null;
   const payload = {
     author_id: existing?.author_id || ownerProfile.id,
     author_name:
@@ -499,8 +493,7 @@ async function migratePost(post) {
         post.frontmatter.description.trim()) ||
       "",
     content_mdx: body,
-    cover_image_url: coverImage,
-    thumbnail_url: thumbnailImage,
+    image_url: imageUrl,
     tags:
       Array.isArray(existing?.tags) && existing.tags.length > 0
         ? existing.tags

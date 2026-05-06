@@ -69,7 +69,7 @@ export default function EditorPreview({
     metadata.author?.replace(/-/g, " ") ??
     "Writer";
   const readingMinutes = readingMinutesFromContent(previewContent);
-  const heroImage = metadata.image || metadata.thumbnail;
+  const heroImage = metadata.image;
 
   if (previewAsset) {
     return (
