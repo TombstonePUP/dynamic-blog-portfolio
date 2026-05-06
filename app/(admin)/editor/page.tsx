@@ -1,5 +1,6 @@
 import MdxEditor from "@/features/posts/components/admin/mdx-editor";
 import { buildEditorContentFromPost, getOwnedPosts } from "@/services/posts";
+import { MOCK_POSTS } from "@/features/posts/data/mock-posts";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -45,25 +46,43 @@ Use the editor on the left to write your content, and see the preview update liv
 3. **Portability**: Your files are just plain text.
 `;
 
-  const initialBlogFolders = posts.map((post) => ({
-    slug: post.slug,
-    title: post.title,
-    status: post.status,
-    updatedAt: post.updated_at,
-  }));
-  const initialBlogContents: Record<string, string> = selectedPost
-    ? {
-        [selectedPost.slug]: buildEditorContentFromPost(
-          selectedPost,
-          profile?.slug || "writer",
-        ),
+  const initialBlogFolders = [
+    ...posts.map((post) => ({
+      slug: post.slug,
+      title: post.title,
+      status: post.status,
+      updatedAt: post.updated_at,
+    })),
+    ...MOCK_POSTS.map((post) => ({
+      slug: post.slug,
+      title: post.title,
+      status: post.status,
+      updatedAt: post.updated_at,
+    })),
+  ];
+
+  const initialBlogContents: Record<string, string> = {
+    ...(selectedPost
+      ? {
+          [selectedPost.slug]: buildEditorContentFromPost(
+            selectedPost,
+            profile?.slug || "writer",
+          ),
+        }
+      : {}),
+    ...MOCK_POSTS.reduce((acc, post) => {
+      if ("content" in post) {
+        acc[post.slug] = post.content as string;
       }
-    : {};
+      return acc;
+    }, {} as Record<string, string>),
+  };
 
   return (
     <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading editor...</div>}>
         <MdxEditor 
+          key={slug || 'new'}
           initialContent={initialContent} 
           initialBlogFolders={initialBlogFolders}
           initialBlogContents={initialBlogContents}

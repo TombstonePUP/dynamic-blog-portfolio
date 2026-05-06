@@ -182,7 +182,14 @@ export default function MdxEditor({
   async function refreshList() {
     const result = await getBlogListAction();
     if (result.success) {
-      setBlogFolders(result.list || []);
+      // Merge initial folders (which contain mock posts) with server results
+      // Keep only server results for slugs that exist on the server, 
+      // but preserve any mock posts from initialBlogFolders that aren't on the server.
+      const serverList = result.list || [];
+      const serverSlugs = new Set(serverList.map(f => f.slug));
+      const extraFolders = initialBlogFolders.filter(f => !serverSlugs.has(f.slug));
+      
+      setBlogFolders([...serverList, ...extraFolders]);
     }
   }
 
