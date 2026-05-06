@@ -1,27 +1,26 @@
 "use client";
 
-import {
-  Calendar,
-  FileText,
-  Image as ImageIcon,
-  Tag,
-  Type,
-  User,
-  CheckCircle,
-  Clock,
-  Archive,
-  Globe,
-  ChevronDown,
-  X,
-  Plus,
-  UploadCloud,
-  Loader2,
-  Sparkles,
-  Trash2,
-} from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
 import { createClient } from "@/db/supabase/client";
 import type { BlogStatus } from "@/features/posts/types";
+import {
+  Archive,
+  Calendar,
+  CheckCircle,
+  ChevronDown,
+  Clock,
+  Globe,
+  Image as ImageIcon,
+  Loader2,
+  Plus,
+  Sparkles,
+  Tag,
+  Trash2,
+  Type,
+  UploadCloud,
+  User,
+  X
+} from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type PostMetadata = {
   title: string;
@@ -169,9 +168,8 @@ function StatusSelector({ value, onChange }: { value: BlogStatus; onChange: (v: 
               key={option.value}
               type="button"
               onClick={() => { onChange(option.value); setOpen(false); }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-[12px] font-bold text-left transition-all hover:bg-admin-primary/5 ${
-                option.value === value ? "bg-admin-primary/8 text-admin-primary" : "text-admin-text/70"
-              }`}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-[12px] font-bold text-left transition-all hover:bg-admin-primary/5 ${option.value === value ? "bg-admin-primary/8 text-admin-primary" : "text-admin-text/70"
+                }`}
             >
               <option.icon size={14} strokeWidth={2.5} />
               {option.label}
@@ -297,11 +295,10 @@ function ImageUploadZone({
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
           onClick={() => !isUploading && fileInputRef.current?.click()}
-          className={`flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed cursor-pointer transition-all ${
-            isDragOver
-              ? "border-admin-primary bg-admin-primary/5"
-              : "border-admin-text/10 hover:border-admin-primary/30 hover:bg-admin-primary/3"
-          } ${isUploading ? "pointer-events-none opacity-60" : ""}`}
+          className={`flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed cursor-pointer transition-all ${isDragOver
+            ? "border-admin-primary bg-admin-primary/5"
+            : "border-admin-text/10 hover:border-admin-primary/30 hover:bg-admin-primary/3"
+            } ${isUploading ? "pointer-events-none opacity-60" : ""}`}
         >
           {isUploading ? (
             <>
@@ -362,13 +359,13 @@ export default function EditorMetadata({ metadata, onChange, activeSlug }: Edito
 
         {/* Topic — What's this about */}
         <div>
-          <FieldLabel icon={Sparkles} label="Topic / What's this about?" hint="Describe your post" />
+          <FieldLabel icon={Sparkles} label="Excerpt" hint="Describe your post" />
           <textarea
             id="metadata-excerpt"
             value={metadata.excerpt}
             onChange={(e) => update("excerpt", e.target.value)}
             placeholder="Briefly describe what this post is about — e.g. 'A deep dive into building resilience through everyday habits and positive psychology…'"
-            rows={3}
+            rows={7}
             className="w-full bg-admin-bg/60 border border-admin-text/8 px-3 py-2.5 text-[12px] font-medium text-admin-text leading-relaxed placeholder:text-admin-text/25 focus:outline-none focus:ring-1 focus:ring-admin-primary/30 focus:border-admin-primary/30 transition-all resize-none"
           />
           <p className="text-[10px] text-admin-text/30 mt-1 px-0.5">
