@@ -55,12 +55,12 @@ export default function EditorSidebar({
 }: EditorSidebarProps) {
   return (
     <div
-      className={`flex h-screen flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/80 transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent"}`}
+      className={`flex max-h-full flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/80 transition-all duration-75 ${showSidebar ? "w-full md:w-auto" : "hidden md:block w-0 border-transparent"}`}
       style={showSidebar ? { flexBasis: `var(--sidebar-width, ${width}px)` } : { width: 0 }}
     >
       <style>{`@media (max-width: 768px) { .responsive-sidebar-inner { width: 100% !important; } }`}</style>
       <div
-        className="responsive-sidebar-inner flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4 md:p-5"
+        className="responsive-sidebar-inner flex max-h-full flex-1 flex-col gap-6 overflow-y-auto p-4 md:p-5"
         style={{ width: `var(--sidebar-width, ${width}px)` }}
       >
         <div className="flex items-center justify-between px-1 text-[10px] font-black uppercase tracking-[0.2em] text-admin-primary/60">
