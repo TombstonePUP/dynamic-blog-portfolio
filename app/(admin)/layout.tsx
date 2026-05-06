@@ -1,3 +1,8 @@
+// Force all admin pages to render dynamically at request time.
+// This prevents Next.js from trying to statically prerender them during
+// the Vercel build, where Supabase env vars are not available.
+export const dynamic = "force-dynamic";
+
 import "@/app/globals.css";
 import { isAdminProfile, requireApprovedContext } from "@/services/auth";
 import { ThemeProvider } from "@/components/theme-provider";

@@ -1,3 +1,7 @@
+// Auth pages call Supabase at render time — must not be statically prerendered.
+export const dynamic = "force-dynamic";
+
+
 import "@/app/globals.css";
 import { Hanken_Grotesk } from "next/font/google";
 
