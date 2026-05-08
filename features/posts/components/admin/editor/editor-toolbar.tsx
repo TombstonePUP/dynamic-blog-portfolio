@@ -122,12 +122,12 @@ export default function EditorToolbar({
           <Button
             variant="default"
             onClick={onSave}
-            disabled={isSaving || !isDirty}
+            disabled={isSaving || (!!activeSlug && !isDirty)}
             isLoading={isSaving}
             className="shrink-0 rounded-full shadow-sm"
           >
             {!isSaving && <Save className="size-3" />}
-            {activeSlug ? (isDirty ? "Save Changes" : "Saved") : "Create Post"}
+            {activeSlug ? (isDirty ? "Save Changes" : "Saved") : "Create & Save Post"}
           </Button>
         </div>
       </div>

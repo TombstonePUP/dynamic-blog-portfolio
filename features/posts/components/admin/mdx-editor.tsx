@@ -28,6 +28,7 @@ type BlogFolder = {
   title: string;
   status: "draft" | "published" | "archived";
   updatedAt: string;
+  assetFolder: string;
 };
 
 type EditorMode = "form" | "raw";
@@ -91,6 +92,11 @@ export default function MdxEditor({
   const [lastSavedContent, setLastSavedContent] = useState(defaultContent);
   const [activeSlug, setActiveSlug] = useState<string | null>(initialActiveSlug || null);
   const [blogFolders, setBlogFolders] = useState<BlogFolder[]>(initialBlogFolders);
+
+  // Derive asset folder for the active post — falls back to slug if missing
+  const activeAssetFolder = activeSlug
+    ? (blogFolders.find((f) => f.slug === activeSlug)?.assetFolder || activeSlug)
+    : null;
   const [expandedSlugs, setExpandedSlugs] = useState<Set<string>>(
     new Set(initialActiveSlug ? [initialActiveSlug] : [])
   );
@@ -127,6 +133,7 @@ export default function MdxEditor({
   const [newPostSlug, setNewPostSlug] = useState("");
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
+  const [editorError, setEditorError] = useState<string | null>(null);
 
   const isDirty = content !== lastSavedContent;
 
@@ -331,9 +338,12 @@ export default function MdxEditor({
       }
       setActiveSlug(nextSlug);
       setLastSavedContent(result.content || content);
+      setEditorError(null);
       await refreshList();
     } else {
-      alert(result.error || "Failed to save story");
+      const msg = result.error || "Failed to save story";
+      setEditorError(msg);
+      setTimeout(() => setEditorError(null), 8000);
     }
 
     setIsSaving(false);
@@ -376,10 +386,13 @@ export default function MdxEditor({
     } else {
       const result = await createDraftAction(slug);
       if (result.success && result.slug) {
+        setEditorError(null);
         await refreshList();
         void handleLoadPost(result.slug);
       } else {
-        alert(result.error || "Failed to create draft");
+        const msg = result.error || "Failed to create draft";
+        setEditorError(msg);
+        setTimeout(() => setEditorError(null), 8000);
       }
       setIsSaving(false);
     }
@@ -409,9 +422,12 @@ export default function MdxEditor({
       const updatedSlug = result.slug || newSlug;
       setActiveSlug(updatedSlug);
       router.replace(`?slug=${updatedSlug}`, { scroll: false });
+      setEditorError(null);
       await refreshList();
     } else {
-      alert(result.error || "Failed to rename slug");
+      const msg = result.error || "Failed to rename slug";
+      setEditorError(msg);
+      setTimeout(() => setEditorError(null), 8000);
     }
 
     setIsSaving(false);
@@ -434,9 +450,12 @@ export default function MdxEditor({
         setPreviewSource(null);
         router.push("/editor");
       }
+      setEditorError(null);
       await refreshList();
     } else {
-      alert(result.error || "Failed to delete story");
+      const msg = result.error || "Failed to delete story";
+      setEditorError(msg);
+      setTimeout(() => setEditorError(null), 8000);
     }
     setIsSaving(false);
   }
@@ -497,6 +516,24 @@ export default function MdxEditor({
         editorMode={editorMode}
         onSwitchEditorMode={switchEditorMode}
       />
+
+      {/* Inline error banner — replaces alert() for save/create failures */}
+      {editorError && (
+        <div className="shrink-0 flex items-center justify-between gap-3 border-b border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          <span className="flex items-center gap-2 font-medium">
+            <span className="text-base leading-none">⚠</span>
+            {editorError}
+          </span>
+          <button
+            type="button"
+            onClick={() => setEditorError(null)}
+            className="shrink-0 text-red-400 hover:text-red-600 transition-colors"
+            aria-label="Dismiss error"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/30">
         <div className="flex items-center justify-end px-4 py-2 md:px-6">
@@ -566,9 +603,9 @@ export default function MdxEditor({
         >
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/90">
             {editorMode === "form" ? (
-              /* Structured Form Mode: Metadata panel on top + Body editor below */
+              /* Structured Form Mode: Metadata panel (scrollable fixed height) + Body editor (flex-1) */
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                {/* Metadata Panel — scrollable */}
+                {/* Metadata Panel header */}
                 <button
                   onClick={() => setIsMetadataExpanded(!isMetadataExpanded)}
                   className="shrink-0 flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur hover:bg-admin-surface-hover transition-colors text-left"
@@ -584,12 +621,14 @@ export default function MdxEditor({
                     <ChevronRight size={18} className="text-admin-text/40" />
                   )}
                 </button>
+
+                {/* Metadata Panel — fixed pixel height so overflow-y-auto actually scrolls */}
                 {isMetadataExpanded && (
-                  <div className="shrink-0 max-h-[40%] overflow-y-auto border-b border-admin-text/5">
+                  <div className="shrink-0 h-80 overflow-y-auto border-b border-admin-text/5">
                     <EditorMetadata
                       metadata={metadata}
                       onChange={handleMetadataChange}
-                      activeSlug={activeSlug}
+                      activeSlug={activeAssetFolder}
                     />
                   </div>
                 )}

@@ -9,6 +9,7 @@ import {
   updatePostContent,
 } from "@/db/queries/posts";
 import { createClient } from "@/db/supabase/server";
+import { requireApprovedContext } from "@/features/auth/server/context";
 import { parseEditorDocument } from "@/features/posts/lib/post-documents";
 import { parsePostContent, parsePostSlug } from "@/validators/posts";
 
@@ -21,6 +22,7 @@ export async function getEditorBlogList() {
     title: item.title,
     status: item.status,
     updatedAt: item.updated_at,
+    assetFolder: item.asset_folder || item.slug,
   }));
 }
 
@@ -60,9 +62,19 @@ export async function saveEditorBlogContent(slug: string, content: string) {
 }
 
 export async function createEditorDraft(slug: string) {
-  const supabase = await createClient();
+  // Use requireApprovedContext so:
+  // 1. The Supabase client carries the user JWT (satisfies RLS: auth.uid() = author_id)
+  // 2. We can read profile fields to populate author snapshot columns at creation time
+  const { supabase, user, profile } = await requireApprovedContext();
   const normalizedSlug = parsePostSlug(slug);
-  return createDraftPost(supabase, normalizedSlug);
+
+  return createDraftPost(supabase, normalizedSlug, {
+    authorId: user.id,
+    authorName: profile.display_name || profile.first_name || "Author",
+    authorSlug: profile.slug || normalizedSlug,
+    authorRole: profile.role || "author",
+    authorAvatarUrl: profile.avatar_url || null,
+  });
 }
 
 export async function deleteEditorStory(slug: string) {
