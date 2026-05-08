@@ -47,6 +47,7 @@ export type EditorPostSummary = {
   title: string;
   status: BlogStatus;
   updated_at: string;
+  asset_folder: string | null;
 };
 
 const PUBLISHED_POST_SELECT =
@@ -55,7 +56,7 @@ const PUBLISHED_POST_SELECT =
 export const OWNED_POST_SELECT =
   "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, image_url, tags, status, published_on, published_at, created_at, updated_at";
 
-const EDITOR_POST_SELECT = "slug, title, status, updated_at";
+const EDITOR_POST_SELECT = "slug, title, status, updated_at, asset_folder";
 
 export async function listPublishedPosts(
   supabase: SupabaseClient,
@@ -197,23 +198,37 @@ export async function updatePostContent(
 export async function createDraftPost(
   supabase: SupabaseClient,
   slug: string,
+  options: {
+    authorId: string;
+    authorName: string;
+    authorSlug: string;
+    authorRole: string;
+    authorAvatarUrl: string | null;
+  },
 ) {
+  const assetFolder = slug;
   const { data, error } = await supabase
     .from("posts")
     .insert({
       slug,
       title: slug,
+      author_id: options.authorId,
+      author_name: options.authorName,
+      author_slug: options.authorSlug,
+      author_role: options.authorRole,
+      author_avatar_url: options.authorAvatarUrl,
+      asset_folder: assetFolder,
       status: "draft",
       content_mdx: `---\ntitle: ${slug}\n---\n\nStart writing...`,
     })
-    .select("slug")
+    .select("slug, asset_folder")
     .single();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return { slug: data.slug as string };
+  return { slug: data.slug as string, assetFolder: (data.asset_folder as string) || slug };
 }
 
 export async function renamePostSlug(

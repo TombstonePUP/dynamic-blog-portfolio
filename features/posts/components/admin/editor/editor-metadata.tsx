@@ -180,7 +180,6 @@ function StatusSelector({ value, onChange }: { value: BlogStatus; onChange: (v: 
   );
 }
 
-/* ─── Image Upload Zone ─── */
 function ImageUploadZone({
   label,
   imageUrl,
@@ -196,12 +195,15 @@ function ImageUploadZone({
 }) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [showSaveHint, setShowSaveHint] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
   const uploadFile = async (file: File) => {
     if (!activeSlug) {
-      alert("Please save the post first to upload images.");
+      // Show a non-blocking inline hint instead of an alert
+      setShowSaveHint(true);
+      setTimeout(() => setShowSaveHint(false), 4000);
       return;
     }
 
@@ -247,6 +249,14 @@ function ImageUploadZone({
   return (
     <div>
       <FieldLabel icon={ImageIcon} label={label} hint={fieldHint} />
+
+      {/* Save-first hint banner */}
+      {showSaveHint && (
+        <div className="mb-2 flex items-center gap-2 border border-amber-400/30 bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-700">
+          <span>⚠</span>
+          <span>Click <strong>Create &amp; Save Post</strong> in the toolbar first, then upload your image.</span>
+        </div>
+      )}
 
       {/* Image Preview or Upload Zone */}
       {imageUrl ? (
@@ -296,7 +306,9 @@ function ImageUploadZone({
           onClick={() => !isUploading && fileInputRef.current?.click()}
           className={`flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed cursor-pointer transition-all ${isDragOver
             ? "border-admin-primary bg-admin-primary/5"
-            : "border-admin-text/10 hover:border-admin-primary/30 hover:bg-admin-primary/3"
+            : activeSlug
+              ? "border-admin-text/10 hover:border-admin-primary/30 hover:bg-admin-primary/3"
+              : "border-amber-300/40 bg-amber-50/50 hover:border-amber-400/60"
             } ${isUploading ? "pointer-events-none opacity-60" : ""}`}
         >
           {isUploading ? (
@@ -304,7 +316,7 @@ function ImageUploadZone({
               <Loader2 size={20} className="animate-spin text-admin-primary" />
               <span className="text-[11px] font-bold text-admin-primary">Uploading…</span>
             </>
-          ) : (
+          ) : activeSlug ? (
             <>
               <div className="flex items-center justify-center size-10 bg-admin-primary/8 text-admin-primary/60">
                 <UploadCloud size={20} />
@@ -315,6 +327,20 @@ function ImageUploadZone({
                 </span>
                 <span className="text-[9px] text-admin-text/25 mt-0.5 block">
                   JPG, PNG, WebP · Max 5MB
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center justify-center size-10 bg-amber-100 text-amber-500">
+                <UploadCloud size={20} />
+              </div>
+              <div className="text-center">
+                <span className="text-[11px] font-bold text-amber-600/80 block">
+                  Save post first to enable upload
+                </span>
+                <span className="text-[9px] text-amber-500/50 mt-0.5 block">
+                  Click <strong>Create &amp; Save Post</strong> above
                 </span>
               </div>
             </>
@@ -390,18 +416,7 @@ export default function EditorMetadata({ metadata, onChange, activeSlug }: Edito
           </div>
         </div>
 
-        {/* Author */}
-        <div>
-          <FieldLabel icon={User} label="Author" />
-          <input
-            id="metadata-author"
-            type="text"
-            value={metadata.author}
-            onChange={(e) => update("author", e.target.value)}
-            placeholder="Author slug…"
-            className="w-full bg-admin-bg/60 border border-admin-text/8 px-3 py-2.5 text-[12px] font-medium text-admin-text placeholder:text-admin-text/25 focus:outline-none focus:ring-1 focus:ring-admin-primary/30 focus:border-admin-primary/30 transition-all"
-          />
-        </div>
+
 
         {/* Divider — Images */}
         <div className="border-t border-admin-text/5 pt-1" />
