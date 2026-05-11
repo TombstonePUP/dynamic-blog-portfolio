@@ -1,8 +1,7 @@
 import { LogoIcon } from "@/components/app-logo";
 import AuthForm from "@/features/auth/components/auth-form";
-import PostsCarousel from "@/features/auth/components/posts-carousel";
+import DashboardPreview from "@/features/auth/components/dashboard-preview";
 import { getAuthenticatedContext, isApprovedProfile } from "@/services/auth";
-import { getBlogs } from "@/services/posts";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -33,8 +32,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     redirect(isApprovedProfile(context.profile) ? "/dashboard" : "/pending");
   }
 
-  const featuredPosts = (await getBlogs()).slice(0, 5);
-
   return (
     <main className="grid min-h-screen grid-cols-1 lg:max-h-screen lg:grid-cols-[1.1fr_0.9fr] lg:overflow-hidden">
       <section className="relative hidden flex-col overflow-hidden bg-[#1f3d39] px-8 text-[#f7f2ea] sm:px-12 lg:flex lg:px-16">
@@ -61,13 +58,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         <div className="pointer-events-none relative z-20 mt-14 h-full shrink-0 overflow-hidden [mask-image:radial-gradient(white_30%,transparent_90%)] [perspective:4000px] [perspective-origin:center]">
           <div className="[-translate-y-10] [-translate-z-10] [transform:rotateX(10deg)_rotateY(20deg)_rotateZ(-10deg)] [transform-style:preserve-3d]">
-            {featuredPosts.length > 0 ? (
-              <PostsCarousel posts={featuredPosts} />
-            ) : (
-              <div className="flex aspect-[16/10] w-full items-center justify-center border border-white/10 bg-black/20 px-10 text-center text-white/65 shadow-2xl backdrop-blur-sm">
-                No published stories yet.
-              </div>
-            )}
+            <DashboardPreview />
           </div>
         </div>
 

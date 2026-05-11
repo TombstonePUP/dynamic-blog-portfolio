@@ -194,13 +194,8 @@ export default function HomePage({ blogs }: HomePageProps) {
   const sortedBlogs = [...blogs].sort(
     (left, right) => new Date(right.date).getTime() - new Date(left.date).getTime(),
   );
-  const latestPost =
-    sortedBlogs.find((post) => post.tags.includes("featured")) ??
-    sortedBlogs[0] ??
-    null;
-  const streamPosts = latestPost
-    ? sortedBlogs.filter((post) => post.id !== latestPost.id)
-    : [];
+  const latestPost = sortedBlogs[0] ?? null;
+  const streamPosts = sortedBlogs.slice(1);
   const head = streamPosts.slice(0, 3);
   const pool = streamPosts.slice(3);
 
