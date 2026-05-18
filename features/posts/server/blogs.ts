@@ -2,8 +2,17 @@ import {
   listPublicProfilesByIds,
   type PublicProfileRecord,
 } from "@/db/queries/profiles";
-import { listPublishedPosts, type PublishedPostRow } from "@/db/queries/posts";
+import {
+  listGuestPosts,
+  listPublishedPosts,
+  type PublishedPostRow,
+} from "@/db/queries/posts";
 import { createClient } from "@/db/supabase/server";
+import {
+  getAuthenticatedContext,
+  isAdminProfile,
+} from "@/features/auth/server/context";
+import { getGuestViewState } from "@/features/posts/server/guest-view-mode";
 import {
   resolvePostAssetUrl,
   rewritePostAssetUrls,
@@ -85,6 +94,8 @@ function mapSupabasePost(
           id: topic.id,
           name: topic.name,
           slug: topic.slug,
+          isFeatured: Boolean(topic.is_featured),
+          homepageOrder: topic.homepage_order ?? null,
         }
       : null,
     excerpt: row.excerpt || "",
@@ -95,9 +106,20 @@ function mapSupabasePost(
   };
 }
 
-async function getPublishedSupabaseBlogs(): Promise<Blog[]> {
+export function mapSupabasePostForGuest(
+  row: PublishedPostRow,
+  profile?: PublicProfileRecord | null,
+): Blog {
+  return mapSupabasePost(row, profile);
+}
+
+async function getSupabaseBlogs(options?: {
+  includeUnpublished?: boolean;
+}): Promise<Blog[]> {
   const supabase = await createClient();
-  const posts = await listPublishedPosts(supabase);
+  const posts = options?.includeUnpublished
+    ? await listGuestPosts(supabase, { includeUnpublished: true })
+    : await listPublishedPosts(supabase);
 
   const authorIds = [
     ...new Set(
@@ -120,10 +142,26 @@ async function getPublishedSupabaseBlogs(): Promise<Blog[]> {
 }
 
 export async function getBlogs(): Promise<Blog[]> {
-  const blogs = await getPublishedSupabaseBlogs();
+  const context = await getAuthenticatedContext();
+  const guestViewState = await getGuestViewState(context);
+  const blogs = await getSupabaseBlogs({
+    includeUnpublished:
+      isAdminProfile(context?.profile || null) &&
+      !guestViewState.isViewingAsGuest,
+  });
 
   return [...blogs].sort(
-    (left, right) => new Date(right.date).getTime() - new Date(left.date).getTime(),
+    (left, right) => {
+      const featuredDelta =
+        Number(right.tags.includes("featured")) -
+        Number(left.tags.includes("featured"));
+
+      if (featuredDelta !== 0) {
+        return featuredDelta;
+      }
+
+      return new Date(right.date).getTime() - new Date(left.date).getTime();
+    },
   );
 }
 

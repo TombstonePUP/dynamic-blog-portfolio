@@ -1,8 +1,11 @@
 import HomePage from "@/features/posts/components/guest/home-page";
-import { getBlogs } from "@/services/posts";
+import { getBlogs, getGuestAdminModeration } from "@/services/posts";
 
 export default async function LandingPage() {
-  const blogs = await getBlogs();
+  const [blogs, adminModeration] = await Promise.all([
+    getBlogs(),
+    getGuestAdminModeration(),
+  ]);
 
-  return <HomePage blogs={blogs} />;
+  return <HomePage blogs={blogs} adminModeration={adminModeration} />;
 }

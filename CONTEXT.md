@@ -77,6 +77,15 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 - **Dynamic Data Source**: Guest and admin content resolve through services backed by Supabase data and storage, with static marketing pages removed from the public flow.
 - **Gotchas**: Prefer `@/db/supabase/server` in Server Components and `@/db/supabase/client` in Client Components; `@/utils/supabase/*` now exists only as a compatibility shim layer.
 
+## Guest Admin Controls
+- Public guest routes may render admin-only moderation controls when `getAuthenticatedContext()` resolves an approved admin profile.
+- Approved admins can see draft and archived stories on public routes unless View as Guest is enabled; guests and guest-view admins only query published stories.
+- View as Guest is stored in the server-only `tsw_guest_view` cookie and resolved by `features/posts/server/guest-view-mode.ts`, so role and visibility decisions stay SSR-safe.
+- Public story controls support edit shortcuts, publish/unpublish, and featured pin toggles through Server Actions.
+- Homepage topic controls use `topics.is_featured` to manage the public featured-topic strip.
+- Comment moderation reads flow through `services/posts` and `db/queries/comments.ts`; comment mutations flow only through `app/actions/comment-actions.ts`.
+- Admin controls are role-conditionally rendered, but Server Actions must still call `requireAdminContext()` before hiding, approving, or deleting comments.
+
 ## Taxonomy System
 - **Topics** are the primary story category. They live in the `topics` table and are assigned to posts through `posts.topic_id`.
 - **Tags** remain a flexible `text[]` on `posts` for secondary labels and search/filter chips.
@@ -96,6 +105,8 @@ The project uses **Tailwind CSS 4** with a strict design system defined in `glob
 - **Assets**: Assets must be referenced via relative paths such as `./assets/image.jpg` in MDX.
 - **Admin Access**: Desktop-only restriction is enforced via layout; mobile users see a blocker.
 - **Mutations**: All database updates must go through Server Actions in `app/actions/`.
+- **Public Moderation**: Public UI may expose admin controls only from SSR-derived role checks and the server guest-view state; never trust a client prop without re-authorizing in the Server Action.
+- **Draft Visibility**: Draft and archived stories may appear on guest routes only for approved admins outside View as Guest mode. Guest access to unpublished slugs must still resolve to `notFound()`.
 - **MDX**: Use `ClientMDXRemote` for previewing to avoid hostname whitelist issues with `next/image`.
 - **Auth Security**: All sign-in attempts are tracked in `auth_security_events` and rate-limited via `login_attempts` table.
 

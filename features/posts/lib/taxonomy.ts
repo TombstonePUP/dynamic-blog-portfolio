@@ -2,6 +2,8 @@ export type TopicOption = {
   id: string;
   name: string;
   slug: string;
+  isFeatured?: boolean;
+  homepageOrder?: number | null;
 };
 
 export function normalizeTaxonomyName(value: unknown): string {

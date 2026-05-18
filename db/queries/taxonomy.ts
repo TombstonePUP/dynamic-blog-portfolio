@@ -4,9 +4,11 @@ export type TopicRecord = {
   id: string;
   name: string;
   slug: string;
+  is_featured?: boolean;
+  homepage_order?: number | null;
 };
 
-const TOPIC_SELECT = "id, name, slug";
+const TOPIC_SELECT = "id, name, slug, is_featured, homepage_order";
 
 export async function listPostTags(supabase: SupabaseClient): Promise<string[]> {
   const { data, error } = await supabase.from("posts").select("tags");
@@ -41,6 +43,8 @@ export async function listTopics(
   const { data, error } = await supabase
     .from("topics")
     .select(TOPIC_SELECT)
+    .order("is_featured", { ascending: false })
+    .order("homepage_order", { ascending: true, nullsFirst: false })
     .order("name", { ascending: true });
 
   if (error) {
@@ -86,4 +90,22 @@ export async function insertTopicIfMissing(
   }
 
   return record;
+}
+
+export async function updateTopicFeaturedBySlug(
+  supabase: SupabaseClient,
+  options: { slug: string; isFeatured: boolean },
+): Promise<TopicRecord> {
+  const { data, error } = await supabase
+    .from("topics")
+    .update({ is_featured: options.isFeatured })
+    .eq("slug", options.slug)
+    .select(TOPIC_SELECT)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as TopicRecord;
 }

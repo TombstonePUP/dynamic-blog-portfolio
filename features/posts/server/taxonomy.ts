@@ -65,7 +65,12 @@ export async function getTopicsIndex(): Promise<TopicsIndex> {
   const topicsByKey = new Map<string, TopicIndexItem>();
 
   for (const topic of topics) {
-    topicsByKey.set(taxonomyKey(topic.name), { ...topic, postCount: 0 });
+    topicsByKey.set(taxonomyKey(topic.name), {
+      ...topic,
+      isFeatured: Boolean(topic.is_featured),
+      homepageOrder: topic.homepage_order ?? null,
+      postCount: 0,
+    });
   }
 
   for (const post of posts) {
@@ -85,6 +90,7 @@ export async function getTopicsIndex(): Promise<TopicsIndex> {
 
   return {
     topics: [...topicsByKey.values()].sort((left, right) =>
+      Number(right.isFeatured) - Number(left.isFeatured) ||
       left.name.localeCompare(right.name),
     ),
     posts,

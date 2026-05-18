@@ -88,6 +88,8 @@ export interface Blog {
     id: string;
     name: string;
     slug: string;
+    isFeatured?: boolean;
+    homepageOrder?: number | null;
   } | null;
   excerpt: string;
   /** Article body as plain-text paragraphs (rendered as prose) */
@@ -97,6 +99,12 @@ export interface Blog {
   status?: BlogStatus;
   comments?: Comment[];
 }
+
+export type GuestAdminCapabilities = {
+  canManageStories: boolean;
+  canModerateComments: boolean;
+  canManageTopics: boolean;
+};
 
 export type Comment = {
   id: string;

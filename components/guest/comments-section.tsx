@@ -1,54 +1,18 @@
 "use client";
 
-import { createClient } from "@/db/supabase/client";
-import { MessageCircle, Send } from "lucide-react";
-import { useEffect, useState } from "react";
-
-interface CommentRow {
-  id: string;
-  author: string;
-  body: string;
-  created_at: string;
-}
-
-interface CommentViewModel {
-  id: string;
-  name: string;
-  body: string;
-  date: string;
-}
+import { createCommentAction } from "@/app/actions/comment-actions";
+import AdminCommentModerationPanel from "@/features/posts/components/guest/admin-comment-moderation-panel";
+import type { CommentViewModel } from "@/services/posts";
+import { Loader2, MessageCircle, Send } from "lucide-react";
+import { useState, useTransition } from "react";
 
 interface CommentsSectionProps {
   postSlug: string;
   themeColor: string;
   enabled?: boolean;
-}
-
-const supabase = createClient();
-
-function formatCommentDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-function toCommentViewModel(comment: CommentRow): CommentViewModel {
-  return {
-    id: comment.id,
-    name: comment.author,
-    body: comment.body,
-    date: formatCommentDate(comment.created_at),
-  };
-}
-
-function getLoadErrorMessage(message: string) {
-  if (message.includes("public.comments")) {
-    return "Comments are not live yet. Finish the Supabase table setup first.";
-  }
-
-  return "Comments are unavailable right now.";
+  initialComments: CommentViewModel[];
+  canModerateComments: boolean;
+  loadError?: string;
 }
 
 function toDisplayInitial(name: string) {
@@ -60,60 +24,27 @@ export default function CommentsSection({
   postSlug,
   themeColor,
   enabled = true,
+  initialComments,
+  canModerateComments,
+  loadError,
 }: CommentsSectionProps) {
-  const [comments, setComments] = useState<CommentViewModel[]>([]);
+  const [comments, setComments] = useState(initialComments);
   const [name, setName] = useState("");
   const [body, setBody] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    loadError || null,
+  );
+  const [isPending, startTransition] = useTransition();
   const displayComments = enabled ? comments : [];
-  const displayLoading = enabled ? loading : false;
   const displayErrorMessage = enabled ? errorMessage : null;
   const resolvedThemeColor = themeColor || "#72dbcc";
+  const visibleCommentCount = canModerateComments
+    ? comments.length
+    : comments.filter((comment) => comment.status === "approved").length;
 
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    let active = true;
-
-    async function loadComments() {
-      setLoading(true);
-      setErrorMessage(null);
-
-      const { data, error } = await supabase
-        .from("comments")
-        .select("id, author, body, created_at")
-        .eq("post_slug", postSlug)
-        .order("created_at", { ascending: false });
-
-      if (!active) {
-        return;
-      }
-
-      if (error) {
-        setComments([]);
-        setErrorMessage(getLoadErrorMessage(error.message));
-      } else {
-        setComments((data ?? []).map(toCommentViewModel));
-      }
-
-      setLoading(false);
-    }
-
-    void loadComments();
-
-    return () => {
-      active = false;
-    };
-  }, [enabled, postSlug]);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
     const trimmedName = name.trim();
     const trimmedBody = body.trim();
@@ -122,31 +53,26 @@ export default function CommentsSection({
       return;
     }
 
-    setSubmitting(true);
     setErrorMessage(null);
 
-    const { data, error } = await supabase
-      .from("comments")
-      .insert({
-        post_slug: postSlug,
+    startTransition(async () => {
+      const result = await createCommentAction({
+        postSlug,
         author: trimmedName,
         body: trimmedBody,
-      })
-      .select("id, author, body, created_at")
-      .single();
+      });
 
-    if (error) {
-      setErrorMessage("Could not post your comment right now.");
-      setSubmitting(false);
-      return;
-    }
+      if (!result.success) {
+        setErrorMessage(result.error);
+        return;
+      }
 
-    setComments((prev) => [toCommentViewModel(data), ...prev]);
-    setName("");
-    setBody("");
-    setSubmitted(true);
-    setSubmitting(false);
-    setTimeout(() => setSubmitted(false), 3000);
+      setComments((current) => [result.comment, ...current]);
+      setName("");
+      setBody("");
+      setSubmitted(true);
+      window.setTimeout(() => setSubmitted(false), 3000);
+    });
   }
 
   return (
@@ -159,12 +85,17 @@ export default function CommentsSection({
         <h2 className="text-lg font-bold text-foreground">
           {!enabled
             ? "Comments unavailable"
-            : loading
-              ? "Loading comments..."
-              : comments.length === 0
-                ? "No comments yet"
-                : `${comments.length} ${comments.length === 1 ? "Comment" : "Comments"}`}
+            : visibleCommentCount === 0
+              ? "No comments yet"
+              : `${visibleCommentCount} ${
+                  visibleCommentCount === 1 ? "Comment" : "Comments"
+                }`}
         </h2>
+        {canModerateComments ? (
+          <span className="border border-admin-primary/15 bg-admin-primary/8 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-admin-primary">
+            Admin
+          </span>
+        ) : null}
       </div>
 
       {!enabled ? (
@@ -177,33 +108,56 @@ export default function CommentsSection({
           {displayComments.map((comment) => (
             <div
               key={comment.id}
-              className="bg-[#f3f2f0]/60 px-6 py-5"
+              className={`bg-[#f3f2f0]/60 px-6 py-5 ${
+                comment.status === "rejected" ? "opacity-70" : ""
+              }`}
               style={{ borderLeft: `4px solid ${themeColor}` }}
             >
               <div className="mb-3 flex items-center gap-3">
-              <div
-                className="flex size-8 items-center justify-center text-xs font-bold text-foreground/70"
-                style={{ backgroundColor: `${resolvedThemeColor}30` }}
-              >
+                <div
+                  className="flex size-8 items-center justify-center text-xs font-bold text-foreground/70"
+                  style={{ backgroundColor: `${resolvedThemeColor}30` }}
+                >
                   {toDisplayInitial(comment.name)}
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground">
-                    {comment.name}
-                  </p>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-bold text-foreground">
+                      {comment.name}
+                    </p>
+                    {canModerateComments ? (
+                      <span className="border border-admin-surface-hover bg-admin-surface px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em] text-admin-muted">
+                        {comment.status}
+                      </span>
+                    ) : null}
+                  </div>
                   <p className="text-xs text-foreground/50">{comment.date}</p>
                 </div>
               </div>
               <p className="text-sm leading-relaxed text-foreground/80">
                 {comment.body}
               </p>
+              {canModerateComments ? (
+                <AdminCommentModerationPanel
+                  comments={[comment]}
+                  variant="inline"
+                  onChange={(updated) =>
+                    setComments((current) =>
+                      current.map((item) =>
+                        item.id === updated.id ? updated : item,
+                      ),
+                    )
+                  }
+                  onDelete={(commentId) =>
+                    setComments((current) =>
+                      current.filter((item) => item.id !== commentId),
+                    )
+                  }
+                />
+              ) : null}
             </div>
           ))}
         </div>
-      ) : displayLoading ? (
-        <p className="text-sm text-foreground/50">
-          Loading the conversation...
-        </p>
       ) : (
         <p className="text-sm text-foreground/50">
           Be the first to share your thoughts on this story.
@@ -241,12 +195,16 @@ export default function CommentsSection({
             <div className="flex items-center justify-end gap-4">
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={isPending}
                 className="inline-flex cursor-pointer items-center gap-2 px-6 py-3 text-sm font-bold text-black transition hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-60"
                 style={{ backgroundColor: resolvedThemeColor }}
               >
-                <Send className="size-4" strokeWidth={2} />
-                {submitting ? "Posting..." : "Post comment"}
+                {isPending ? (
+                  <Loader2 className="size-4 animate-spin" strokeWidth={2} />
+                ) : (
+                  <Send className="size-4" strokeWidth={2} />
+                )}
+                {isPending ? "Posting..." : "Post comment"}
               </button>
               {submitted ? (
                 <p className="animate-pulse text-sm font-medium text-foreground/60">

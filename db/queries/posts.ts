@@ -66,18 +66,79 @@ const EDITOR_POST_SELECT = "slug, title, status, updated_at, asset_folder";
 export async function listPublishedPosts(
   supabase: SupabaseClient,
 ): Promise<PublishedPostRow[]> {
-  const { data, error } = await supabase
+  return listGuestPosts(supabase, { includeUnpublished: false });
+}
+
+export async function listGuestPosts(
+  supabase: SupabaseClient,
+  options: { includeUnpublished: boolean },
+): Promise<PublishedPostRow[]> {
+  let query = supabase
     .from("posts")
     .select(PUBLISHED_POST_SELECT)
-    .eq("status", "published")
     .order("published_on", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
+
+  if (!options.includeUnpublished) {
+    query = query.eq("status", "published");
+  }
+
+  const { data, error } = await query;
 
   if (error || !data) {
     return [];
   }
 
   return data as PublishedPostRow[];
+}
+
+export async function updatePostStatusBySlug(
+  supabase: SupabaseClient,
+  options: { slug: string; status: BlogStatus },
+): Promise<PublishedPostRow> {
+  const publishedOn =
+    options.status === "published" ? new Date().toISOString().slice(0, 10) : null;
+  const publishedAt =
+    options.status === "published" ? new Date().toISOString() : null;
+
+  const { data, error } = await supabase
+    .from("posts")
+    .update({
+      status: options.status,
+      published_on: publishedOn,
+      published_at: publishedAt,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("slug", options.slug)
+    .select(PUBLISHED_POST_SELECT)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as PublishedPostRow;
+}
+
+export async function updatePostTagsBySlug(
+  supabase: SupabaseClient,
+  options: { slug: string; tags: string[] },
+): Promise<PublishedPostRow> {
+  const { data, error } = await supabase
+    .from("posts")
+    .update({
+      tags: options.tags,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("slug", options.slug)
+    .select(PUBLISHED_POST_SELECT)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as PublishedPostRow;
 }
 
 export async function listManageablePosts(
