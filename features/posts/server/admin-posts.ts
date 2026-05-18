@@ -3,6 +3,7 @@ import {
   getManageablePostBySlug as getManageablePostBySlugQuery,
   type OwnedPostRecord,
 } from "@/db/queries/posts";
+import type { TopicRecord } from "@/db/queries/taxonomy";
 import { isAdminProfile, requireApprovedContext, type AuthContext } from "@/features/auth/server/context";
 import {
   resolvePostAssetUrl,
@@ -11,6 +12,12 @@ import {
 import { buildEditorDocument } from "@/features/posts/lib/post-documents";
 
 export type { OwnedPostRecord };
+
+function normalizeTopicRecord(
+  topic: TopicRecord | TopicRecord[] | null,
+): TopicRecord | null {
+  return Array.isArray(topic) ? (topic[0] || null) : topic;
+}
 
 export async function getManageablePosts(context: AuthContext) {
   return listManageablePosts(context.supabase, {
@@ -45,6 +52,7 @@ export function buildEditorContentFromPost(
   authorSlug = "author",
 ) {
   const assetFolder = post.asset_folder || post.slug;
+  const topic = normalizeTopicRecord(post.topics);
 
   return buildEditorDocument({
     title: post.title,
@@ -52,6 +60,7 @@ export function buildEditorContentFromPost(
     author: post.author_slug || authorSlug,
     image: resolvePostAssetUrl(assetFolder, post.image_url) || "",
     excerpt: post.excerpt || "",
+    topic: topic?.name || "",
     tags: post.tags || [],
     status: post.status,
     body: rewritePostAssetUrls(assetFolder, post.content_mdx),

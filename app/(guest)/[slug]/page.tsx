@@ -1,5 +1,10 @@
 import ArticlePage from "@/features/posts/components/guest/article-page";
-import { getBlogBySlug, getBlogs, getRelatedBlogs } from "@/services/posts";
+import {
+  getBlogBySlug,
+  getBlogs,
+  getCommentThread,
+  getRelatedBlogs,
+} from "@/services/posts";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -41,6 +46,22 @@ export default async function BlogArticlePage({ params }: PageProps) {
         new Date(right.date).getTime() - new Date(left.date).getTime(),
     );
   const more = [...related, ...fallbackPosts].slice(0, 3);
+  const commentThread = await getCommentThread(post.slug).catch((error) => ({
+    comments: [],
+    canModerateComments: false,
+    error:
+      error instanceof Error
+        ? error.message
+        : "Comments are unavailable right now.",
+  }));
 
-  return <ArticlePage post={post} more={more} />;
+  return (
+    <ArticlePage
+      post={post}
+      more={more}
+      comments={commentThread.comments}
+      canModerateComments={commentThread.canModerateComments}
+      commentsError={"error" in commentThread ? commentThread.error : undefined}
+    />
+  );
 }

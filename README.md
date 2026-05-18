@@ -15,6 +15,8 @@ The **Dynamic Blog Portfolio** (The Strengths Writer) is a professional CMS and 
 ## Features
 - **Integrated MDX Editor**: Dual-pane workspace with real-time preview and CodeMirror syntax highlighting.
 - **Unified Media Explorer**: Manage story content and image assets directly within the sidebar.
+- **Dynamic Taxonomy**: Autocomplete tags and dedicated topics are loaded from Supabase and saved with each story.
+- **Admin-Aware Guest Controls**: Approved admins can moderate comments from public pages without exposing controls to guests.
 - **Supabase Powered**: Dynamic story storage, authentication, and asset management via Supabase.
 - **Responsive Layouts**: Desktop-optimized admin dashboard and mobile-friendly reader site.
 - **Server Runtime Ready**: Structured for Node-compatible deployment targets such as Vercel.
@@ -60,6 +62,15 @@ The **Dynamic Blog Portfolio** (The Strengths Writer) is a professional CMS and 
 | `npm run supabase:seed-admin` | Seeds or repairs the primary admin account. |
 | `npm run supabase:import-posts` | Migrates legacy local MDX posts to Supabase. |
 
+## Taxonomy
+Stories use one dedicated topic for primary grouping and any number of tags for secondary labels. The editor loads existing tags and topics from Supabase, prevents duplicate entries by normalized name, and creates new topics through the story save flow.
+
+## Comment Moderation
+Public comment reads and submissions are routed through server-side services and Server Actions. Approved admins get role-based moderation controls on the guest homepage and public story pages, while hide/delete/approve actions are re-authorized on the server before mutating Supabase.
+
+## Guest Admin Controls
+Approved admins can manage public content without opening the dashboard: edit story shortcuts, publish/unpublish toggles, featured story pins, draft visibility, and featured-topic pins are available on guest pages. The floating View as Guest control keeps the admin signed in while suppressing admin controls, admin badges, moderation data, and unpublished content. Guests, non-admin users, and guest-view admins only receive published stories and never receive admin controls.
+
 ## Environment Variables
 | Variable | Purpose | Required |
 | :--- | :--- | :--- |
@@ -78,4 +89,4 @@ Please follow the standard branching strategy:
 ## License
 MIT (c) 2026 The Strengths Writer
 
-<!-- last updated: 2026-05-04 -->
+<!-- last updated: 2026-05-18 -->

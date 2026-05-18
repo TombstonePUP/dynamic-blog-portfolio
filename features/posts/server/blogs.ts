@@ -2,13 +2,23 @@ import {
   listPublicProfilesByIds,
   type PublicProfileRecord,
 } from "@/db/queries/profiles";
-import { listPublishedPosts, type PublishedPostRow } from "@/db/queries/posts";
+import {
+  listGuestPosts,
+  listPublishedPosts,
+  type PublishedPostRow,
+} from "@/db/queries/posts";
 import { createClient } from "@/db/supabase/server";
+import {
+  getAuthenticatedContext,
+  isAdminProfile,
+} from "@/features/auth/server/context";
+import { getGuestViewState } from "@/features/posts/server/guest-view-mode";
 import {
   resolvePostAssetUrl,
   rewritePostAssetUrls,
 } from "@/features/posts/lib/post-assets";
 import type { Author, Blog } from "@/features/posts/types";
+import type { TopicRecord } from "@/db/queries/taxonomy";
 
 function formatDateLabel(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
@@ -48,6 +58,12 @@ function sanitizeDisplayImageUrl(value: string | null | undefined) {
   return trimmed;
 }
 
+function normalizeTopicRecord(
+  topic: TopicRecord | TopicRecord[] | null,
+): TopicRecord | null {
+  return Array.isArray(topic) ? (topic[0] || null) : topic;
+}
+
 function mapSupabasePost(
   row: PublishedPostRow,
   profile?: PublicProfileRecord | null,
@@ -58,6 +74,7 @@ function mapSupabasePost(
   const imageUrl = sanitizeDisplayImageUrl(
     resolvePostAssetUrl(assetFolder, row.image_url),
   );
+  const topic = normalizeTopicRecord(row.topics);
 
   return {
     id: row.id,
@@ -72,6 +89,15 @@ function mapSupabasePost(
     date,
     dateLabel: formatDateLabel(date),
     tags: row.tags || [],
+    topic: topic
+      ? {
+          id: topic.id,
+          name: topic.name,
+          slug: topic.slug,
+          isFeatured: Boolean(topic.is_featured),
+          homepageOrder: topic.homepage_order ?? null,
+        }
+      : null,
     excerpt: row.excerpt || "",
     content: contentMdx.split(/\n\s*\n/).filter(Boolean),
     contentMdx,
@@ -80,9 +106,20 @@ function mapSupabasePost(
   };
 }
 
-async function getPublishedSupabaseBlogs(): Promise<Blog[]> {
+export function mapSupabasePostForGuest(
+  row: PublishedPostRow,
+  profile?: PublicProfileRecord | null,
+): Blog {
+  return mapSupabasePost(row, profile);
+}
+
+async function getSupabaseBlogs(options?: {
+  includeUnpublished?: boolean;
+}): Promise<Blog[]> {
   const supabase = await createClient();
-  const posts = await listPublishedPosts(supabase);
+  const posts = options?.includeUnpublished
+    ? await listGuestPosts(supabase, { includeUnpublished: true })
+    : await listPublishedPosts(supabase);
 
   const authorIds = [
     ...new Set(
@@ -105,10 +142,26 @@ async function getPublishedSupabaseBlogs(): Promise<Blog[]> {
 }
 
 export async function getBlogs(): Promise<Blog[]> {
-  const blogs = await getPublishedSupabaseBlogs();
+  const context = await getAuthenticatedContext();
+  const guestViewState = await getGuestViewState(context);
+  const blogs = await getSupabaseBlogs({
+    includeUnpublished:
+      isAdminProfile(context?.profile || null) &&
+      !guestViewState.isViewingAsGuest,
+  });
 
   return [...blogs].sort(
-    (left, right) => new Date(right.date).getTime() - new Date(left.date).getTime(),
+    (left, right) => {
+      const featuredDelta =
+        Number(right.tags.includes("featured")) -
+        Number(left.tags.includes("featured"));
+
+      if (featuredDelta !== 0) {
+        return featuredDelta;
+      }
+
+      return new Date(right.date).getTime() - new Date(left.date).getTime();
+    },
   );
 }
 

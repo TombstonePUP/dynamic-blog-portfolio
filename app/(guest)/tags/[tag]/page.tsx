@@ -1,4 +1,4 @@
-import { slugToTag } from "@/data/blog";
+import { tagToSlug } from "@/data/blog";
 import TagPage from "@/features/posts/components/guest/tag-page";
 import { getBlogs } from "@/services/posts";
 import { Metadata } from "next";
@@ -15,11 +15,20 @@ function capitalizeTopic(tag: string) {
     .join(" ");
 }
 
+async function resolveTag(slug: string) {
+  const blogs = await getBlogs();
+  const tag = Array.from(new Set(blogs.flatMap((blog) => blog.tags))).find(
+    (value) => tagToSlug(value) === slug,
+  );
+
+  return { tag, blogs };
+}
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { tag: slug } = await params;
-  const tag = slugToTag(slug);
+  const { tag } = await resolveTag(slug);
 
   if (!tag) {
     return { title: "Tag not found" };
@@ -33,13 +42,12 @@ export async function generateMetadata({
 
 export default async function TagRoute({ params }: PageProps) {
   const { tag: slug } = await params;
-  const tag = slugToTag(slug);
+  const { tag, blogs } = await resolveTag(slug);
 
   if (!tag) {
     notFound();
   }
 
-  const blogs = await getBlogs();
   const tagBlogs = blogs.filter((blog) => blog.tags.includes(tag));
 
   return <TagPage tag={tag} blogs={tagBlogs} />;

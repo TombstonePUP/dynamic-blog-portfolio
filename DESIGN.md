@@ -154,6 +154,39 @@
 </div>
 ```
 
+### Taxonomy Autocomplete
+**Anatomy:**
+```text
++-----------------------------------------+
+| Selected chips / selected topic          |
+| Search or create input              [+]  |
+| --------------------------------------- |
+| Suggestion                              |
+| Create "new value"                      |
++-----------------------------------------+
+```
+**Code Structure:**
+```html
+<div class="relative">
+  <input class="w-full bg-admin-bg/60 border border-admin-text/8 px-3 py-2.5 text-[13px] font-semibold
+                focus:ring-1 focus:ring-admin-primary/30" />
+  <div class="absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-y-auto
+              border border-admin-text/8 bg-admin-surface shadow-xl ring-1 ring-black/5">
+    <button class="flex w-full items-center justify-between px-3 py-2 text-[12px] font-semibold
+                   hover:bg-admin-primary/8">
+      Suggestion
+    </button>
+  </div>
+</div>
+```
+**States:**
+| State | Tailwind Classes / Behavior |
+| :--- | :--- |
+| **Loading** | `text-admin-text/45` with spinner. |
+| **Empty** | `text-admin-text/35` helper row. |
+| **Error** | `text-admin-danger` helper row. |
+| **Create** | `text-admin-primary hover:bg-admin-primary/8` action row. |
+
 ### CodeMirror Editor
 **Anatomy:**
 ```text
@@ -196,6 +229,103 @@
     <!-- Header, Body, Footer -->
   </div>
 </div>
+```
+
+### Admin Comment Moderation
+**Anatomy:**
+```text
++--------------------------------------------------+
+| Shield Comment Moderation                 Count   |
+| ------------------------------------------------ |
+| Author (Status)          Date / Story             |
+| Comment body                                      |
+| [Approve] [Hide] [Delete]                         |
++--------------------------------------------------+
+```
+**Code Structure:**
+```html
+<div class="border border-admin-surface-hover bg-admin-surface px-5 py-5 shadow-sm">
+  <button class="inline-flex items-center gap-1.5 border border-admin-success/20
+                 bg-admin-success/10 px-3 py-1.5 text-xs font-bold text-admin-success">
+    Approve
+  </button>
+  <button class="inline-flex items-center gap-1.5 border border-admin-danger/20
+                 bg-admin-danger/10 px-3 py-1.5 text-xs font-bold text-admin-danger">
+    Hide
+  </button>
+  <button class="inline-flex items-center gap-1.5 border border-admin-surface-hover
+                 bg-admin-surface px-3 py-1.5 text-xs font-bold text-admin-text">
+    Delete
+  </button>
+</div>
+```
+**States:**
+| State | Tailwind Classes / Behavior |
+| :--- | :--- |
+| **Loading** | `Loader2` with `animate-spin` beside the active item. |
+| **Error** | `border-admin-danger/20 bg-admin-danger/10 text-admin-danger`. |
+| **Empty** | Dashed `border-admin-surface-hover` with `text-admin-muted`. |
+| **Confirm Delete** | Uses the Modal / Overlay structure with danger action styling. |
+
+### Guest Admin Story Controls
+**Anatomy:**
+```text
+[Status] [Edit] [Publish/Unpublish] [Pin/Unpin] [State message]
+```
+**Code Structure:**
+```html
+<div class="flex flex-wrap items-center gap-2 border border-admin-surface-hover bg-admin-surface/95 p-2 shadow-lg">
+  <span class="border px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.14em]">draft</span>
+  <a class="inline-flex items-center gap-1.5 border border-admin-surface-hover bg-admin-surface px-2.5 py-1.5 text-xs font-bold">
+    Edit
+  </a>
+  <button class="inline-flex items-center gap-1.5 border border-admin-primary/20 bg-admin-primary/8 px-2.5 py-1.5 text-xs font-bold text-admin-primary">
+    Publish
+  </button>
+</div>
+```
+**States:**
+| State | Tailwind Classes / Behavior |
+| :--- | :--- |
+| **Published** | `border-admin-success/20 bg-admin-success/10 text-admin-success`. |
+| **Draft** | `border-admin-danger/20 bg-admin-danger/10 text-admin-danger`. |
+| **Archived** | `border-admin-muted/20 bg-admin-muted/10 text-admin-muted`. |
+| **Pending** | `Loader2 animate-spin` inside the active button. |
+
+### Admin Guest View Toggle
+**Anatomy:**
+```text
+[ (Eye/EyeOff Icon) View as Guest / Exit Guest View ] [State message]
+```
+**Code Structure:**
+```html
+<div class="fixed bottom-4 right-4 z-50 border border-admin-surface-hover bg-admin-surface p-2 shadow-2xl ring-1 ring-black/10">
+  <button class="inline-flex items-center justify-center gap-2 border border-admin-accent bg-admin-accent px-4 py-2 text-sm font-semibold text-admin-contrast hover:bg-admin-accent/90">
+    <svg class="size-4 shrink-0">...</svg>
+    <span>View as Guest</span>
+  </button>
+  <span class="text-xs font-semibold text-admin-muted">Guest view active</span>
+</div>
+```
+**Behavior:**
+- Render only for approved admins on guest/public pages.
+- Uses a Server Action to toggle the server-only guest-view cookie.
+- When active, public pages hide admin controls and badges and load only guest-visible published content.
+
+### Featured Topic Controls
+**Anatomy:**
+```text
++---------------------------------------------+
+| Featured Topics                    Message   |
+| [Pin Topic 3] [Unpin Topic 1] [Pin Topic 2]  |
++---------------------------------------------+
+```
+**Code Structure:**
+```html
+<button class="inline-flex items-center gap-2 border border-admin-primary/20 bg-admin-primary/8 px-3 py-2 text-xs font-bold text-admin-primary">
+  Topic
+  <span class="text-admin-muted">3</span>
+</button>
 ```
 
 ### Auth Form

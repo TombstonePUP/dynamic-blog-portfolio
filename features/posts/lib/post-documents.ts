@@ -1,5 +1,9 @@
 import matter from "gray-matter";
 import type { BlogStatus } from "@/features/posts/types";
+import {
+  dedupeTaxonomyValues,
+  normalizeTaxonomyName,
+} from "@/features/posts/lib/taxonomy";
 
 export type EditorPostDocument = {
   title: string;
@@ -7,6 +11,7 @@ export type EditorPostDocument = {
   author: string;
   image: string;
   excerpt: string;
+  topic: string;
   tags: string[];
   status: BlogStatus;
   body: string;
@@ -22,19 +27,24 @@ export function normalizeSlug(value: string) {
 
 export function normalizeTags(value: unknown): string[] {
   if (Array.isArray(value)) {
-    return value
-      .map((tag) => String(tag).trim())
-      .filter(Boolean);
+    return dedupeTaxonomyValues(value);
   }
 
   if (typeof value === "string") {
-    return value
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean);
+    return dedupeTaxonomyValues(value.split(","));
   }
 
   return [];
+}
+
+export function normalizeTopic(value: unknown, tags: string[] = []): string {
+  const topic = normalizeTaxonomyName(value);
+
+  if (topic) {
+    return topic;
+  }
+
+  return tags.find((tag) => tag.toLowerCase() !== "featured") || "";
 }
 
 export function normalizeStatus(value: unknown): BlogStatus {
@@ -67,13 +77,16 @@ export function parseEditorDocument(rawDocument: string): EditorPostDocument {
         ? data.thumbnail.trim()
         : "";
 
+  const tags = normalizeTags(data.tags);
+
   return {
     title: typeof data.title === "string" && data.title.trim() ? data.title.trim() : "Untitled story",
     date: toIsoDate(data.date),
     author: typeof data.author === "string" && data.author.trim() ? data.author.trim() : "author",
     image,
     excerpt: typeof data.excerpt === "string" ? data.excerpt.trim() : "",
-    tags: normalizeTags(data.tags),
+    topic: normalizeTopic(data.topic, tags),
+    tags,
     status: normalizeStatus(data.status),
     body: content.trim(),
   };
@@ -86,6 +99,7 @@ export function buildEditorDocument(document: EditorPostDocument) {
     author: document.author,
     image: document.image,
     excerpt: document.excerpt,
+    topic: document.topic,
     tags: document.tags,
     status: document.status,
   });

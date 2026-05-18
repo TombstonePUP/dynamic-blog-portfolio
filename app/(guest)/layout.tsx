@@ -2,7 +2,8 @@ import "@/app/globals.css";
 import GuestHeader from "@/components/guest/header";
 import LenisProvider from "@/components/lenis-provider";
 import ScrollToTop from "@/components/scroll-to-top";
-import { getBlogs } from "@/services/posts";
+import AdminGuestViewToggle from "@/features/posts/components/guest/admin-guest-view-toggle";
+import { getBlogs, getGuestViewState } from "@/services/posts";
 import { Metadata } from "next";
 import { Hanken_Grotesk } from "next/font/google";
 
@@ -22,7 +23,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const blogs = await getBlogs();
+  const [blogs, guestViewState] = await Promise.all([
+    getBlogs(),
+    getGuestViewState(),
+  ]);
 
   return (
     <html lang="en" className={`${hanken.variable} antialiased`}>
@@ -30,6 +34,11 @@ export default async function RootLayout({
         <LenisProvider />
         <GuestHeader blogs={blogs} />
         {children}
+        {guestViewState.isAdmin ? (
+          <AdminGuestViewToggle
+            isViewingAsGuest={guestViewState.isViewingAsGuest}
+          />
+        ) : null}
         <ScrollToTop />
       </body>
     </html>

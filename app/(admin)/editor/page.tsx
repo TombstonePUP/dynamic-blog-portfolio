@@ -24,6 +24,7 @@ date: "${new Date().toISOString().split('T')[0]}"
 author: "${profile?.slug || "writer"}"
 image: ""
 excerpt: ""
+topic: ""
 tags: []
 ---
 
@@ -35,6 +36,7 @@ tags: []
     title: post.title,
     status: post.status,
     updatedAt: post.updated_at,
+    assetFolder: post.asset_folder || post.slug,
   }));
   const initialBlogContents: Record<string, string> = selectedPost
     ? {

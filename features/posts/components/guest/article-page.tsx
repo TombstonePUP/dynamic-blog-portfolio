@@ -3,6 +3,9 @@ import CommentsSection from "@/components/guest/comments-section";
 import ScrollArrow from "@/components/guest/scroll-arrow";
 import SmoothScrollLink from "@/components/smooth-scroll-link";
 import { MAIN_CATEGORIES, readingMinutesFromContent, tagToSlug } from "@/data/blog";
+import AdminStoryControls, {
+  StoryStatusBadge,
+} from "@/features/posts/components/guest/admin-story-controls";
 import { CustomMDX } from "@/features/posts/components/mdx/mdx-remote";
 import { getThemeColor } from "@/features/posts/lib/tag-theme";
 import type { Blog } from "@/features/posts/types";
@@ -20,9 +23,17 @@ import type { CSSProperties } from "react";
 type ArticlePageProps = {
   post: Blog;
   more: Blog[];
+  comments: import("@/services/posts").CommentViewModel[];
+  canModerateComments: boolean;
+  commentsError?: string;
 };
 
-function seriesLabel(tags: string[]): string {
+function seriesLabel(post: Blog): string {
+  if (post.topic?.name) {
+    return capitalizeTopic(post.topic.name);
+  }
+
+  const tags = post.tags;
   const tag = tags.find((value) => value !== "featured");
   return tag ? capitalizeTopic(tag) : "Story";
 }
@@ -35,8 +46,8 @@ function capitalizeTopic(tag: string): string {
 }
 
 function RelatedCard({ post }: { post: Blog }) {
-  const label = seriesLabel(post.tags);
-  const color = getThemeColor(post.tags);
+  const label = seriesLabel(post);
+  const color = getThemeColor([post.topic?.name || "", ...post.tags]);
 
   return (
     <Link
@@ -82,8 +93,14 @@ function RelatedCard({ post }: { post: Blog }) {
   );
 }
 
-export default function ArticlePage({ post, more }: ArticlePageProps) {
-  const themeColor = getThemeColor(post.tags);
+export default function ArticlePage({
+  post,
+  more,
+  comments,
+  canModerateComments,
+  commentsError,
+}: ArticlePageProps) {
+  const themeColor = getThemeColor([post.topic?.name || "", ...post.tags]);
   const minutes = readingMinutesFromContent(post.contentMdx || post.content);
   const bodyParagraphs = post.content.filter(Boolean);
 
@@ -135,11 +152,21 @@ export default function ArticlePage({ post, more }: ArticlePageProps) {
                 className="mb-4 inline-flex items-center px-3 py-1 text-sm font-semibold text-black"
                 style={{ backgroundColor: themeColor }}
               >
-                {seriesLabel(post.tags)}
+                {seriesLabel(post)}
               </span>
+              {canModerateComments ? (
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <StoryStatusBadge status={post.status} />
+                </div>
+              ) : null}
               <h1 className="max-w-4xl text-3xl font-bold leading-[1.12] tracking-tight text-balance text-white sm:text-4xl md:text-[4rem] md:leading-[1.1]">
                 {post.title}
               </h1>
+              {canModerateComments ? (
+                <div className="mt-5">
+                  <AdminStoryControls post={post} compact />
+                </div>
+              ) : null}
 
               <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-white/80">
                 <div className="flex items-center gap-2">
@@ -238,6 +265,9 @@ export default function ArticlePage({ post, more }: ArticlePageProps) {
           postSlug={post.slug}
           themeColor={themeColor}
           enabled={post.source === "supabase"}
+          initialComments={comments}
+          canModerateComments={canModerateComments}
+          loadError={commentsError}
         />
 
         <div className="mt-16 flex flex-wrap items-center gap-2 border-t border-foreground/10 pt-8">

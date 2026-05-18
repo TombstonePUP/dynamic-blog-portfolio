@@ -1,5 +1,5 @@
 import TopicsPage from "@/features/posts/components/guest/topics-page";
-import { getBlogs } from "@/services/posts";
+import { getTopicsIndex } from "@/services/posts";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TopicsRoute() {
-  const blogs = await getBlogs();
+  const { topics, posts } = await getTopicsIndex();
 
-  return <TopicsPage blogs={blogs} />;
+  return <TopicsPage topics={topics} blogs={posts} />;
 }

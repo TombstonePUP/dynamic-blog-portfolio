@@ -1,13 +1,24 @@
 import type { Blog } from "@/features/posts/types";
+import AdminCommentModerationPanel from "@/features/posts/components/guest/admin-comment-moderation-panel";
+import AdminStoryControls, {
+  StoryStatusBadge,
+} from "@/features/posts/components/guest/admin-story-controls";
+import AdminTopicControls from "@/features/posts/components/guest/admin-topic-controls";
+import type { GuestAdminModeration } from "@/services/posts";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 type HomePageProps = {
   blogs: Blog[];
+  adminModeration: GuestAdminModeration;
 };
 
 function topicLabel(post: Blog): string {
+  if (post.topic?.name) {
+    return post.topic.name;
+  }
+
   const tag = post.tags.find((value) => value !== "featured");
   return tag ? tag : (post.tags[0] ?? "Story");
 }
@@ -40,22 +51,136 @@ function PlaceholderImage({
   );
 }
 
-function HeroCard({ post }: { post: Blog }) {
+function HeroCard({
+  post,
+  canManageStories,
+}: {
+  post: Blog;
+  canManageStories: boolean;
+}) {
   return (
-    <Link
-      href={post.href}
-      className="group relative flex h-fit w-full max-w-md flex-col self-center overflow-hidden bg-background shadow-[0_24px_48px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10 transition hover:ring-[#F0D8A1]/60 lg:max-w-md lg:self-stretch"
-    >
-      <div className="border-t-[6px] border-[#F0D8A1] px-8 pb-10 pt-8 sm:px-10">
-        <div className="relative aspect-[4/3] w-full overflow-hidden sm:h-52 sm:aspect-auto">
-          {post.image ? (
+    <article className="relative flex h-fit w-full max-w-md self-center lg:max-w-md lg:self-stretch">
+      <Link
+        href={post.href}
+        className="group flex w-full flex-col overflow-hidden bg-background shadow-[0_24px_48px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10 transition hover:ring-[#F0D8A1]/60"
+      >
+        <div className="border-t-[6px] border-[#F0D8A1] px-8 pb-10 pt-8 sm:px-10">
+          <div className="relative aspect-[4/3] w-full overflow-hidden sm:h-52 sm:aspect-auto">
+            {post.image ? (
+              <Image
+                fill
+                src={post.image}
+                alt={post.title}
+                className="object-cover transition duration-500 group-hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 28rem"
+                priority
+              />
+            ) : (
+              <PlaceholderImage
+                label={post.title}
+                className="absolute inset-0 flex items-center justify-center"
+              />
+            )}
+          </div>
+          <div className="mt-6 space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              {canManageStories ? <StoryStatusBadge status={post.status} /> : null}
+            </div>
+            <h2 className="text-xl font-bold leading-snug text-foreground sm:text-2xl">
+              {post.title}
+            </h2>
+            <p className="line-clamp-4 text-base leading-relaxed text-foreground/80">
+              {displayExcerpt(post)}
+            </p>
+          </div>
+        </div>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
+      </Link>
+      {canManageStories ? <AdminStoryControls post={post} /> : null}
+    </article>
+  );
+}
+
+function FeaturedCard({
+  post,
+  canManageStories,
+}: {
+  post: Blog;
+  canManageStories: boolean;
+}) {
+  const topic = topicLabel(post);
+
+  return (
+    <article className="relative">
+      <Link
+        href={post.href}
+        className="group flex flex-col gap-6 overflow-hidden bg-white p-8 shadow-sm ring-1 ring-black/[0.04] transition hover:ring-[#72dbcc]/50"
+      >
+        <div className="relative h-44 overflow-hidden">
+          {post.thumbnail ? (
             <Image
               fill
-              src={post.image}
+              src={post.thumbnail}
               alt={post.title}
-              className="object-cover transition duration-500 group-hover:scale-105"
-              sizes="(max-width: 1024px) 100vw, 28rem"
-              priority
+              className="object-cover transition duration-300 group-hover:scale-101"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          ) : (
+            <PlaceholderImage
+              label={post.title}
+              className="absolute inset-0 flex items-center justify-center"
+            />
+          )}
+          <span className="absolute left-2 top-2 bg-[#72dbcc]/80 px-2 py-1 text-xs font-semibold capitalize text-black">
+            {topic}
+          </span>
+        </div>
+        <div className="flex min-h-[6.5rem] flex-col justify-between gap-2">
+          <div className="flex flex-wrap gap-2">
+            {canManageStories ? <StoryStatusBadge status={post.status} /> : null}
+          </div>
+          <h3 className="text-lg font-black leading-snug text-foreground transition group-hover:text-black/80">
+            {post.title}
+          </h3>
+          <p className="line-clamp-3 text-sm leading-relaxed text-foreground/80">
+            {displayExcerpt(post)}
+          </p>
+        </div>
+      </Link>
+      {canManageStories ? <AdminStoryControls post={post} /> : null}
+    </article>
+  );
+}
+
+function RiverCard({
+  post,
+  variant,
+  canManageStories,
+}: {
+  post: Blog;
+  variant: "a" | "b";
+  canManageStories: boolean;
+}) {
+  const topic = topicLabel(post);
+  const border =
+    variant === "a"
+      ? "border-l-[5px] border-[#F0D8A1]"
+      : "border-l-[5px] border-[#72dbcc]";
+
+  return (
+    <article className="relative">
+      <Link
+        href={post.href}
+        className={`group flex flex-col overflow-hidden bg-white shadow-sm ring-1 ring-black/[0.04] transition hover:ring-foreground/15 sm:flex-row sm:items-stretch ${border}`}
+      >
+        <div className="relative h-48 w-full shrink-0 sm:h-auto sm:min-h-[220px] sm:w-[42%]">
+          {post.thumbnail ? (
+            <Image
+              fill
+              src={post.thumbnail}
+              alt={post.title}
+              className="object-cover transition duration-300 group-hover:scale-101"
+              sizes="(max-width: 640px) 100vw, 280px"
             />
           ) : (
             <PlaceholderImage
@@ -64,103 +189,27 @@ function HeroCard({ post }: { post: Blog }) {
             />
           )}
         </div>
-        <div className="mt-6 space-y-4">
-          <h2 className="text-xl font-bold leading-snug text-foreground sm:text-2xl">
+        <div className="flex flex-1 flex-col justify-center gap-3 p-6 sm:p-8">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="w-fit bg-[#f3f2f0] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground/70">
+              {topic}
+            </span>
+            {canManageStories ? <StoryStatusBadge status={post.status} /> : null}
+          </div>
+          <h3 className="text-lg font-black leading-snug text-foreground sm:text-xl">
             {post.title}
-          </h2>
-          <p className="line-clamp-4 text-base leading-relaxed text-foreground/80">
+          </h3>
+          <p className="line-clamp-2 text-sm leading-relaxed text-foreground/75 sm:line-clamp-3">
             {displayExcerpt(post)}
           </p>
+          <span className="inline-flex items-center gap-1 text-sm font-semibold text-foreground/60 transition group-hover:text-foreground">
+            Continue reading
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
         </div>
-      </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-    </Link>
-  );
-}
-
-function FeaturedCard({ post }: { post: Blog }) {
-  const topic = topicLabel(post);
-
-  return (
-    <Link
-      href={post.href}
-      className="group flex flex-col gap-6 overflow-hidden bg-white p-8 shadow-sm ring-1 ring-black/[0.04] transition hover:ring-[#72dbcc]/50"
-    >
-      <div className="relative h-44 overflow-hidden">
-        {post.thumbnail ? (
-          <Image
-            fill
-            src={post.thumbnail}
-            alt={post.title}
-            className="object-cover transition duration-300 group-hover:scale-101"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
-        ) : (
-          <PlaceholderImage
-            label={post.title}
-            className="absolute inset-0 flex items-center justify-center"
-          />
-        )}
-        <span className="absolute left-2 top-2 bg-[#72dbcc]/80 px-2 py-1 text-xs font-semibold capitalize text-black">
-          {topic}
-        </span>
-      </div>
-      <div className="flex min-h-[6.5rem] flex-col justify-between gap-2">
-        <h3 className="text-lg font-black leading-snug text-foreground transition group-hover:text-black/80">
-          {post.title}
-        </h3>
-        <p className="line-clamp-3 text-sm leading-relaxed text-foreground/80">
-          {displayExcerpt(post)}
-        </p>
-      </div>
-    </Link>
-  );
-}
-
-function RiverCard({ post, variant }: { post: Blog; variant: "a" | "b" }) {
-  const topic = topicLabel(post);
-  const border =
-    variant === "a"
-      ? "border-l-[5px] border-[#F0D8A1]"
-      : "border-l-[5px] border-[#72dbcc]";
-
-  return (
-    <Link
-      href={post.href}
-      className={`group flex flex-col overflow-hidden bg-white shadow-sm ring-1 ring-black/[0.04] transition hover:ring-foreground/15 sm:flex-row sm:items-stretch ${border}`}
-    >
-      <div className="relative h-48 w-full shrink-0 sm:h-auto sm:min-h-[220px] sm:w-[42%]">
-        {post.thumbnail ? (
-          <Image
-            fill
-            src={post.thumbnail}
-            alt={post.title}
-            className="object-cover transition duration-300 group-hover:scale-101"
-            sizes="(max-width: 640px) 100vw, 280px"
-          />
-        ) : (
-          <PlaceholderImage
-            label={post.title}
-            className="absolute inset-0 flex items-center justify-center"
-          />
-        )}
-      </div>
-      <div className="flex flex-1 flex-col justify-center gap-3 p-6 sm:p-8">
-        <span className="w-fit bg-[#f3f2f0] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground/70">
-          {topic}
-        </span>
-        <h3 className="text-lg font-black leading-snug text-foreground sm:text-xl">
-          {post.title}
-        </h3>
-        <p className="line-clamp-2 text-sm leading-relaxed text-foreground/75 sm:line-clamp-3">
-          {displayExcerpt(post)}
-        </p>
-        <span className="inline-flex items-center gap-1 text-sm font-semibold text-foreground/60 transition group-hover:text-foreground">
-          Continue reading
-          <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-        </span>
-      </div>
-    </Link>
+      </Link>
+      {canManageStories ? <AdminStoryControls post={post} /> : null}
+    </article>
   );
 }
 
@@ -190,14 +239,80 @@ function FeedInterstitial({
   );
 }
 
-export default function HomePage({ blogs }: HomePageProps) {
+function FeaturedTopicsStrip({
+  topics,
+}: {
+  topics: Array<NonNullable<Blog["topic"]> & { postCount: number }>;
+}) {
+  const featuredTopics = topics.filter((topic) => topic.isFeatured);
+
+  if (featuredTopics.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="px-4 py-8 sm:px-8">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 border-y border-foreground/10 py-5">
+        <span className="text-[11px] font-black uppercase tracking-[0.18em] text-foreground/45">
+          Featured topics
+        </span>
+        {featuredTopics.map((topic) => (
+          <Link
+            key={topic.slug}
+            href="/topics"
+            className="inline-flex items-center gap-2 bg-white px-3 py-2 text-xs font-bold text-foreground shadow-sm ring-1 ring-black/[0.04] transition hover:bg-black/5"
+          >
+            {topic.name}
+            <span className="text-foreground/35">{topic.postCount}</span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage({ blogs, adminModeration }: HomePageProps) {
+  const canManageStories = adminModeration.canManageStories;
+  const canManageTopics = adminModeration.canManageTopics;
   const sortedBlogs = [...blogs].sort(
-    (left, right) => new Date(right.date).getTime() - new Date(left.date).getTime(),
+    (left, right) => {
+      const featuredDelta =
+        Number(right.tags.includes("featured")) -
+        Number(left.tags.includes("featured"));
+
+      if (featuredDelta !== 0) {
+        return featuredDelta;
+      }
+
+      return new Date(right.date).getTime() - new Date(left.date).getTime();
+    },
   );
   const latestPost = sortedBlogs[0] ?? null;
   const streamPosts = sortedBlogs.slice(1);
   const head = streamPosts.slice(0, 3);
   const pool = streamPosts.slice(3);
+  const topicsBySlug = new Map<
+    string,
+    NonNullable<Blog["topic"]> & { postCount: number }
+  >();
+
+  for (const post of blogs) {
+    if (!post.topic) {
+      continue;
+    }
+
+    const existing = topicsBySlug.get(post.topic.slug);
+    topicsBySlug.set(post.topic.slug, {
+      ...post.topic,
+      postCount: (existing?.postCount || 0) + 1,
+    });
+  }
+
+  const topics = [...topicsBySlug.values()].sort(
+    (left, right) =>
+      Number(right.isFeatured) - Number(left.isFeatured) ||
+      left.name.localeCompare(right.name),
+  );
 
   return (
     <main className="relative min-h-screen font-sans">
@@ -253,7 +368,7 @@ export default function HomePage({ blogs }: HomePageProps) {
           </div>
 
           {latestPost ? (
-            <HeroCard post={latestPost} />
+            <HeroCard post={latestPost} canManageStories={canManageStories} />
           ) : (
             <div className="flex w-full max-w-md items-center justify-center border border-dashed border-foreground/15 bg-background px-8 py-16 text-center shadow-[0_24px_48px_-12px_rgba(0,0,0,0.15)]">
               <div>
@@ -268,6 +383,23 @@ export default function HomePage({ blogs }: HomePageProps) {
           )}
         </div>
       </section>
+
+      {adminModeration.canModerateComments ? (
+        <section className="px-4 sm:px-8">
+          <AdminCommentModerationPanel
+            comments={adminModeration.recentComments}
+            error={adminModeration.error}
+          />
+        </section>
+      ) : null}
+
+      {canManageTopics ? (
+        <section className="px-4 sm:px-8">
+          <AdminTopicControls topics={topics} />
+        </section>
+      ) : null}
+
+      <FeaturedTopicsStrip topics={topics} />
 
       <div className="relative font-sans">
         <section
@@ -285,7 +417,13 @@ export default function HomePage({ blogs }: HomePageProps) {
             </div>
             <div className="grid gap-6 px-4 pb-12 pt-0 sm:px-8 sm:pb-14 md:grid-cols-3 md:gap-6">
               {head.length > 0 ? (
-                head.map((post) => <FeaturedCard key={post.id} post={post} />)
+                head.map((post) => (
+                  <FeaturedCard
+                    key={post.id}
+                    post={post}
+                    canManageStories={canManageStories}
+                  />
+                ))
               ) : (
                 <div className="col-span-full px-6 pb-4 text-center text-sm text-foreground/55">
                   More featured stories will appear here after additional posts are
@@ -327,6 +465,7 @@ export default function HomePage({ blogs }: HomePageProps) {
                     key={`${post.slug}-${index}`}
                     post={post}
                     variant={index % 2 === 0 ? "a" : "b"}
+                    canManageStories={canManageStories}
                   />
                 ))}
               </div>

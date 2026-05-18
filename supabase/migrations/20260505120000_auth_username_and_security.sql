@@ -20,7 +20,7 @@ end;
 $$;
 
 create unique index if not exists profiles_username_lower_idx
-on public.profiles (lower(username))
+on public.profiles (lower(username)) 
 where username is not null;
 
 create table if not exists public.auth_login_attempts (

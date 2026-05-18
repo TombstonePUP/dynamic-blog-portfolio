@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { TopicRecord } from "@/db/queries/taxonomy";
 import type { BlogStatus } from "@/features/posts/types";
 
 export type PublishedPostRow = {
@@ -14,6 +15,8 @@ export type PublishedPostRow = {
   excerpt: string | null;
   content_mdx: string;
   image_url: string | null;
+  topic_id: string | null;
+  topics: TopicRecord | TopicRecord[] | null;
   status: BlogStatus;
   tags: string[] | null;
   published_on: string | null;
@@ -33,6 +36,8 @@ export type OwnedPostRecord = {
   excerpt: string | null;
   content_mdx: string;
   image_url: string | null;
+  topic_id: string | null;
+  topics: TopicRecord | TopicRecord[] | null;
   tags: string[] | null;
   status: BlogStatus;
   published_on: string | null;
@@ -51,28 +56,89 @@ export type EditorPostSummary = {
 };
 
 const PUBLISHED_POST_SELECT =
-  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, image_url, status, tags, published_on, created_at";
+  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, image_url, topic_id, topics:topic_id(id, name, slug), status, tags, published_on, created_at";
 
 export const OWNED_POST_SELECT =
-  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, image_url, tags, status, published_on, published_at, created_at, updated_at";
+  "id, author_id, author_name, author_slug, author_role, author_avatar_url, asset_folder, title, slug, excerpt, content_mdx, image_url, topic_id, topics:topic_id(id, name, slug), tags, status, published_on, published_at, created_at, updated_at";
 
 const EDITOR_POST_SELECT = "slug, title, status, updated_at, asset_folder";
 
 export async function listPublishedPosts(
   supabase: SupabaseClient,
 ): Promise<PublishedPostRow[]> {
-  const { data, error } = await supabase
+  return listGuestPosts(supabase, { includeUnpublished: false });
+}
+
+export async function listGuestPosts(
+  supabase: SupabaseClient,
+  options: { includeUnpublished: boolean },
+): Promise<PublishedPostRow[]> {
+  let query = supabase
     .from("posts")
     .select(PUBLISHED_POST_SELECT)
-    .eq("status", "published")
     .order("published_on", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
+
+  if (!options.includeUnpublished) {
+    query = query.eq("status", "published");
+  }
+
+  const { data, error } = await query;
 
   if (error || !data) {
     return [];
   }
 
   return data as PublishedPostRow[];
+}
+
+export async function updatePostStatusBySlug(
+  supabase: SupabaseClient,
+  options: { slug: string; status: BlogStatus },
+): Promise<PublishedPostRow> {
+  const publishedOn =
+    options.status === "published" ? new Date().toISOString().slice(0, 10) : null;
+  const publishedAt =
+    options.status === "published" ? new Date().toISOString() : null;
+
+  const { data, error } = await supabase
+    .from("posts")
+    .update({
+      status: options.status,
+      published_on: publishedOn,
+      published_at: publishedAt,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("slug", options.slug)
+    .select(PUBLISHED_POST_SELECT)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as PublishedPostRow;
+}
+
+export async function updatePostTagsBySlug(
+  supabase: SupabaseClient,
+  options: { slug: string; tags: string[] },
+): Promise<PublishedPostRow> {
+  const { data, error } = await supabase
+    .from("posts")
+    .update({
+      tags: options.tags,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("slug", options.slug)
+    .select(PUBLISHED_POST_SELECT)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as PublishedPostRow;
 }
 
 export async function listManageablePosts(
@@ -169,6 +235,7 @@ export async function updatePostContent(
     content: string;
     excerpt: string;
     imageUrl: string | null;
+    topicId: string | null;
     tags: string[];
     status: BlogStatus;
     publishedOn: string | null;
@@ -182,6 +249,7 @@ export async function updatePostContent(
       title: options.title,
       excerpt: options.excerpt,
       image_url: options.imageUrl,
+      topic_id: options.topicId,
       tags: options.tags,
       status: options.status,
       published_on: options.publishedOn,
@@ -219,7 +287,7 @@ export async function createDraftPost(
       author_avatar_url: options.authorAvatarUrl,
       asset_folder: assetFolder,
       status: "draft",
-      content_mdx: `---\ntitle: ${slug}\n---\n\nStart writing...`,
+      content_mdx: `---\ntitle: ${slug}\ntopic: ""\ntags: []\n---\n\nStart writing...`,
     })
     .select("slug, asset_folder")
     .single();

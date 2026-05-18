@@ -28,10 +28,10 @@ export default function ContactPage() {
             Get In Touch
           </span>
           <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Let's start a conversation.
+            Let&apos;s start a conversation.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-foreground/80">
-            Whether you have a question about positive psychology, want to collaborate, or just want to say hello, I'd love to hear from you.
+            Whether you have a question about positive psychology, want to collaborate, or just want to say hello, I&apos;d love to hear from you.
           </p>
         </div>
 

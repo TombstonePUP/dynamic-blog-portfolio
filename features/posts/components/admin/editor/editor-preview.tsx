@@ -15,7 +15,11 @@ function capitalizeTopic(tag: string): string {
     .join(" ");
 }
 
-function seriesLabel(tags: string[]): string {
+function seriesLabel(topic: string, tags: string[]): string {
+  if (topic.trim()) {
+    return capitalizeTopic(topic);
+  }
+
   const tag = tags.find((value) => value !== "featured");
   return tag ? capitalizeTopic(tag) : "Story";
 }
@@ -71,8 +75,8 @@ export default function EditorPreview({
   onClearPreviewAsset,
   onInsertAsset,
 }: EditorPreviewProps) {
-  const themeColor = getThemeColor(metadata.tags);
-  const label = seriesLabel(metadata.tags);
+  const themeColor = getThemeColor([metadata.topic, ...metadata.tags].filter(Boolean));
+  const label = seriesLabel(metadata.topic, metadata.tags);
   const authorName = formatAuthorName(metadata.author);
   const readingMinutes = readingMinutesFromContent(previewContent);
   const heroImage = metadata.image;

@@ -84,6 +84,13 @@ export interface Blog {
   /** Human-readable date e.g. "August 13, 2025" */
   dateLabel: string;
   tags: string[];
+  topic: {
+    id: string;
+    name: string;
+    slug: string;
+    isFeatured?: boolean;
+    homepageOrder?: number | null;
+  } | null;
   excerpt: string;
   /** Article body as plain-text paragraphs (rendered as prose) */
   content: string[];
@@ -92,6 +99,12 @@ export interface Blog {
   status?: BlogStatus;
   comments?: Comment[];
 }
+
+export type GuestAdminCapabilities = {
+  canManageStories: boolean;
+  canModerateComments: boolean;
+  canManageTopics: boolean;
+};
 
 export type Comment = {
   id: string;

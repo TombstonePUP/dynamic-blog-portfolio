@@ -20,6 +20,7 @@ export default function PostsCarousel({
   className,
 }: PostsCarouselProps) {
   const [index, setIndex] = useState(0);
+  const activeIndex = posts.length > 0 ? index % posts.length : 0;
 
   useEffect(() => {
     if (posts.length <= 1) {
@@ -32,12 +33,6 @@ export default function PostsCarousel({
 
     return () => clearInterval(timer);
   }, [posts.length]);
-
-  useEffect(() => {
-    if (index >= posts.length) {
-      setIndex(0);
-    }
-  }, [index, posts.length]);
 
   if (posts.length === 0) {
     return (
@@ -71,7 +66,7 @@ export default function PostsCarousel({
           <div
             key={post.id}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              itemIndex === index ? "opacity-100" : "opacity-0"
+              itemIndex === activeIndex ? "opacity-100" : "opacity-0"
             }`}
           >
             {post.thumbnail ? (
@@ -133,7 +128,7 @@ export default function PostsCarousel({
             type="button"
             onClick={() => setIndex(itemIndex)}
             className={`h-1 transition-all duration-300 ${
-              itemIndex === index
+              itemIndex === activeIndex
                 ? "w-6 bg-white"
                 : "w-2 bg-white/30 hover:bg-white/50"
             }`}
