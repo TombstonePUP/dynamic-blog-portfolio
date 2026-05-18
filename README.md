@@ -15,6 +15,7 @@ The **Dynamic Blog Portfolio** (The Strengths Writer) is a professional CMS and 
 ## Features
 - **Integrated MDX Editor**: Dual-pane workspace with real-time preview and CodeMirror syntax highlighting.
 - **Unified Media Explorer**: Manage story content and image assets directly within the sidebar.
+- **Dynamic Taxonomy**: Autocomplete tags and dedicated topics are loaded from Supabase and saved with each story.
 - **Supabase Powered**: Dynamic story storage, authentication, and asset management via Supabase.
 - **Responsive Layouts**: Desktop-optimized admin dashboard and mobile-friendly reader site.
 - **Server Runtime Ready**: Structured for Node-compatible deployment targets such as Vercel.
@@ -60,6 +61,9 @@ The **Dynamic Blog Portfolio** (The Strengths Writer) is a professional CMS and 
 | `npm run supabase:seed-admin` | Seeds or repairs the primary admin account. |
 | `npm run supabase:import-posts` | Migrates legacy local MDX posts to Supabase. |
 
+## Taxonomy
+Stories use one dedicated topic for primary grouping and any number of tags for secondary labels. The editor loads existing tags and topics from Supabase, prevents duplicate entries by normalized name, and creates new topics through the story save flow.
+
 ## Environment Variables
 | Variable | Purpose | Required |
 | :--- | :--- | :--- |
@@ -78,4 +82,4 @@ Please follow the standard branching strategy:
 ## License
 MIT (c) 2026 The Strengths Writer
 
-<!-- last updated: 2026-05-04 -->
+<!-- last updated: 2026-05-18 -->

@@ -9,6 +9,7 @@ import {
   rewritePostAssetUrls,
 } from "@/features/posts/lib/post-assets";
 import type { Author, Blog } from "@/features/posts/types";
+import type { TopicRecord } from "@/db/queries/taxonomy";
 
 function formatDateLabel(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
@@ -48,6 +49,12 @@ function sanitizeDisplayImageUrl(value: string | null | undefined) {
   return trimmed;
 }
 
+function normalizeTopicRecord(
+  topic: TopicRecord | TopicRecord[] | null,
+): TopicRecord | null {
+  return Array.isArray(topic) ? (topic[0] || null) : topic;
+}
+
 function mapSupabasePost(
   row: PublishedPostRow,
   profile?: PublicProfileRecord | null,
@@ -58,6 +65,7 @@ function mapSupabasePost(
   const imageUrl = sanitizeDisplayImageUrl(
     resolvePostAssetUrl(assetFolder, row.image_url),
   );
+  const topic = normalizeTopicRecord(row.topics);
 
   return {
     id: row.id,
@@ -72,6 +80,13 @@ function mapSupabasePost(
     date,
     dateLabel: formatDateLabel(date),
     tags: row.tags || [],
+    topic: topic
+      ? {
+          id: topic.id,
+          name: topic.name,
+          slug: topic.slug,
+        }
+      : null,
     excerpt: row.excerpt || "",
     content: contentMdx.split(/\n\s*\n/).filter(Boolean),
     contentMdx,

@@ -22,7 +22,12 @@ type ArticlePageProps = {
   more: Blog[];
 };
 
-function seriesLabel(tags: string[]): string {
+function seriesLabel(post: Blog): string {
+  if (post.topic?.name) {
+    return capitalizeTopic(post.topic.name);
+  }
+
+  const tags = post.tags;
   const tag = tags.find((value) => value !== "featured");
   return tag ? capitalizeTopic(tag) : "Story";
 }
@@ -35,8 +40,8 @@ function capitalizeTopic(tag: string): string {
 }
 
 function RelatedCard({ post }: { post: Blog }) {
-  const label = seriesLabel(post.tags);
-  const color = getThemeColor(post.tags);
+  const label = seriesLabel(post);
+  const color = getThemeColor([post.topic?.name || "", ...post.tags]);
 
   return (
     <Link
@@ -83,7 +88,7 @@ function RelatedCard({ post }: { post: Blog }) {
 }
 
 export default function ArticlePage({ post, more }: ArticlePageProps) {
-  const themeColor = getThemeColor(post.tags);
+  const themeColor = getThemeColor([post.topic?.name || "", ...post.tags]);
   const minutes = readingMinutesFromContent(post.contentMdx || post.content);
   const bodyParagraphs = post.content.filter(Boolean);
 
@@ -135,7 +140,7 @@ export default function ArticlePage({ post, more }: ArticlePageProps) {
                 className="mb-4 inline-flex items-center px-3 py-1 text-sm font-semibold text-black"
                 style={{ backgroundColor: themeColor }}
               >
-                {seriesLabel(post.tags)}
+                {seriesLabel(post)}
               </span>
               <h1 className="max-w-4xl text-3xl font-bold leading-[1.12] tracking-tight text-balance text-white sm:text-4xl md:text-[4rem] md:leading-[1.1]">
                 {post.title}

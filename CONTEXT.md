@@ -77,6 +77,12 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 - **Dynamic Data Source**: Guest and admin content resolve through services backed by Supabase data and storage, with static marketing pages removed from the public flow.
 - **Gotchas**: Prefer `@/db/supabase/server` in Server Components and `@/db/supabase/client` in Client Components; `@/utils/supabase/*` now exists only as a compatibility shim layer.
 
+## Taxonomy System
+- **Topics** are the primary story category. They live in the `topics` table and are assigned to posts through `posts.topic_id`.
+- **Tags** remain a flexible `text[]` on `posts` for secondary labels and search/filter chips.
+- Editor taxonomy suggestions are loaded through `app/actions/blog-actions.ts`, delegated to `services/posts`, and persisted through `db/queries/taxonomy.ts` plus `db/queries/posts.ts`.
+- New topics are created by the existing save Server Action path, which upserts the topic before assigning it to the post.
+
 ## Styling Approach
 The project uses **Tailwind CSS 4** with a strict design system defined in `globals.css`. We use CSS variables for theme tokens and avoid ad-hoc color values in JSX. Layouts use CSS Grid and Flexbox for responsiveness. Refer to **DESIGN.md** for the full specification of tokens and components.
 
@@ -85,6 +91,7 @@ The project uses **Tailwind CSS 4** with a strict design system defined in `glob
 - **Architecture**: Route files should stay thin and delegate business logic to `services/`, feature UI to `features/`, and persistence to `db/queries/`.
 - **Guest UI**: Public routes should use the feature-owned guest post components under `features/posts/components/guest` instead of standalone static marketing sections.
 - **Database Schema**: The MDX content is stored in the `content_mdx` column in the `posts` table (do not use `content`).
+- **Taxonomy**: Use dedicated topics for primary grouping and tags only for secondary labels. Do not recreate static topic lists in routes.
 - **Data Fetching**: Never import server-only modules into Client Components. Missing post images or empty Supabase result sets must render placeholders instead of crashing.
 - **Assets**: Assets must be referenced via relative paths such as `./assets/image.jpg` in MDX.
 - **Admin Access**: Desktop-only restriction is enforced via layout; mobile users see a blocker.

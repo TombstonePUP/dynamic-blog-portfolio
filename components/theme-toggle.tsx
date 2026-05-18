@@ -10,7 +10,9 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   // Prevent hydration mismatch
   useEffect(() => {
-    setMounted(true);
+    const frameId = window.requestAnimationFrame(() => setMounted(true));
+
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   if (!mounted) {

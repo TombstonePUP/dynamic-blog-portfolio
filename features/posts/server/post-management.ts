@@ -12,6 +12,7 @@ import { createClient } from "@/db/supabase/server";
 import { requireApprovedContext } from "@/features/auth/server/context";
 import { parseEditorDocument } from "@/features/posts/lib/post-documents";
 import { parsePostContent, parsePostSlug } from "@/validators/posts";
+import { ensureTopicForPost } from "./taxonomy";
 
 export async function getEditorBlogList() {
   const supabase = await createClient();
@@ -39,6 +40,7 @@ export async function saveEditorBlogContent(slug: string, content: string) {
   const normalizedSlug = parsePostSlug(slug);
   const nextContent = parsePostContent(content);
   const document = parseEditorDocument(nextContent);
+  const topic = await ensureTopicForPost(document.topic);
 
   await updatePostContent(supabase, {
     slug: normalizedSlug,
@@ -46,6 +48,7 @@ export async function saveEditorBlogContent(slug: string, content: string) {
     content: nextContent,
     excerpt: document.excerpt,
     imageUrl: document.image || null,
+    topicId: topic?.id || null,
     tags: document.tags,
     status: document.status,
     publishedOn: document.date || null,

@@ -3,6 +3,7 @@ export {
   normalizeSlug,
   normalizeStatus,
   normalizeTags,
+  normalizeTopic,
   parseEditorDocument,
   toIsoDate,
   type EditorPostDocument,

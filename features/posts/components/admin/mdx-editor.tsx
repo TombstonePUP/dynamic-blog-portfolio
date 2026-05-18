@@ -5,9 +5,11 @@ import {
   deleteStoryAction,
   getBlogContentAction,
   getBlogListAction,
+  getEditorTaxonomyAction,
   renameBlogSlugAction,
   saveBlogContentAction
 } from "@/app/actions/blog-actions";
+import type { EditorTaxonomyOptions } from "@/services/posts";
 import { compileMdxAction } from "@/app/actions/mdx-actions";
 import { buildEditorDocument, parseEditorDocument } from "@/features/posts/lib/post-documents";
 import { ChevronDown, ChevronRight, Eye, FileEdit, FolderOpen } from "lucide-react";
@@ -43,6 +45,7 @@ function extractMetadataAndBody(content: string): { metadata: PostMetadata; body
         author: doc.author,
         image: doc.image,
         excerpt: doc.excerpt,
+        topic: doc.topic,
         tags: doc.tags,
         status: doc.status,
       },
@@ -56,6 +59,7 @@ function extractMetadataAndBody(content: string): { metadata: PostMetadata; body
         author: "writer",
         image: "",
         excerpt: "",
+        topic: "",
         tags: [],
         status: "draft",
       },
@@ -111,6 +115,12 @@ export default function MdxEditor({
   // Structured metadata state — derived from content
   const [metadata, setMetadata] = useState<PostMetadata>(() => extractMetadataAndBody(defaultContent).metadata);
   const [bodyContent, setBodyContent] = useState<string>(() => extractMetadataAndBody(defaultContent).body);
+  const [taxonomy, setTaxonomy] = useState<EditorTaxonomyOptions>({
+    tags: [],
+    topics: [],
+  });
+  const [isTaxonomyLoading, setIsTaxonomyLoading] = useState(true);
+  const [taxonomyError, setTaxonomyError] = useState<string | null>(null);
 
   const editorRef = useRef<CodeMirrorInputRef>(null);
 
@@ -193,6 +203,34 @@ export default function MdxEditor({
 
   useEffect(() => {
     void refreshList();
+  }, []);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadTaxonomy() {
+      setIsTaxonomyLoading(true);
+      const result = await getEditorTaxonomyAction();
+
+      if (isCancelled) {
+        return;
+      }
+
+      if (result.success && result.taxonomy) {
+        setTaxonomy(result.taxonomy);
+        setTaxonomyError(null);
+      } else {
+        setTaxonomyError(result.error || "Failed to load taxonomy.");
+      }
+
+      setIsTaxonomyLoading(false);
+    }
+
+    void loadTaxonomy();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // Preview compilation
@@ -629,6 +667,11 @@ export default function MdxEditor({
                       metadata={metadata}
                       onChange={handleMetadataChange}
                       activeSlug={activeAssetFolder}
+                      taxonomy={taxonomy}
+                      taxonomyState={{
+                        isLoading: isTaxonomyLoading,
+                        error: taxonomyError,
+                      }}
                     />
                   </div>
                 )}

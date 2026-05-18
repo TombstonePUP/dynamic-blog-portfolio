@@ -154,6 +154,39 @@
 </div>
 ```
 
+### Taxonomy Autocomplete
+**Anatomy:**
+```text
++-----------------------------------------+
+| Selected chips / selected topic          |
+| Search or create input              [+]  |
+| --------------------------------------- |
+| Suggestion                              |
+| Create "new value"                      |
++-----------------------------------------+
+```
+**Code Structure:**
+```html
+<div class="relative">
+  <input class="w-full bg-admin-bg/60 border border-admin-text/8 px-3 py-2.5 text-[13px] font-semibold
+                focus:ring-1 focus:ring-admin-primary/30" />
+  <div class="absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-y-auto
+              border border-admin-text/8 bg-admin-surface shadow-xl ring-1 ring-black/5">
+    <button class="flex w-full items-center justify-between px-3 py-2 text-[12px] font-semibold
+                   hover:bg-admin-primary/8">
+      Suggestion
+    </button>
+  </div>
+</div>
+```
+**States:**
+| State | Tailwind Classes / Behavior |
+| :--- | :--- |
+| **Loading** | `text-admin-text/45` with spinner. |
+| **Empty** | `text-admin-text/35` helper row. |
+| **Error** | `text-admin-danger` helper row. |
+| **Create** | `text-admin-primary hover:bg-admin-primary/8` action row. |
+
 ### CodeMirror Editor
 **Anatomy:**
 ```text

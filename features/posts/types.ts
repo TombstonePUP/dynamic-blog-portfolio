@@ -84,6 +84,11 @@ export interface Blog {
   /** Human-readable date e.g. "August 13, 2025" */
   dateLabel: string;
   tags: string[];
+  topic: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
   excerpt: string;
   /** Article body as plain-text paragraphs (rendered as prose) */
   content: string[];

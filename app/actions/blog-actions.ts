@@ -7,6 +7,7 @@ import {
   getEditorBlogAssets,
   getEditorBlogContent,
   getEditorBlogList,
+  getEditorTaxonomyOptions,
   renameEditorStorySlug,
   saveEditorBlogContent,
 } from "@/services/posts";
@@ -104,6 +105,20 @@ export async function getBlogAssetsAction(slug: string) {
     return {
       success: false as const,
       error: error instanceof Error ? error.message : "Failed to load story assets.",
+    };
+  }
+}
+
+export async function getEditorTaxonomyAction() {
+  try {
+    return {
+      success: true as const,
+      taxonomy: await getEditorTaxonomyOptions(),
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: error instanceof Error ? error.message : "Failed to load taxonomy.",
     };
   }
 }

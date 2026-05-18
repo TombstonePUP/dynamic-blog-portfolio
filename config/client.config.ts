@@ -117,5 +117,17 @@ export const CLIENT_CONFIG = {
   ],
 } as const;
 
-export type ClientConfig = typeof CLIENT_CONFIG;
+type WidenConfig<T> = T extends string
+  ? string
+  : T extends number
+    ? number
+    : T extends boolean
+      ? boolean
+      : T extends readonly (infer Item)[]
+        ? WidenConfig<Item>[]
+        : T extends object
+          ? { -readonly [Key in keyof T]: WidenConfig<T[Key]> }
+          : T;
+
+export type ClientConfig = WidenConfig<typeof CLIENT_CONFIG>;
 export type ClientConfigKey = keyof typeof CLIENT_CONFIG;

@@ -11,6 +11,13 @@ export {
   getRelatedBlogs,
 } from "@/features/posts/server/blogs";
 export {
+  getEditorTaxonomyOptions,
+  getTopicsIndex,
+  type EditorTaxonomyOptions,
+  type TopicIndexItem,
+  type TopicsIndex,
+} from "@/features/posts/server/taxonomy";
+export {
   createEditorDraft,
   deleteEditorStory,
   getEditorBlogAssets,

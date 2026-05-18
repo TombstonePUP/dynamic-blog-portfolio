@@ -8,6 +8,10 @@ type HomePageProps = {
 };
 
 function topicLabel(post: Blog): string {
+  if (post.topic?.name) {
+    return post.topic.name;
+  }
+
   const tag = post.tags.find((value) => value !== "featured");
   return tag ? tag : (post.tags[0] ?? "Story");
 }

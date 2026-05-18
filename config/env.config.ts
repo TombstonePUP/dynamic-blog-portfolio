@@ -7,11 +7,15 @@
 
 import { CLIENT_CONFIG, type ClientConfig } from "./client.config";
 
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K] extends object ? Mutable<T[K]> : T[K];
+};
+
 /**
  * Get merged configuration with environment variable overrides
  */
 export function getClientConfig(): ClientConfig {
-  const config = JSON.parse(JSON.stringify(CLIENT_CONFIG)) as any;
+  const config = JSON.parse(JSON.stringify(CLIENT_CONFIG)) as Mutable<ClientConfig>;
 
   // Override site settings from environment
   if (process.env.NEXT_PUBLIC_SITE_NAME) {
