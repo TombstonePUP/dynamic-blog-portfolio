@@ -41,3 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# graphify (regenerable structural map; run `graphify .` to rebuild)
+/graphify-out/
+
+# design working artifacts (screenshots, mockups) and playwright-cli session data
+/design-refs/
+/.playwright-cli/

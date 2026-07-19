@@ -207,6 +207,7 @@ Card (`rounded-lg border border-admin-text/8 bg-admin-surface p-6`) with a "Late
 | **Create** | `text-admin-primary hover:bg-admin-primary/8` action row. |
 
 ### Editor Chrome (Ghost-style)
+- Opens as a single centered writing column (`max-w-[880px] mx-auto`): hero title input (`text-[32px] font-bold border-none bg-transparent`, bound to metadata title; the form panel's own Title field is hidden via `hideTitle`), then collapsed "Story details", then the content editor. Explorer, preview, and details all default closed and toggle from the top bar; in split mode the column goes full-width with a right hairline.
 - Top bar: `border-b border-admin-text/6 bg-admin-surface px-6 py-3` with a "‹ Stories" breadcrumb (14px/600) + slug/status text (14px muted) left; right side: quiet `rounded-md` icon toggles (explorer/preview panels), "Raw MDX" chip, and the solid accent save button.
 - Panel section labels ("Story details", "Story content", "Stories" explorer header) are `text-[13px] font-medium text-admin-muted` — no uppercase tracking.
 - Footer: `text-[13px] text-admin-muted` word/character counts left, save-state dot right.

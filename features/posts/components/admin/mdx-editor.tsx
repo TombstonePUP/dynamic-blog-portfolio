@@ -109,7 +109,7 @@ export default function MdxEditor({
 
   // Editor mode: "form" (structured inputs) or "raw" (full MDX)
   const [editorMode, setEditorMode] = useState<EditorMode>("form");
-  const [isMetadataExpanded, setIsMetadataExpanded] = useState(true);
+  const [isMetadataExpanded, setIsMetadataExpanded] = useState(false);
   const [isContentExpanded, setIsContentExpanded] = useState(true);
 
   // Structured metadata state — derived from content
@@ -127,8 +127,8 @@ export default function MdxEditor({
   const [isPending, startTransition] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
   const [isCompiling, setIsCompiling] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(true);
-  const [isSplit, setIsSplit] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [isSplit, setIsSplit] = useState(false);
   const [activeTab, setActiveTab] = useState<"explorer" | "editor" | "preview">("editor");
 
   const [sidebarWidth, setSidebarWidth] = useState(240);
@@ -573,7 +573,7 @@ export default function MdxEditor({
         </div>
       )}
 
-      <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/30">
+      <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/30 md:hidden">
         <div className="flex items-center justify-end px-4 py-2 md:px-6">
 
           <div className="flex rounded-full border border-admin-text/10 bg-admin-contrast/65 p-1 md:hidden">
@@ -639,10 +639,32 @@ export default function MdxEditor({
           className={`min-h-0 w-full shrink-0 md:h-full md:w-auto ${isSplit ? "md:flex-none" : "flex-1"} ${activeTab === "editor" ? "flex" : "hidden md:flex"}`}
           style={isSplit ? { flexBasis: editorWidth, width: editorWidth } : {}}
         >
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-r border-admin-text/5 bg-admin-surface/90">
+          <div
+            className={`flex min-h-0 flex-1 flex-col overflow-hidden bg-admin-surface/90 ${
+              isSplit ? "border-r border-admin-text/5" : ""
+            }`}
+          >
             {editorMode === "form" ? (
-              /* Structured Form Mode: Metadata panel (scrollable fixed height) + Body editor (flex-1) */
-              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              /* Structured Form Mode: hero title + collapsible details + body editor */
+              <div
+                className={`flex min-h-0 w-full flex-1 flex-col overflow-hidden ${
+                  isSplit ? "" : "mx-auto max-w-[880px]"
+                }`}
+              >
+                {/* Hero title — the story's title is the writing surface's headline */}
+                <div className="shrink-0 px-5 pb-2 pt-8">
+                  <input
+                    id="editor-hero-title"
+                    type="text"
+                    value={metadata.title}
+                    onChange={(e) =>
+                      handleMetadataChange({ ...metadata, title: e.target.value })
+                    }
+                    placeholder="Story title"
+                    className="w-full border-none bg-transparent text-[32px] font-bold tracking-tight text-admin-heading placeholder:text-admin-text/20 focus:outline-none"
+                  />
+                </div>
+
                 {/* Metadata Panel header */}
                 <button
                   onClick={() => setIsMetadataExpanded(!isMetadataExpanded)}
@@ -672,6 +694,7 @@ export default function MdxEditor({
                         isLoading: isTaxonomyLoading,
                         error: taxonomyError,
                       }}
+                      hideTitle
                     />
                   </div>
                 )}

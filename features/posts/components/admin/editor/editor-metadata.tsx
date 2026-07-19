@@ -48,6 +48,8 @@ interface EditorMetadataProps {
     isLoading: boolean;
     error: string | null;
   };
+  /** Hide the title field when the editor renders its own hero title input */
+  hideTitle?: boolean;
 }
 
 const STATUS_OPTIONS: { value: BlogStatus; label: string; icon: typeof Clock; color: string }[] = [
@@ -595,6 +597,7 @@ export default function EditorMetadata({
   activeSlug,
   taxonomy,
   taxonomyState,
+  hideTitle,
 }: EditorMetadataProps) {
   const update = <K extends keyof PostMetadata>(key: K, value: PostMetadata[K]) => {
     onChange({ ...metadata, ...{ [key]: value } });
@@ -605,17 +608,19 @@ export default function EditorMetadata({
 
       <div className="flex flex-col gap-5 p-5">
         {/* Title */}
-        <div>
-          <FieldLabel icon={Type} label="Title" />
-          <input
-            id="metadata-title"
-            type="text"
-            value={metadata.title}
-            onChange={(e) => update("title", e.target.value)}
-            placeholder="Enter your story title…"
-            className="w-full bg-admin-bg/60 border border-admin-text/8 px-3 py-2.5 text-[13px] font-semibold text-admin-heading placeholder:text-admin-text/25 focus:outline-none focus:ring-1 focus:ring-admin-primary/30 focus:border-admin-primary/30 transition-all"
-          />
-        </div>
+        {!hideTitle && (
+          <div>
+            <FieldLabel icon={Type} label="Title" />
+            <input
+              id="metadata-title"
+              type="text"
+              value={metadata.title}
+              onChange={(e) => update("title", e.target.value)}
+              placeholder="Enter your story title…"
+              className="w-full bg-admin-bg/60 border border-admin-text/8 px-3 py-2.5 text-[13px] font-semibold text-admin-heading placeholder:text-admin-text/25 focus:outline-none focus:ring-1 focus:ring-admin-primary/30 focus:border-admin-primary/30 transition-all"
+            />
+          </div>
+        )}
 
         {/* Topic */}
         <div>
