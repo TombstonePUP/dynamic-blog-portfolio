@@ -63,8 +63,8 @@ export default function EditorSidebar({
         className="responsive-sidebar-inner flex max-h-full flex-1 flex-col gap-6 overflow-y-auto p-4 md:p-5"
         style={{ width: `var(--sidebar-width, ${width}px)` }}
       >
-        <div className="flex items-center justify-between px-1 text-[10px] font-black uppercase tracking-[0.2em] text-admin-primary/60">
-          <span>Explorer</span>
+        <div className="flex items-center justify-between px-1 text-[13px] font-medium text-admin-muted">
+          <span>Stories</span>
           <button
             onClick={onNewDraft}
             disabled={!activeSlug}

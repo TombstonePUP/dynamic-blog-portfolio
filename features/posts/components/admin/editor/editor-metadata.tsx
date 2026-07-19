@@ -59,8 +59,8 @@ const STATUS_OPTIONS: { value: BlogStatus; label: string; icon: typeof Clock; co
 function FieldLabel({ icon: Icon, label, hint }: { icon: typeof Type; label: string; hint?: string }) {
   return (
     <div className="flex items-center justify-between mb-1.5">
-      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-admin-text/50 select-none">
-        <Icon size={12} strokeWidth={2.5} className="opacity-60" />
+      <label className="flex items-center gap-2 text-[13px] font-medium text-admin-muted select-none">
+        <Icon size={13} strokeWidth={2} className="opacity-70" />
         {label}
       </label>
       {hint && (

@@ -7,21 +7,21 @@ interface EditorFooterProps {
 
 export default function EditorFooter({ content, isDirty }: EditorFooterProps) {
   return (
-    <div className="px-6 py-3 border-t border-admin-text/5 flex items-center justify-between text-[10px] font-black text-admin-text/40 uppercase tracking-[0.15em] bg-admin-surface/50">
-      <div className="flex gap-6">
-        <span>Words: {content.split(/\s+/).filter(Boolean).length}</span>
-        <span>Chars: {content.length}</span>
+    <div className="flex items-center justify-between border-t border-admin-text/6 bg-admin-surface px-6 py-2.5 text-[13px] text-admin-muted">
+      <div className="flex gap-4">
+        <span>{content.split(/\s+/).filter(Boolean).length} words</span>
+        <span>{content.length} characters</span>
       </div>
       <div className="flex items-center gap-2">
         {isDirty ? (
-          <div className="flex items-center gap-2 text-admin-danger/70">
-            <div className="size-1.5 rounded-full bg-admin-danger/70 animate-pulse" />
-            Unsaved Changes
+          <div className="flex items-center gap-2">
+            <div className="size-1.5 animate-pulse rounded-full bg-admin-danger/70" />
+            Unsaved changes
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-admin-success">
+          <div className="flex items-center gap-2">
             <div className="size-1.5 rounded-full bg-admin-success" />
-            All Changes Saved
+            Saved
           </div>
         )}
       </div>

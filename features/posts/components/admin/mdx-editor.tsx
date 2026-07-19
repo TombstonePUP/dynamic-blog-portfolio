@@ -649,8 +649,8 @@ export default function MdxEditor({
                   className="shrink-0 flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur hover:bg-admin-surface-hover transition-colors text-left"
                 >
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
-                      Post Details (Metadata)
+                    <p className="text-[13px] font-medium text-admin-muted">
+                      Story details
                     </p>
                   </div>
                   {isMetadataExpanded ? (
@@ -682,8 +682,8 @@ export default function MdxEditor({
                     onClick={() => setIsContentExpanded(!isContentExpanded)}
                     className="sticky top-0 z-10 flex items-center justify-between border-b border-admin-text/5 bg-admin-surface/50 px-4 py-2 backdrop-blur hover:bg-admin-surface-hover transition-colors text-left"
                   >
-                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-admin-primary/60">
-                      Story content (MDX)
+                    <span className="text-[13px] font-medium text-admin-muted">
+                      Story content
                     </span>
                     {isContentExpanded ? (
                       <ChevronDown size={16} className="text-admin-text/40" />
@@ -705,7 +705,7 @@ export default function MdxEditor({
             ) : (
               <>
                 <div className="shrink-0 border-b border-admin-text/5 bg-admin-surface/50 px-4 py-3 backdrop-blur">
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-admin-primary/60">
+                  <p className="text-[13px] font-medium text-admin-muted">
                     Raw MDX
                   </p>
                   <p className="text-sm font-bold text-admin-heading tracking-tight">

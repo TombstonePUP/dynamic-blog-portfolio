@@ -58,7 +58,7 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 | Layout | File | Used By | Styling Approach |
 | :--- | :--- | :--- | :--- |
 | **Guest (Root)** | `app/(guest)/layout.tsx` | `/`, `/topics`, and story routes | Uses `Hanken Grotesk`; includes `GuestHeader` with dynamic search and no static footer. Acts as a root layout. |
-| **Admin (Root)** | `app/(admin)/layout.tsx` | `/dashboard`, `/editor`, `/posts`, `/users`, `/profile` | Uses `Inter`; includes `AdminHeader`; enforces approved desktop access. Acts as a root layout. |
+| **Admin (Root)** | `app/(admin)/layout.tsx` | `/dashboard`, `/editor`, `/posts`, `/users`, `/profile` | Uses `Inter`; fixed left `AdminSidebar` (300px, icon rail below `lg`) beside a white content pane. The sidebar hides itself on `/editor` for a full-screen writing surface. Acts as a root layout. |
 | **Auth (Root)** | `app/(auth)/layout.tsx` | `/login`, `/pending`, `/auth-error`, `/reset-password` | Lightweight auth shell for sign-in and approval flows. Acts as a root layout. |
 
 ## Routing Conventions
@@ -68,8 +68,9 @@ The **Dynamic Blog Portfolio** (branded as "The Strengths Writer") is a professi
 | `/topics` | Guest | Filterable list of story categories. |
 | `/login` | Auth | Access point for story authors. |
 | `/reset-password` | Auth | Secure password recovery flow. |
-| `/dashboard` | Admin | Overview of stories and draft status. |
-| `/editor` | Admin | Specialized workspace for MDX editing. |
+| `/dashboard` | Admin | Ghost-inspired overview: stat strip, latest story, draft list. |
+| `/editor` | Admin | Full-screen MDX workspace (admin sidebar hidden on this route). |
+| `/posts` | Admin | "Stories" list with status/sort filters via `?status=` and `?sort=` query params. |
 | `/[slug]` | Guest | Dynamic story rendering via MDX. |
 
 ## Render Mode
@@ -103,7 +104,7 @@ The project uses **Tailwind CSS 4** with a strict design system defined in `glob
 - **Taxonomy**: Use dedicated topics for primary grouping and tags only for secondary labels. Do not recreate static topic lists in routes.
 - **Data Fetching**: Never import server-only modules into Client Components. Missing post images or empty Supabase result sets must render placeholders instead of crashing.
 - **Assets**: Assets must be referenced via relative paths such as `./assets/image.jpg` in MDX.
-- **Admin Access**: Desktop-only restriction is enforced via layout; mobile users see a blocker.
+- **Admin Access**: Admin surfaces are desktop-first; below the `lg` breakpoint the sidebar collapses to an icon rail. (No hard mobile blocker is implemented in code — an earlier version of this doc claimed one existed.)
 - **Mutations**: All database updates must go through Server Actions in `app/actions/`.
 - **Public Moderation**: Public UI may expose admin controls only from SSR-derived role checks and the server guest-view state; never trust a client prop without re-authorizing in the Server Action.
 - **Draft Visibility**: Draft and archived stories may appear on guest routes only for approved admins outside View as Guest mode. Guest access to unpublished slugs must still resolve to `notFound()`.

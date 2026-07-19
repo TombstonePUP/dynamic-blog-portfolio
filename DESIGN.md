@@ -33,23 +33,32 @@
 
 ## Layout
 
-### Admin Layout Shell
+### Admin Layout Shell (Ghost-inspired)
 ```text
-+---------------------------------------------------------+
-| [AdminHeader]                                           |
-| Logo | / Editor | / Dashboard | Search | User Profile   |
-+---------------------------------------------------------+
-|                                                         |
-|  [Main Content Wrapper]                                 |
-|  .mx-auto .w-full .max-w-7xl .px-8 .py-10               |
-|                                                         |
-|  +-------------------------+   +---------------------+  |
-|  | [Sidebar]               |   | [Editor/Preview]    |  |
-|  | .w-60 .border-r         |   | .flex-1             |  |
-|  +-------------------------+   +---------------------+  |
-|                                                         |
-+---------------------------------------------------------+
++----------------+----------------------------------------+
+| [AdminSidebar] | [PageHeader]                           |
+| .w-[300px]     | Title (16px/600)      [Chips] [Primary]|
+| .bg-admin-bg   |----------------------------------------|
+|                | [Content: white .bg-admin-surface]     |
+| Brand row      | .mx-auto .max-w-[1120px] .px-6/.px-12  |
+| Nav (32px rows)|                                        |
+| · Overview     |  Cards: .rounded-lg .border            |
+| · View site    |         .border-admin-text/8           |
+| · Stories  [+] |  Lists: hairline-divided rows          |
+|   - Drafts     |                                        |
+|   - Published  |                                        |
+| · Users        |                                        |
+| · Profile      |                                        |
+|                |                                        |
+| ThemeToggle    |                                        |
+| User block     |                                        |
++----------------+----------------------------------------+
 ```
+- Sidebar is `sticky top-0 h-screen`, 300px at `lg`+, 64px icon rail below `lg`.
+- Sidebar hides entirely on `/editor` (client pathname check) for a full-screen editor.
+- Nav items: `h-8 rounded-md px-3 text-[13px] font-medium`; active = `bg-admin-surface-hover/70 text-admin-heading`.
+- Admin type scale: 13px controls/labels/nav, 14px body & list rows, 16px/600 page titles, 24px/700 stat numbers.
+- Radius scale: `rounded-md` buttons/chips/thumbnails, `rounded-lg` cards/panels. Hairlines use `border-admin-text/6..10` on white.
 
 ### Guest Layout Shell
 ```text
@@ -115,44 +124,54 @@
 </div>
 ```
 
-### StatCard (DashboardStats)
+### OverviewStats (dashboard stat strip)
 **Anatomy:**
 ```text
-+-----------------------------+
-| Label (Pill Variant)        |
-|                             |
-| Value                       |
-+-----------------------------+
++---------+---------+---------+---------+
+| Label   | Label   | Label   | Label   |
+| Value   | Value   | Value   | Value   |
++---------+---------+---------+---------+
 ```
 **Code Structure:**
 ```html
-<div class="border border-admin-surface-hover bg-admin-surface p-6">
-  <span class="inline-flex px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] bg-admin-accent/15">
-    Label
-  </span>
-  <p class="mt-4 text-3xl font-bold text-admin-accent">Value</p>
-</div>
-```
-
-### StoryCard
-**Anatomy:**
-```text
-+-----------------------------+
-| Title              (Status) |
-| Excerpt                     |
-| [Edit Button] [View Button] |
-+-----------------------------+
-```
-**Code Structure:**
-```html
-<div class="border border-admin-surface-hover bg-admin-surface p-6 flex flex-col gap-4">
-  <div class="flex items-start justify-between gap-4">
-    <h3 class="text-xl font-bold text-admin-heading">Title</h3>
-    <StatusPill status="published" />
+<div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-admin-text/6 rounded-lg border border-admin-text/8 bg-admin-surface">
+  <div class="px-6 py-5">
+    <p class="text-[13px] text-admin-muted">Label</p>
+    <p class="mt-1 text-2xl font-bold tracking-tight text-admin-heading">Value</p>
   </div>
-  <p class="text-sm text-admin-text">Excerpt...</p>
 </div>
 ```
+The "Published" value uses `text-admin-success`.
+
+### StoryRow (admin lists: dashboard drafts, /posts)
+**Anatomy:**
+```text
+[Thumb 100x64] Title (14px/600)                [View] [Edit]
+               By Author in Topic – 3 days ago
+               Status word (Published/Draft/Archived)
+```
+**Code Structure:**
+```html
+<div class="group flex items-center gap-5 border-b border-admin-text/6 py-4 last:border-b-0">
+  <StoryThumb class="h-16 w-[100px] rounded-md" />
+  <div class="min-w-0 flex-1">
+    <a class="block truncate text-sm font-semibold text-admin-heading">Title</a>
+    <p class="mt-0.5 truncate text-sm text-admin-muted">By Author in Topic – time</p>
+    <p class="mt-0.5 text-[13px] text-admin-success">Published</p>
+  </div>
+  <div class="opacity-0 group-hover:opacity-100"><!-- View / Edit outline buttons --></div>
+</div>
+```
+Status word colors: published `text-admin-success`, draft `text-admin-danger`, archived `text-admin-muted`.
+
+### StoryThumb
+Resolves the post image through `resolvePostAssetUrl`; non-absolute or missing URLs fall back to a `bg-admin-accent/8 rounded-md` tile with a `BookOpen` icon. Never crashes on null.
+
+### LatestStoryCard (dashboard)
+Card (`rounded-lg border border-admin-text/8 bg-admin-surface p-6`) with a "Latest story" label, 232x150 StoryThumb, title + byline + status, and a solid accent primary action ("Continue writing" / "Edit story") plus outline "View story" when published.
+
+### PageHeader (admin content pages)
+`flex justify-between px-6 lg:px-12 py-5`; `<h1 class="text-base font-semibold tracking-tight text-admin-heading">` left; right side holds 32px-tall actions: FilterChip links (`rounded-md border px-3 py-1.5 text-[13px]`; active = `border-admin-accent/30 bg-admin-accent/8 font-semibold`) and the solid accent primary button (`rounded-md bg-admin-accent px-4 py-1.5 text-[13px] font-semibold text-admin-contrast`).
 
 ### Taxonomy Autocomplete
 **Anatomy:**
@@ -186,6 +205,13 @@
 | **Empty** | `text-admin-text/35` helper row. |
 | **Error** | `text-admin-danger` helper row. |
 | **Create** | `text-admin-primary hover:bg-admin-primary/8` action row. |
+
+### Editor Chrome (Ghost-style)
+- Top bar: `border-b border-admin-text/6 bg-admin-surface px-6 py-3` with a "‹ Stories" breadcrumb (14px/600) + slug/status text (14px muted) left; right side: quiet `rounded-md` icon toggles (explorer/preview panels), "Raw MDX" chip, and the solid accent save button.
+- Panel section labels ("Story details", "Story content", "Stories" explorer header) are `text-[13px] font-medium text-admin-muted` — no uppercase tracking.
+- Footer: `text-[13px] text-admin-muted` word/character counts left, save-state dot right.
+
+**Removed components (Ghost redesign):** `AdminHeader` (`components/admin/header.tsx`), `DashboardStats`/StatCard, `StoryCard`, `ExplorerGrid` and their `components/admin/*` shims — replaced by `AdminSidebar`, `PageHeader`, `OverviewStats`, `StoryRow`, `StoryThumb`, `LatestStoryCard`.
 
 ### CodeMirror Editor
 **Anatomy:**

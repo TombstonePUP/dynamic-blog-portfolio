@@ -19,7 +19,9 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "600"],
 });
-import AdminHeader from "@/components/admin/header";
+import AdminSidebar from "@/components/admin/sidebar";
+import { CLIENT_CONFIG } from "@/config/client.config";
+import { Suspense } from "react";
 
 export default async function RootLayout({
   children,
@@ -38,17 +40,21 @@ export default async function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-screen flex-col bg-admin-bg font-sans text-admin-text selection:bg-admin-accent selection:text-admin-contrast">
+      <body className="flex min-h-screen bg-admin-bg font-sans text-admin-text selection:bg-admin-accent selection:text-admin-contrast">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        {/* Main Content */}
-        <div className="flex flex-col flex-1 w-full">
-          <AdminHeader
-            userName={userName}
-            userEmail={userEmail}
-            isAdmin={isAdmin}
-          />
-          {children}
-        </div>
+          <div className="flex min-h-screen w-full">
+            <Suspense fallback={null}>
+              <AdminSidebar
+                siteName={CLIENT_CONFIG.site.name}
+                userName={userName}
+                userEmail={userEmail}
+                isAdmin={isAdmin}
+              />
+            </Suspense>
+            <div className="flex min-w-0 flex-1 flex-col bg-admin-surface">
+              {children}
+            </div>
+          </div>
         </ThemeProvider>
       </body>
     </html>
